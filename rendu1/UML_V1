@@ -1,0 +1,135 @@
+@startuml
+
+'''ALT+D'''
+class Gare {
+  nom: string
+  adresse: string
+  ville: string 
+  zoneHoraire: TimeZone
+  key: {nom, ville}
+}
+
+
+
+class Train {
+  num: int {key}
+}
+
+
+class Type {
+  nom: string
+  nb_places: int
+  classe: Classe_train
+  vitesse: int
+}
+
+
+
+class Ligne {
+  num: int {key}
+}
+
+class Voyage {
+  id: int {key}
+  +heureDepart: string
+  +heureArrivee: string
+  +train: Train
+
+  ??
+}
+
+class Contient {
+  h_depart: time
+  h_arrive: time
+}
+
+class Calendrier {
+  date_debut: date
+  date_fin: date
+  horiaire: time
+  date_: ??
+  hebdomadaire: ?? 
+}
+
+class Voyageur {
+  nom: string {key}
+  prenom: string
+  adresse: string
+  telephone: string
+  paiement: Paiement
+  typeVoyageur: string
+  carteNumero: string
+  statut: string
+}
+
+class Occasionnel {
+
+}
+
+class Regulier {
+  carte: int
+  status: Statut
+}
+
+
+
+Voyageur <|-- Occasionnel
+Voyageur <|-- Regulier
+
+
+
+
+class Billet {
+  id: int {key}
+  assurance: boolean
+}
+
+class Trajet {
+  id: int {key}
+  gareDepart: Gare
+  heureDepart: string
+  gareArrivee: Gare
+  heureArrivee: string
+  duree: string
+  numeroTrain: int
+  numeroPlace: int
+
+}
+
+class Classe_train << enumeration >> {
+  pre_sec
+  sec
+}
+
+class Paiement << enumeration >> {
+  carte
+  chèque
+  monnaie
+}
+
+class Statut << enumeration >> {
+  bronze
+  silver
+  gold
+  platine
+}
+
+
+Gare "?" -- "?" Ligne
+Ligne "?" -- "?" Voyage
+Train "0..n" -- "1" Type : est_de_type >
+Billet "1..n" -- "1..n" Trajet : est_composé_de >
+Voyageur "1" -- "0..n" Billet : possède >
+Ligne "0..n" -- "1" Type : est_assuré_par >
+Voyage "0..n" -- "1" Calendrier : est_programmé_par >
+Trajet "?" -- "?" Voyage
+Train "1" -- "0..n" Voyage: possède <
+
+
+Ligne "0..*" - "1..*" Voyage
+(Ligne, Voyage) .. Contient
+
+
+
+
+@enduml

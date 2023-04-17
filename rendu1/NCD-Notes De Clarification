@@ -47,6 +47,7 @@ Régulier : Statut est une énumération, on suppose qu’il existe 4 statuts : 
 
 BILLET :
 Un voyageur possède 0 ou plusieurs billets, et un billet est possédé par un voyageur. En effet, une fois le billet commandé, il est réservé et appartient à quelqu’un.
+Méthode Modification : le billet est modifié si la personne a souscrit à une assurance.
 Association : 
 On suppose qu’un billet est réservé pour un ou plusieurs trajets 
 Et si un trajet ne contient aucun billet réservé, il est annulé. 

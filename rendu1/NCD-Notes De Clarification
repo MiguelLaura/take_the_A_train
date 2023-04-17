@@ -16,8 +16,9 @@ Une gare comprend  des arrêts de ligne ou non ( 0..N). En effet, on suppose qu�
 Le booléen arrive permet d’indiquer si l’arrêt est le dernier de la ligne
 
 
-/////////////// Association entre Trajet/arretVoyage/ArretLigne/Billet////////////////////////////
-
+VOYAGE :
+« Sur chaque ligne sont programmés un ou plusieurs voyages ». L’association se fait entre ligne et Voyage. Les voyages sont programmes en fonction d’un CALENDRIER La classe voyage n’a pas d’attribut propre.
+La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique », nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter a une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain a ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles ».
 
 CALENDRIER
 « Les voyages sont programmés de manière périodique selon un calendrier hebdomadaire ». On choisit d’ajouter la classe Calendrier,  le terme « hebdomadaire » est représenté  par des booléens représentant les jours de la semaine
@@ -37,6 +38,7 @@ Régulier : Statut est une énumération, on suppose qu’il existe 4 statuts : 
 
 BILLET :
 Un voyageur possède 0 ou plusieurs billets, et un billet est possédé par un voyageur. En effet, une fois le billet commandé, il est réservé et appartient à quelqu’un.
-
-
-
+Association : 
+On suppose qu’un billet est réservé pour un ou plusieurs trajets 
+Et si un trajet ne contient aucun billet réservé, il est annulé. 
+Trajet <->Billet 0..N si par exemple un trajet n’a pas de billet -> il est annulé

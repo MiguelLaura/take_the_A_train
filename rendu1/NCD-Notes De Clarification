@@ -32,9 +32,9 @@ CALENDRIER
 Exemple : calendrier 1 :-> tous les jours sauf le dimanche 
 Pour représenter "les dates exceptions (jours fériés par exemple) où on supprime/ajoute des voyages", nous avons choisi d'utiliser une classe ‘DateException’, l’attribut date représente les dates d’exceptions et ajout est un booléen mis à 1 s’il y a ajout de voyage et  0 sinon.
 Exemple : le 1er mai le train Paris Compiègne de 10h30 est supprimé
-	     Le 1er Janvier, le train Paris-Compiègne est rajouté.
+	      Le 1er Janvier, le train Paris-Compiègne est rajouté.
 Association Calendrier/voyage :
-Un voyage possède un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages Les voyages sont programmés de manière périodique selon UN calendrier
+Un voyage possède un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages. Les voyages sont programmés de manière périodique selon UN calendrier
 
 
 VOYAGEUR
@@ -51,5 +51,4 @@ Un voyageur possède 0 ou plusieurs billets, et un billet est possédé par un v
 Association : 
 On suppose qu’un billet est réservé pour un ou plusieurs trajets 
 Et si un trajet ne contient aucun billet réservé, il est annulé. 
-Trajet <->Billet 0..N si par exemple un trajet n’a pas de billet -> il est annulé
 

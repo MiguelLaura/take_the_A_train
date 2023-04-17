@@ -6,7 +6,7 @@ class Gare {
   ville: string
   pays: string
   __
-  GMT: TimeZone
+  GMT(): TimeZone
 }
 
 class Gare
@@ -106,14 +106,15 @@ class Billet {
   assurance: boolean
   prix: float
   __
-  Annulation: boolean
+  Annulation(): boolean
+  Modification(assurance:bool)
 }
 
 class Trajet {
   num_place: int
   date: date
   __
-  Durée: time
+  Durée(): time
 }
 
 class Paiement << enumeration >> {

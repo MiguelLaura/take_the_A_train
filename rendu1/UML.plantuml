@@ -22,7 +22,7 @@ note right: key: {nom, adresse}
 
 class Taxi {
   num: int {key}
-  tel: int
+  telephone: string
 }
 
 class TransportPublic {
@@ -99,15 +99,12 @@ class Regulier {
   statut: Statut
 }
 
-class Regulier
-note left: key: {carte, statut}
-
 class Billet {
   assurance: boolean
   prix: float
   __
   Annulation(): boolean
-  Modification(assurance:bool)
+  Modification(assurance:boolean)
 }
 
 class Trajet {
@@ -156,6 +153,6 @@ Calendrier "1..n" -- "0..n" DateException: concerne <
 Billet "0..n" -- "1..n" Trajet: est_composé_de >
 Voyageur "1" -- "0..n" Billet: possède >
 
-note "Les attributs sont non nuls par défaut.\n\nL'héritage est exclusif.\n\nL'attribut date dans Trajet doit être une date présente\ndans le Calendrier du Voyage et non supprimée dans DateException,\nou bien une date ajoutée dans DateException du Voyage.\n\nIl faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est\négale à l'heure de départ du premier ArretVoyage.\n\nIl faut s'assurer que le nombre de places réservées ne dépasse pas\nnb_places du TypeTrain pour chaque Voyage." as N1
+note "Les attributs sont non nuls par défaut.\n\nL'héritage est exclusif.\n\nIl faut s'assurer que la ligne reliée à un voyage est la même que celle\nreliée à ArretVoyage à travers ArretLigne.\n\nUn Trajet est relié à deux arrêts d'un même voyage.\n\nL'attribut date dans Trajet doit être une date présente\ndans le Calendrier du Voyage et non supprimée dans DateException,\nou bien une date ajoutée dans DateException du Voyage.\n\nIl faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est\négale à l'heure de départ du premier ArretVoyage.\n\nIl faut s'assurer que le nombre de places réservées ne dépasse pas\nnb_places du TypeTrain pour chaque Voyage.\n\nIl faut s'assuer que le train qui assure un voyage est bien du type\ncorrespondant à la ligne sur laquelle le voyage est effectué." as N1
 
 @enduml

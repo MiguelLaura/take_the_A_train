@@ -3,9 +3,9 @@ I-	Choix des classes
 
 GARE 
 Adresse : c’est un string comportant un numéro de rue, rue , code postal
-Ville : on suppose que 2 villes n’ont pas 2 fois le même nom
+Ville : on suppose que deux villes n’ont pas deux fois le même nom
 Key -> (nom, ville) clé car on suppose que deux gares peuvent avoir le même nom cependant les noms des gars d’une même ville sont différents.
-GMT -> une méthode pour l’instant on choisit un domaine de type timezone SELECT CONVERT_TZ(date, @@session.time_zone, '-5:00') FROM GARE ( ressource sur internet que nous exploiteront par la suite)
+GMT -> une méthode pour l’instant on choisit un domaine de type timezone SELECT CONVERT_TZ(date, @@session.time_zone, '-5:00') FROM GARE ( ressource sur internet que nous exploiterons par la suite)
 
 TAXI/TRANSPORTPUBLIC/HOTEL
 Ces classes sont associées à Gare. Chacune de ces classes possède des attributs propre, d’où le choix de faire des classes différentes pour chacune.

@@ -10,7 +10,7 @@
 
 <b>GMT</b> est une méthode permettant d'obtenir la zone horaire.
 
-<b>(nom, ville)</b> est clé car on suppose que deux gares peuvent avoir le même nom cependant les noms des gares d’une même ville sont différents.
+<b>(nom, ville)</b> est clé car on suppose que deux gares peuvent avoir le même nom. Cependant, les noms des gares d’une même ville sont différents.
 
 # Taxi, TransportPublic, Hotel
 
@@ -58,7 +58,7 @@ Un arrêt est relié à un unique voyage. Un voyage est composé d'au moins 2 ar
 
 <b>Durée()</b> permet de calculer la durée du trajet.
 
-Un trajet est relié à 2 arrêts d'un même voyage. Des arrêts d'un voyage peuvent être reliés à plusieurs trajets.
+Un trajet est relié à 2 arrêts d'un même voyage. Les arrêts d'un voyage peuvent être reliés à plusieurs trajets.
 
 # ArretTrajet
 
@@ -70,9 +70,9 @@ Un trajet est relié à 2 arrêts d'un même voyage. Des arrêts d'un voyage peu
 
 <b>prix</b> : le prix du billet.
 
-<b> Annulation()</b> est une méthode permettant d'annuler un billet.
+<b>Annulation()</b> est une méthode permettant d'annuler un billet.
 
-<b>Modification(assurance:boolean)</b> est une méthode permettant de modfier le billet (une modification n'est possible que lorsqu'une assurance a été choisie).
+<b>Modification(assurance:boolean)</b> est une méthode permettant de modifier le billet (une modification n'est possible que lorsqu'une assurance a été choisie).
 
 Un billet est composé de un ou plusieurs trajets. Un trajet n'est pas forcément associé à un billet (un billet peut avoir été annulé) et peut être associé à plusieurs billets.
 
@@ -92,25 +92,25 @@ Un billet est composé de un ou plusieurs trajets. Un trajet n'est pas forcémen
 
 Un voyageur possède aucun ou plusieurs billets, et un billet est possédé par exactement un voyageur.
 
-Un voyageur est soit un voyageur occasionnel, soit un régulier : la classe viyageur ets donc abstraite. L’héritage est presque complet.
+Un voyageur est soit un voyageur occasionnel, soit un régulier : la classe voyageur est donc abstraite. L’héritage est presque complet.
 
 ## Régulier
 
 <b>carte</b> : numéro de carte du voyageur.
 
-<b>statut</b> :  le statut est une énumération, on suppose qu’il existe 4 statuts : bronze, silver, gold, platine.
+<b>statut</b> : le statut est une énumération. On suppose qu’il existe 4 statuts : bronze, silver, gold, platine.
 
 # Calendrier
 
-« Les voyages sont programmés de manière périodique selon un calendrier hebdomadaire ». On choisit d’ajouter la classe Calendrier,  le terme « hebdomadaire » est représenté  par des booléens représentant les jours de la semaine (pour indiquer tous les jours sauf le dimanche, tous les attributs sont à True et dimanche est à False).
+« Les voyages sont programmés de manière périodique selon un calendrier hebdomadaire ». On choisit d’ajouter la classe Calendrier, le terme « hebdomadaire » est représenté par des booléens représentant les jours de la semaine (pour indiquer tous les jours sauf le dimanche, tous les attributs sont à True et dimanche est à False).
 
-<b>date_debut</b> : date de début de période du calendrier.
+<b>date_debut</b> : date de début de la période du calendrier.
 
-<b>date_fin</b> : date de fin de période du calendrier.
+<b>date_fin</b> : date de fin de la période du calendrier.
 
 <b>horaire</b> : horaire de départ associé à un voyage.
 
-Un calendrier sert pour 0 ou plusieurs voyages. Un voyage est associé à un calendrier (dans le cas où une nouvelle période pour le voyage est crée, on doit créer un nouveau voyage).
+Un calendrier sert pour 0 ou plusieurs voyages. Un voyage est associé à un calendrier (dans le cas où une nouvelle période pour le voyage est créée, on doit créer un nouveau voyage).
 
 # Exception
 
@@ -122,18 +122,18 @@ Exception sert pour représenter les dates exceptions (jours fériés par exempl
 
 # Train
 
-<b>num</b> : le numéro du train qui est unique et toujours renseigné (c'ets donc la clé).
+<b>num</b> : le numéro du train qui est unique et toujours renseigné (c'est donc la clé).
 
 Un voyage est effectué par un train. Un train peut effectuer plusieurs voyages.
 
 # TypeTrain
 
-<b>nom</b> : le nom d'un train est unique. C'ets donc la clé.
+<b>nom</b> : le nom d'un train est unique. C'est donc la clé.
 
 <b>nb_places</b> : le nombre de places maximum dans un train de ce type.
 
 <b>vitesse</b> : la vitesse moyenne du train.
 
-<b>premiere_classe</b> : un booléen. S'il ets à True, le train possède une première classe. Tous les trains possèdent une seconde classe.
+<b>premiere_classe</b> : un booléen. S'il est à True, le train possède une première classe. Tous les trains possèdent une seconde classe.
 
 Un train est d'exactement un type. Plusieurs trains peuvent être du même type. Une ligne est toujours assurée par le même type de train. Un type de train peut ne rouler sur aucune ligne, sur une seule ligne ou sur plusieurs lignes.

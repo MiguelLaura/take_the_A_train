@@ -8,28 +8,29 @@ Key -> (nom, ville) clé car on suppose que deux gares peuvent avoir le même no
 GMT -> une méthode pour l’instant on choisit un domaine de type timezone SELECT CONVERT_TZ(date, @@session.time_zone, '-5:00') FROM GARE ( ressource sur internet que nous exploiterons par la suite)
 
 TAXI/TRANSPORTPUBLIC/HOTEL
-Ces classes sont associées à Gare. Chacune de ces classes possède des attributs propre, d’où le choix de faire des classes différentes pour chacune.
-Association avec Gare : Une gare dispose de plusieurs hôtels/taxi/Transport ou  aucun à proximité, les taxi/transport dessert les gares.
+Ces classes sont associées à Gare. Chacune de ces classes possède des attributs propres, d’où le choix de faire des classes différentes pour chacune.
+Association avec Gare : Une gare dispose de plusieurs hôtels/taxis/Transports ou  aucun à proximité, les taxis/transports desservent les gares.
 
 
 ARRET LIGNE
-Une gare comprend  des arrêts de ligne ou non ( 0..N). En effet, on suppose qu’un train peut s’arrêter à une gare ou non. Une LIGNE se compose de 2 arrêts au minimum ( départ, arrivée)
+Une gare comprend  des arrêts de ligne ou non ( 0..N). En effet, on suppose qu’un train peut s’arrêter à une gare ou non. Une LIGNE se compose de deux arrêts au minimum ( départ, arrivée)
 Le booléen arrive permet d’indiquer si l’arrêt est le dernier de la ligne
 
 
 VOYAGE :
-« Sur chaque ligne sont programmés un ou plusieurs voyages ». L’association se fait entre ligne et Voyage. Les voyages sont programmes en fonction d’un CALENDRIER La classe voyage n’a pas d’attribut propre.
-La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique », nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter a une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain a ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles ».
+« Sur chaque ligne sont programmés un ou plusieurs voyages ». L’association se fait entre Ligne et Voyage. Les voyages sont programmés en fonction d’un CALENDRIER.
+La classe voyage n’a pas d’attribut propre.
+La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique », nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter à une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain à ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles ».
 Association VOYAGE/TRAIN :
 Un voyage est forcément assuré par un type de train  
-Un type de train peut assurer de 0 à n voyages dans la semaine. Par exemple aucun rer qui assure un voyage Paris/Compiègne 
+Un type de train peut assurer de 0 à n voyages dans la semaine. Par exemple, aucun rer assure un voyage Paris/Compiègne 
 Un train type vapeur assure 0 voyage, un rer assure plusieurs voyages
 
 
 CALENDRIER
 « Les voyages sont programmés de manière périodique selon un calendrier hebdomadaire ». On choisit d’ajouter la classe Calendrier,  le terme « hebdomadaire » est représenté  par des booléens représentant les jours de la semaine
 Exemple : calendrier 1 :-> tous les jours sauf le dimanche 
-Pour représenter les dates exceptions (jours fériés par exemple) où on supprime/ajoute des voyages. Cette notion est représentée par une classe ‘DateException’, l’attribut date représente les dates d’exceptions et ajout est un booléen mis à 1 s’il y a ajout de voyage et  0 sinon.
+Pour représenter "les dates exceptions (jours fériés par exemple) où on supprime/ajoute des voyages", nous avons choisi d'utiliser une classe ‘DateException’, l’attribut date représente les dates d’exceptions et ajout est un booléen mis à 1 s’il y a ajout de voyage et  0 sinon.
 Exemple : le 1er mai le train Paris Compiègne de 10h30 est supprimé
 	     Le 1er Janvier, le train Paris-Compiègne est rajouté.
 Association Calendrier/voyage :

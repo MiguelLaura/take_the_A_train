@@ -1,25 +1,22 @@
-            I- Choix des classes
+I-	Choix des classes
 
 GARE 
 Adresse : c’est un string comportant un numéro de rue, rue , code postal
 Ville : on suppose que 2 villes n’ont pas 2 fois le même nom
-Key -> (nom, ville) clé car on suppose que deux gares peuvent avoir le même nom cependant les noms des gars d’une même villes sont différents
+Key -> (nom, ville) clé car on suppose que deux gares peuvent avoir le même nom cependant les noms des gars d’une même ville sont différents.
 GMT -> une méthode pour l’instant on choisit un domaine de type timezone SELECT CONVERT_TZ(date, @@session.time_zone, '-5:00') FROM GARE ( ressource sur internet que nous exploiteront par la suite)
 
 TAXI/TRANSPORTPUBLIC/HOTEL
 Ces classes sont associées à Gare. Chacune de ces classes possède des attributs propre, d’où le choix de faire des classes différentes pour chacune.
 Association avec Gare : Une gare dispose de plusieurs hôtels/taxi/Transport ou  aucun à proximité, les taxi/transport dessert les gares.
-Relation hotel -> gare ? 
-Perso j’aurai inverse les czrdinalite 
-Gare a au 1 ou pleurs hotel a cote, un hotel se siture à cote ou non de la gare
 
 
 ARRET LIGNE
 Une gare comprend  des arrêts de ligne ou non ( 0..N). En effet, on suppose qu’un train peut s’arrêter à une gare ou non. Une LIGNE se compose de 2 arrêts au minimum ( départ, arrivée)
-Le booléen ARRIVE
+Le booléen arrive permet d’indiquer si l’arrêt est le dernier de la ligne
 
 
-Association entre Trajet/arretVoyage/ArretLigne/Billet
+/////////////// Association entre Trajet/arretVoyage/ArretLigne/Billet////////////////////////////
 
 
 CALENDRIER
@@ -38,31 +35,8 @@ L’attribut paiement est de type énumération, on considère qu’il existe 3 
 
 Régulier : Statut est une énumération, on suppose qu’il existe 4 statuts : bronze, silver, gold, platine.
 
-
-
-II-	Association
-
-
-BILLET
-Num -> numéro du billet on considère que l’identifiant du billet est unique 
-Trajet <->Billet 0..N si par exemple un trajet n’a pas de billet -> il est annulé
-
-Train<->type 
-Un train a forcememnt un type peut pas etre à la fois tgv et rer 
-Un type peut avoir de 0 à N train, expl train a vapeur plus utilisé 
-
-Voyage et type
-Un voyage est assure apr un type de train forcement 
-Un type peut assure de 0 à n voyages dans la semaine expl aucun rer qui assure un voyage 
-Train type vapeur assure 0 voyage 
-
-Calendrier/voyage 
-Un voyage possede un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages expl le calendrier des vacances scolaire
-Les voyages sont programmés de manière périodique selon un calendrier
-
-Trajet /billet 
-Un trajet a forcement 1 billet 
-Forcément un billet acheté le trajet est créé si pas de billet acheté pas de trajet crée.
+BILLET :
+Un voyageur possède 0 ou plusieurs billets, et un billet est possédé par un voyageur. En effet, une fois le billet commandé, il est réservé et appartient à quelqu’un.
 
 
 

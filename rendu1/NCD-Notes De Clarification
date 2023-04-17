@@ -13,17 +13,23 @@ Association avec Gare : Une gare dispose de plusieurs hôtels/taxis/transports o
 
 
 ARRET LIGNE
-Une gare comprend des arrêts de ligne ou non (0..N). En effet, on suppose qu’un train peut s’arrêter à une gare ou non. Une LIGNE se compose de 2 arrêts au minimum (départ, arrivée).
+Une gare comprend des arrêts de ligne ou non (0..N). En effet, on suppose qu’un train peut s’arrêter à une gare ou non. Une ligne se compose de 2 arrêts au minimum (départ, arrivée).
 Le booléen arrive permet d’indiquer si l’arrêt est le dernier de la ligne.
+Association ARRET LIGNE/ARRET VOYAGE  :
+Un arrêt de ligne peut être compris dans un voyage. Un voyage possède au moins deux arrêts de voyage (départ et arrivée) et peut avoir jusqu'à n arrêts de voyage. La classe ArretVoyage permet de faire l'intermédiaire entre les arrêts propres à une ligne et les arrêts qui constituent le voyage.
 
 
 VOYAGE :
 « Sur chaque ligne sont programmés un ou plusieurs voyages ». L’association se fait entre Ligne et Voyage. Les voyages sont programmés en fonction d’un CALENDRIER. La classe voyage n’a pas d’attribut propre.
-La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique » nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter à une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain a ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles ».
 Association VOYAGE/TRAIN :
-Un voyage est forcément assuré par un type de train  .
-Un type de train peut assurer de 0 à n voyages dans la semaine. Par exemple, aucun rer peut assurer un voyage Paris/Compiègne.
-Un train de type vapeur (qui n'est plus en service aujourd'hui) assure 0 voyage, un rer assure plusieurs voyages.
+Un voyage est forcément assuré par un train.
+Un train peut assurer de 0 à n voyages. Par exemple, un train de type vapeur (qui n'est plus en service aujourd'hui) assure 0 voyage, un rer assure plusieurs voyages.
+
+
+TYPETRAIN :
+La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique » nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter à une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain a ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles [...] ».
+Association TYPETRAIN/TRAIN :
+Un type de train peut être représenté par aucun train. En effet, des types de trains qui ont existé par le passé ne sont plus en service de nos jours.
 
 
 CALENDRIER
@@ -33,7 +39,7 @@ Pour représenter les dates exceptions (jours fériés par exemple) où on suppr
 Exemple : le 1er mai, le train Paris Compiègne de 10h30 est supprimé.
 	     Le 1er Janvier, le train Paris-Compiègne est ajouté.
 Association Calendrier/voyage :
-Un voyage possède un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages. Les voyages sont programmés de manière périodique selon UN calendrier.
+Un voyage possède un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages. Les voyages sont programmés de manière périodique selon 1 calendrier.
 
 
 VOYAGEUR
@@ -51,5 +57,9 @@ Méthode Modification : le billet est modifié si la personne a souscrit à une 
 Association : 
 On suppose qu’un billet est réservé pour un ou plusieurs trajets 
 Et si un trajet ne contient aucun billet réservé, il est annulé. 
-Trajet <->Billet 0..N si par exemple un trajet n’a pas de billet -> il est annulé.
+Trajet <->Billet 0..N, si par exemple un trajet n’a pas de billet -> il est annulé.
+
+
+TRAJET :
+Durée -> méthode qui calcule la durée d'un trajet à partir de l'heure de départ et de l'heure d'arrivée d'un voyage.
 

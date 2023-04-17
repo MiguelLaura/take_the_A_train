@@ -1,5 +1,6 @@
 I-	Choix des classes
 
+
 GARE 
 Adresse : c’est un string comportant un numéro de rue, rue , code postal
 Ville : on suppose que 2 villes n’ont pas 2 fois le même nom
@@ -19,6 +20,11 @@ Le booléen arrive permet d’indiquer si l’arrêt est le dernier de la ligne
 VOYAGE :
 « Sur chaque ligne sont programmés un ou plusieurs voyages ». L’association se fait entre ligne et Voyage. Les voyages sont programmes en fonction d’un CALENDRIER La classe voyage n’a pas d’attribut propre.
 La contrainte « Les voyages d'une même ligne sont assurés par un type de train spécifique », nous impose la création d’une classe TYPETRAIN. En effet, on ne peut pas se limiter a une simple énumération des types : « tgv, ter, rer etc. » car le typeTrain a ses propres attributs «  le nombre de places maximal dans le train, les classes disponibles ».
+Association VOYAGE/TRAIN :
+Un voyage est forcément assuré par un type de train  
+Un type de train peut assurer de 0 à n voyages dans la semaine. Par exemple aucun rer qui assure un voyage Paris/Compiègne 
+Un train type vapeur assure 0 voyage, un rer assure plusieurs voyages
+
 
 CALENDRIER
 « Les voyages sont programmés de manière périodique selon un calendrier hebdomadaire ». On choisit d’ajouter la classe Calendrier,  le terme « hebdomadaire » est représenté  par des booléens représentant les jours de la semaine
@@ -26,6 +32,9 @@ Exemple : calendrier 1 :-> tous les jours sauf le dimanche
 Pour représenter les dates exceptions (jours fériés par exemple) où on supprime/ajoute des voyages. Cette notion est représentée par une classe ‘DateException’, l’attribut date représente les dates d’exceptions et ajout est un booléen mis à 1 s’il y a ajout de voyage et  0 sinon.
 Exemple : le 1er mai le train Paris Compiègne de 10h30 est supprimé
 	     Le 1er Janvier, le train Paris-Compiègne est rajouté.
+Association Calendrier/voyage :
+Un voyage possède un type de calendrier -> un type de calendrier peut avoir de 0 à n voyages Les voyages sont programmés de manière périodique selon UN calendrier
+
 
 VOYAGEUR
 La classe voyageur est abstraite, elle ne sera pas instanciée, l’implémentation se fera dans les classe filles « Regulier » et « Occasionnel »
@@ -42,3 +51,4 @@ Association :
 On suppose qu’un billet est réservé pour un ou plusieurs trajets 
 Et si un trajet ne contient aucun billet réservé, il est annulé. 
 Trajet <->Billet 0..N si par exemple un trajet n’a pas de billet -> il est annulé
+

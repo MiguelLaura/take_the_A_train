@@ -1,1 +1,5 @@
-ArretLigne(id_arret)
+ArretLigne(#num_arret : int, arrive :bool, ligne => Ligne.num, nom_gare =>Gare.nom, ville_gare=>Gare.ville)  avec UNIQUE(num_arret, ligne, nom_gare, ville_gare)
+
+Ligne(#num:int, type_train=>TypeTrain) avec <Une ligne doit être  relier à au moins deux arrêts).
+
+Projection(Ligne,num)=Projection(ArretLigne, ligne =>2)

@@ -65,7 +65,7 @@ ArrêtTrajet (#trajet => Trajet.id_trajet, # num_arrêt_voyage => ArrêtVoyage.n
     AND (Un trajet possède exactement deux arrêts de voyage)
     >
 
-Voyageur (#nom : str, #prenom : str, #adresse : str, telephone : str, paiement : str, carte : int, statut ; str, occasionnel : bool) avec <
+Voyageur (#nom : str, #prenom : str, #adresse : str, telephone : str, paiement : str, carte : int, statut : str, occasionnel : bool) avec <
     (paiement = ‘carte’ OR paiement = ‘chèque’ OR paiement = ‘monnaie’)
     AND (statut = ‘bronze’ OR statut = ‘silver’ OR statut = ‘gold’ OR statut = ‘platine’)
     AND ((occasionnel = false AND carte NOT NULL AND statut NOT NULL) OR (occasionnel = true AND carte IS NULL AND statut IS NULL))

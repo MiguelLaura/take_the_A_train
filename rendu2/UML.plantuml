@@ -79,6 +79,7 @@ class DateException {
   date: date
   ajout: boolean
 }
+note right: key: {date, ajout}
 
 class Voyageur <<abstract>> {
   nom: string

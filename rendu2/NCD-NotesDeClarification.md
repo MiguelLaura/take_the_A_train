@@ -214,4 +214,12 @@ Une ligne est toujours assurée par le même type de train. Un type de train peu
 
 ## La société de chemin de fer
 
+La société de chemin de fer va gérer (c'est-à-dire supprimer, ajouter, modifier) les gares, trains, types de trains, lignes, arrêts de ligne, voyages, arrêts de voyage, calendriers et dates exceptions. Ils doivent aussi avoir accès aux voyageurs pour vérifier les statuts (régulier ou non, et si régulier quel carte ils ont), et les billets.
+
 ## Les clients
+
+Les clients peuvent créer un compte voyageur en tant que régulier. Ils peuvent réserver un billet associés à leurs informations d'identification, et à un ou des trajets. Les voyageurs doivent donc pouvoir regarder les voyages disponibles. Ils peuvent annuler un trajet, ou parfois le modifier (dans le cas des voyageurs réguliers). Au moment de la réservation, ils peuvent voir les hôtels, taxis et transports en commun aux alentours des gares d'arrivées des trajets du billet.
+
+## Les autres sociétés
+
+D'autres sociétés peuvent intéragir avec la base de données, en particulier les hôtels, taxis et transports publics, afin de proposer leurs services aux voyageurs au moment de la réservation du billet. Ils doivent pouvoir accéder aux gares pour renseigner à quelle(s) gare(s) sont associés les hôtels/taxis/transorts publics.

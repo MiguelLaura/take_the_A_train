@@ -82,8 +82,8 @@ id_voyage, id_billet, id_trajet et id_calendrier ont été créé pour pouvoir i
 
 On fait le choix d'un héritage par classe mère car la mère a des associations, et l'héritage est presque complet. Occasionnel est à True si le voyageur est occasionnel (les attributs statut et carte sont donc nuls), sinon occasionnal est à False et c'est un voyageur régulier (attributs carte et statut non nuls) car l'héritage est exclusif et la classe mère est abstraite.
 
-# L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
+L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
 
-# Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
+Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 
-# Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
+Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.

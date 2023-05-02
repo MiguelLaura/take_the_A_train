@@ -69,7 +69,6 @@ Voyageur (#nom : str, #prenom : str, #adresse : str, telephone : str, paiement :
     (paiement = ‘carte’ OR paiement = ‘chèque’ OR paiement = ‘monnaie’)
     AND (statut = ‘bronze’ OR statut = ‘silver’ OR statut = ‘gold’ OR statut = ‘platine’)
     AND ((occasionnel = false AND carte NOT NULL AND statut NOT NULL) OR (occasionnel = true AND carte IS NULL AND statut IS NULL))
-    AND (telephone) KEY
     >
 
 Billet (#id_billet : int, assurance : bool, prix : float, voyageur_nom => Voyageur.nom, voyageur_prenom => Voyageur.prenom, voyageur_adresse => Voyageur.adresse)

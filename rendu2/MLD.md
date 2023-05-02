@@ -10,13 +10,13 @@ DisposeHôtel (#nom_gare => Gare.nom, #ville_gare => Gare.ville, #nom_hôtel => 
 
 Taxi (#num : int, telephone : str)
 
-DisposeTaxi (#nom_gare => Gare.nom, # ville_gare => Gare.ville, #num_taxi => Taxi.num) avec <
+DisposeTaxi (#nom_gare => Gare.nom, #ville_gare => Gare.ville, #num_taxi => Taxi.num) avec <
     Projection(DisposeTaxi, num_taxi) = Projection(Taxi, num)
     >
 
 TransportPublic (#num : int)
 
-DisposeTransportPublic (#nom_gare => Gare.nom, # ville_gare => Gare.ville, #num_transport_public => TransportPublic.num) avec <
+DisposeTransportPublic (#nom_gare => Gare.nom, #ville_gare => Gare.ville, #num_transport_public => TransportPublic.num) avec <
     Projection(DisposeTransportPublic, num_transport_public) = Projection(TransportPublic, num)
     >
 
@@ -69,6 +69,7 @@ Voyageur (#nom : str, #prenom : str, #adresse : str, telephone : str, paiement :
     (paiement = ‘carte’ OR paiement = ‘chèque’ OR paiement = ‘monnaie’)
     AND (statut = ‘bronze’ OR statut = ‘silver’ OR statut = ‘gold’ OR statut = ‘platine’)
     AND ((occasionnel = false AND carte NOT NULL AND statut NOT NULL) OR (occasionnel = true AND carte IS NULL AND statut IS NULL))
+    AND (telephone) KEY
     >
 
 Billet (#id_billet : int, assurance : bool, prix : float, voyageur_nom => Voyageur.nom, voyageur_prenom => Voyageur.prenom, voyageur_adresse => Voyageur.adresse)
@@ -80,7 +81,7 @@ CompositionBillet (#billet => Billet.id_billet, #trajet => Trajet.id_trajet) ave
 
 id_voyage, id_billet, id_trajet et id_calendrier ont été créé pour pouvoir identifier chaque objet d’une classe (clés artificielles).
 
-On fait le choix d'un héritage par classe mère car la mère a des associations, et l'héritage est presque complet. Occasionnel est à True si le voyageur est occasionnel (les attributs statut et carte sont donc nuls), sinon occasionnal est à False et c'est un voyageur régulier (attributs carte et statut non nuls) car l'héritage est exclusif et la classe mère est abstraite.
+On fait le choix d'un héritage par classe mère car la classe mère a des associations, et l'héritage est presque complet. Occasionnel est à True si le voyageur est occasionnel (les attributs statut et carte sont donc nuls), sinon occasionnal est à False et c'est un voyageur régulier (attributs carte et statut non nuls) car l'héritage est exclusif et la classe mère est abstraite.
 
 L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
 

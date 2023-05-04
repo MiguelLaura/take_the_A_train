@@ -1,7 +1,8 @@
 -- A faire
--- vues (fichier séparé ?) pour les projections et pour les conditions 2 (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
+-- vues (fichier séparé ?) pour les projections, pour les conditions 2 et pour les contraintes en fin de document (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
 -- INSERT (fichier séparé ?)
 -- SELECT avec GROUP BY (fichier séparé ?)
+
 
 DROP TABLE IF EXISTS Gare;
 DROP TABLE IF EXISTS Hotel;
@@ -200,9 +201,11 @@ CREATE TABLE CompositionBillet (
     PRIMARY KEY (billet, trajet)
 );
 
+
 -- L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
 -- Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 -- Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
+
 
 CREATE VIEW v_DisposeHotel AS
 SELECT d.nom_hotel, d.adresse_hotel

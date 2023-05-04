@@ -1,3 +1,29 @@
+DROP TABLE IF EXISTS Gare;
+DROP TABLE IF EXISTS Hotel;
+DROP TABLE IF EXISTS DisposeHotel;
+DROP TABLE IF EXISTS Taxi;
+DROP TABLE IF EXISTS DisposeTaxi;
+DROP TABLE IF EXISTS TransportPublic;
+DROP TABLE IF EXISTS DisposeTransportPublic;
+DROP TABLE IF EXISTS TypeTrain;
+DROP TABLE IF EXISTS Train;
+DROP TABLE IF EXISTS Ligne;
+DROP TABLE IF EXISTS ArretLigne;
+DROP TABLE IF EXISTS Calendrier;
+DROP TABLE IF EXISTS DateException;
+DROP TABLE IF EXISTS ConcerneCalendrier;
+DROP TABLE IF EXISTS Voyage;
+DROP TABLE IF EXISTS ArretVoyage;
+DROP TABLE IF EXISTS Trajet;
+DROP TABLE IF EXISTS ArretTrajet;
+DROP TABLE IF EXISTS Voyageur;
+DROP TABLE IF EXISTS Billet;
+DROP TABLE IF EXISTS CompositionBillet;
+
+
+DROP VIEW IF EXISTS v_DisposeHotel;
+
+
 CREATE TABLE Gare (
     nom VARCHAR(20) NOT NULL,
     ville VARCHAR(20) NOT NULL,
@@ -21,6 +47,19 @@ CREATE TABLE DisposeHotel (
     FOREIGN KEY (nom_gare, ville_gare) REFERENCES Gare(nom, ville),
     FOREIGN KEY (nom_hotel, adresse_hotel) REFERENCES Hotel(nom, adresse)
 );
+
+CREATE VIEW v_DisposeHotel AS
+SELECT d.nom_hotel, d.adresse_hotel
+FROM  DisposeHotel d RIGHT OUTER JOIN Hotel h
+ON h.nom = d.nom_hotel
+AND h.adresse = d.adresse_hotel;
+
+SELECT COUNT(*)
+FROM (SELECT d.nom_hotel, d.adresse_hotel
+FROM DisposeHotel d RIGHT OUTER JOIN Hotel h
+ON h.nom = d.nom_hotel
+AND h.adresse = d.adresse_hotel) a
+GROUP BY (a.nom_hotel, a.adresse_hotel);
 
 
 CREATE TABLE Taxi (
@@ -73,11 +112,12 @@ CREATE TABLE Ligne (
     PRIMARY KEY (num),
     FOREIGN KEY (type_train) REFERENCES TypeTrain(nom),
 
-    '''check?? 
+    """check?? 
     une ligne doit relier au moins deux arrêts
     (Projection(Voyage, ligne) = Projection(Ligne, num)
-    '''
+    """
 );
+
 
 
 
@@ -177,11 +217,9 @@ CREATE TABLE Voyageur (
     occasionnel BOOLEAN NOT NULL,
     PRIMARY KEY (nom, prenom, adresse),
 
-    """CHECK
-    (paiement = ‘carte’ OR paiement = ‘chèque’ OR paiement = ‘monnaie’)
-    (statut = ‘bronze’ OR statut = ‘silver’ OR statut = ‘gold’ OR statut = ‘platine’)
-    (occasionnel = false AND carte NOT NULL AND statut NOT NULL) OR (occasionnel = true AND carte IS NULL AND statut IS NULL)
-    """ 
+    CHECK (paiement = 'carte' OR paiement = 'cheque' OR paiement = 'monnaie' AND statut = 'bronze' OR statut = 'silver' OR statut = 'gold' OR statut = 'platine'),
+    CHECK (occasionnel = FALSE AND carte NOT NULL AND statut NOT NULL OR occasionnel = true AND carte IS NULL AND statut IS NULL)
+     
 );
 
 CREATE TABLE Billet (
@@ -213,3 +251,6 @@ L'attribut date dans Trajet doit être une date présente dans le Calendrier du 
 Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
 """
+
+
+CREATE VIEW vDisposeHotel

@@ -1,3 +1,8 @@
+-- A faire
+-- vues (fichier séparé ?) pour les projections et pour les conditions 2 (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
+-- INSERT (fichier séparé ?)
+-- SELECT avec GROUP BY (fichier séparé ?)
+
 DROP TABLE IF EXISTS Gare;
 DROP TABLE IF EXISTS Hotel;
 DROP TABLE IF EXISTS DisposeHotel;
@@ -56,7 +61,7 @@ CREATE TABLE Taxi (
 CREATE TABLE DisposeTaxi (
     nom_gare VARCHAR(20),
     ville_gare VARCHAR(20),
-    num_taxi INT NOT NULL REFERENCES Taxi(num),
+    num_taxi INT REFERENCES Taxi(num),
     PRIMARY KEY (nom_gare, ville_gare, num_taxi),
     FOREIGN KEY (nom_gare, ville_gare) REFERENCES Gare(nom, ville)
 );
@@ -89,10 +94,6 @@ CREATE TABLE Train (
 CREATE TABLE Ligne (
     num INT PRIMARY KEY,
     type_train VARCHAR(20) NOT NULL REFERENCES TypeTrain(nom)
-
-    -- check?? 
-    -- une ligne doit relier au moins deux arrêts
-    -- (Projection(Voyage, ligne) = Projection(Ligne, num)
 );
 
 CREATE TABLE ArretLigne (
@@ -125,7 +126,6 @@ CREATE TABLE DateException (
     ajout BOOLEAN,
     PRIMARY KEY (date_, ajout)
 );
--- date_
 
 CREATE TABLE ConcerneCalendrier (
     date_exception DATE,
@@ -150,7 +150,9 @@ CREATE TABLE ArretVoyage (
     arret_ligne INT NOT NULL,
     ligne INT NOT NULL,
     PRIMARY KEY (num_arret, voyage),
-    FOREIGN KEY (arret_ligne, ligne) REFERENCES ArretLigne(num_arret, ligne)
+    UNIQUE (arret_ligne, ligne, voyage),
+    FOREIGN KEY (arret_ligne, ligne) REFERENCES ArretLigne(num_arret, ligne),
+    CHECK (heure_depart <  heure_arrivee)
 );
 
 CREATE TABLE Trajet (
@@ -158,7 +160,6 @@ CREATE TABLE Trajet (
     num_place INT NOT NULL,
     date_ DATE NOT NULL
 );
--- date_
 
 CREATE TABLE ArretTrajet (
     trajet INT REFERENCES Trajet(id_trajet),
@@ -174,9 +175,9 @@ CREATE TABLE Voyageur (
     prenom VARCHAR(20),
     adresse VARCHAR(80),
     telephone VARCHAR(10) NOT NULL,
-    paiement VARCHAR(20) NOT NULL,
+    paiement VARCHAR(7) NOT NULL,
     carte INT,
-    statut VARCHAR(20),
+    statut VARCHAR(7),
     occasionnel BOOLEAN NOT NULL,
     PRIMARY KEY (nom, prenom, adresse),
     CHECK ((paiement = 'carte' OR paiement = 'cheque' OR paiement = 'monnaie') AND (statut = 'bronze' OR statut = 'silver' OR statut = 'gold' OR statut = 'platine')),

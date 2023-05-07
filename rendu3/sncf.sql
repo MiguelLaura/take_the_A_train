@@ -1,5 +1,5 @@
 -- A faire
---      VIEW (fichier séparé ?) pour les projections, pour les conditions 2 et pour les contraintes en commentaire (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
+--      VIEW (fichier séparé ?) pour les contraintes en commentaire
 --      INSERT (fichier séparé ? Compléter si jugé nécessaire)
 --      SELECT avec GROUP BY (fichier séparé ?)
 
@@ -163,7 +163,7 @@ CREATE TABLE ArretVoyage (
     PRIMARY KEY (num_arret, voyage),
     UNIQUE (arret_ligne, ligne, voyage),
     FOREIGN KEY (arret_ligne, ligne) REFERENCES ArretLigne(num_arret, ligne),
-    CHECK (heure_depart <  heure_arrivee)
+    CHECK (heure_depart < heure_arrivee)
 );
 
 CREATE TABLE Trajet (
@@ -218,17 +218,112 @@ CREATE TABLE CompositionBillet (
 -- VIEW
 
 CREATE VIEW v_DisposeHotel AS
-SELECT d.nom_hotel, d.adresse_hotel
-FROM  DisposeHotel d RIGHT OUTER JOIN Hotel h
-ON h.nom = d.nom_hotel
-AND h.adresse = d.adresse_hotel;
-
-SELECT COUNT(*)
-FROM (SELECT d.nom_hotel, d.adresse_hotel
+SELECT COUNT(*) AS count_not_in_disposehotel
 FROM DisposeHotel d RIGHT OUTER JOIN Hotel h
 ON h.nom = d.nom_hotel
-AND h.adresse = d.adresse_hotel) a
-GROUP BY (a.nom_hotel, a.adresse_hotel);
+AND h.adresse = d.adresse_hotel
+WHERE d.nom_hotel IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_DisposeTaxi AS
+SELECT COUNT(*) AS count_not_in_disposetaxi
+FROM DisposeTaxi d RIGHT OUTER JOIN Taxi t
+ON t.num = d.num_taxi
+WHERE d.num_taxi IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_DisposeTransportPublic AS
+SELECT COUNT(*) AS count_not_in_disposetransporpublic
+FROM DisposeTransportPublic d RIGHT OUTER JOIN TransportPublic t
+ON t.num = d.num_transport_public
+WHERE d.num_transport_public IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_ArretLigne AS
+SELECT coalesce(a.ligne, NULL) AS ligne, COUNT(*) AS count
+FROM ArretLigne a RIGHT OUTER JOIN Ligne l
+ON l.num = a.ligne
+GROUP BY a.ligne;
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretLigne WHERE ligne IS NULL;
+-- pour vérifier la contrainte du MLD
+--      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
+-- (il faut que le SELECT ne renvoie rien)
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretLigne;
+-- pour vérifier la contrainte du MLD
+--      une ligne doit relier au moins deux arrêts
+-- (il faut que chaque valeur renvoyée soit >= 2)
+
+CREATE VIEW v_Voyage AS
+SELECT COUNT(*) AS count_not_in_voyage
+FROM Voyage v RIGHT OUTER JOIN Ligne l
+ON l.num = v.ligne
+WHERE v.ligne IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_ConcerneCalendrier AS
+SELECT COUNT(*) AS count_not_in_concernecalendrier
+FROM ConcerneCalendrier c RIGHT OUTER JOIN DateException d
+ON d.date_ = c.date_exception
+AND d.ajout = c.ajout_exception
+WHERE c.date_exception IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_ArretVoyage AS
+SELECT coalesce(a.voyage, NULL) AS voyage, COUNT(*) AS count
+FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
+ON v.id_voyage = a.voyage
+GROUP BY a.voyage;
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretVoyage WHERE voyage IS NULL;
+-- pour vérifier la contrainte du MLD
+--      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
+-- (il faut que le SELECT ne renvoie rien)
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretVoyage;
+-- pour vérifier la contrainte du MLD
+--      un voyage possède au moins deux arrêts
+-- (il faut que chaque valeur renvoyée soit >= 2)
+
+CREATE VIEW v_ArretVoyage2 AS
+SELECT COUNT(*) AS count_not_in_arretvoyage
+FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
+ON v.id_voyage = a.voyage
+AND v.ligne = a.ligne
+WHERE a.ligne IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_ArretTrajet AS
+SELECT coalesce(a.trajet, NULL) AS trajet, COUNT(*) AS count
+FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
+ON t.id_trajet = a.trajet
+GROUP BY a.trajet;
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretTrajet WHERE trajet IS NULL;
+-- pour vérifier la contrainte du MLD
+--      Projection(ArrêtTrajet, trajet) = Projection(Trajet, id_trajet)
+-- (il faut que le SELECT ne renvoie rien)
+-- Dans l'application Python, on utilisera la commande
+--      SELECT count FROM v_ArretTrajet;
+-- pour vérifier la contrainte du MLD
+--      un trajet possède exactement deux arrêts de voyage
+-- (il faut que chaque valeur renvoyée soit = 2)
+
+CREATE VIEW v_CompositionBillet AS
+SELECT COUNT(*) AS count_not_in_compisitionbillet
+FROM CompositionBillet c RIGHT OUTER JOIN Billet b
+ON b.id_billet = c.billet
+WHERE c.billet IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+
+CREATE VIEW v_LigneVoyageTypeTrain AS
+SELECT COUNT(*) AS count_not_in_lignevoyagetypetrain
+FROM Train t INNER JOIN Voyage v
+ON t.num = v.train RIGHT OUTER JOIN Ligne l
+ON l.type_train = t.type_train
+WHERE t.type_train IS NULL;
+-- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
 
 
 ------------------------------------------------------------------------------------------
@@ -285,13 +380,8 @@ INSERT INTO Train VALUES (745, 'TER');
 INSERT INTO Train VALUES (675, 'TER');
 INSERT INTO Train VALUES (7, 'RER');
 
-INSERT INTO Ligne VALUES (1, 'metro');
-INSERT INTO Ligne VALUES (4, 'metro');
-INSERT INTO Ligne VALUES (14, 'metro');
 INSERT INTO Ligne VALUES (156, 'TGV');
-INSERT INTO Ligne VALUES (1567, 'TGV');
 INSERT INTO Ligne VALUES (27, 'TER');
-INSERT INTO Ligne VALUES (56, 'RER');
 
 INSERT INTO ArretLigne VALUES (1, 27, FALSE, 'Gare du Nord', 'Paris');
 INSERT INTO ArretLigne VALUES (2, 27, FALSE, 'Gare ferroviaire', 'Creil');

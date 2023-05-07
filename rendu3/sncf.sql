@@ -240,20 +240,18 @@ WHERE d.num_transport_public IS NULL;
 -- en donnant la liste des transports publics ne respectant pas la contrainte
 
 CREATE VIEW v_ArretLigne AS
-SELECT coalesce(a.ligne, NULL) AS ligne, COUNT(*) AS count
+SELECT l.num, a.ligne
 FROM ArretLigne a RIGHT OUTER JOIN Ligne l
-ON l.num = a.ligne
-GROUP BY a.ligne;
+ON l.num = a.ligne;
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretLigne WHERE ligne IS NULL;
+--      SELECT num FROM v_ArretLigne WHERE ligne IS NULL;
 -- pour vérifier la contrainte du MLD
 --      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
 -- (il faut que le SELECT ne renvoie rien)
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretLigne;
+--      SELECT ligne FROM v_ArretLigne WHERE ligne IS NOT NULL GROUP BY ligne HAVING COUNT(*) < 2;
 -- pour vérifier la contrainte du MLD
 --      une ligne doit relier au moins deux arrêts
--- (il faut que chaque valeur renvoyée soit >= 2)
 
 CREATE VIEW v_Voyage AS
 SELECT l.num
@@ -275,20 +273,18 @@ WHERE c.date_exception IS NULL;
 -- en donnant la liste des dates exceptions ne respectant pas la contrainte
 
 CREATE VIEW v_ArretVoyage AS
-SELECT coalesce(a.voyage, NULL) AS voyage, COUNT(*) AS count
+SELECT v.id_voyage, a.voyage
 FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
-ON v.id_voyage = a.voyage
-GROUP BY a.voyage;
+ON v.id_voyage = a.voyage;
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretVoyage WHERE voyage IS NULL;
+--      SELECT id_voyage FROM v_ArretVoyage WHERE voyage IS NULL;
 -- pour vérifier la contrainte du MLD
 --      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
 -- (il faut que le SELECT ne renvoie rien)
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretVoyage;
+--      SELECT voyage FROM v_ArretVoyage WHERE voyage IS NOT NULL GROUP BY voyage HAVING COUNT(*) < 2;
 -- pour vérifier la contrainte du MLD
---      un voyage possède au moins deux arrêts
--- (il faut que chaque valeur renvoyée soit >= 2)
+--      une ligne doit relier au moins deux arrêts
 
 CREATE VIEW v_ArretVoyage2 AS
 SELECT v.id_voyage, v.ligne
@@ -301,20 +297,18 @@ WHERE a.ligne IS NULL;
 -- en donnant la liste des voyages et lignes ne respectant pas la contrainte
 
 CREATE VIEW v_ArretTrajet AS
-SELECT coalesce(a.trajet, NULL) AS trajet, COUNT(*) AS count
+SELECT t.id_trajet, a.trajet
 FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
-ON t.id_trajet = a.trajet
-GROUP BY a.trajet;
+ON t.id_trajet = a.trajet;
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretTrajet WHERE trajet IS NULL;
+--      SELECT id_trajet FROM v_ArretTrajet WHERE trajet IS NULL;
 -- pour vérifier la contrainte du MLD
 --      Projection(ArrêtTrajet, trajet) = Projection(Trajet, id_trajet)
 -- (il faut que le SELECT ne renvoie rien)
 -- Dans l'application Python, on utilisera la commande
---      SELECT count FROM v_ArretTrajet;
+--      SELECT trajet FROM v_ArretTrajet WHERE trajet IS NOT NULL GROUP BY trajet HAVING COUNT(*) < 2;
 -- pour vérifier la contrainte du MLD
---      un trajet possède exactement deux arrêts de voyage
--- (il faut que chaque valeur renvoyée soit = 2)
+--      une ligne doit relier au moins deux arrêts
 
 CREATE VIEW v_CompositionBillet AS
 SELECT b.id_billet
@@ -328,7 +322,7 @@ WHERE c.billet IS NULL;
 CREATE VIEW v_LigneVoyageTypeTrain AS
 SELECT t.type_train, v.id_voyage, v.ligne, v.train, l.type_train AS type_train_ligne
 FROM Train t, Voyage v, Ligne l
-WHERE t.num = v.train AND l.num = v.ligne AND l.type_train != t.type_train;
+WHERE t.num = v.train AND l.num = v.ligne AND l.type_train <> t.type_train;
 -- Permet de vérifier
 --      Projection(Jointure(Train, Voyage, Train.num = Voyage.train), type_train) = Projection(Ligne, type_train)
 -- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte
@@ -351,7 +345,7 @@ CREATE VIEW v_CheckTime AS
 SELECT c.horaire horaire_calendrier, a.heure_depart
 FROM Calendrier c JOIN Voyage v
 ON c.id_calendrier = v.calendrier JOIN ArretVoyage a
-ON v.id_voyage = a.voyage WHERE a.num_arret = 1;
+ON v.id_voyage = a.voyage WHERE a.num_arret = 1 AND c.horaire <> a.heure_depart;
 -- La contrainte qu'on cherche à vérifier est
 --      Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 
@@ -368,8 +362,9 @@ ON v.train = tr.num JOIN TypeTrain tt
 ON tr.type_train = tt.nom WHERE a.depart GROUP BY (nb_places, id_trajet);
 -- La contrainte qu'on cherche à vérifier est
 --      Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
--- Pour avoir le nombre de places par trajet :
---      SELECT id_trajet, COUNT(id_trajet) FROM v_CheckPlace GROUP BY id_trajet;
+-- Pour savoir pour quel(s) trajet(s) le nombre de places est dépassé :
+--      SELECT * FROM v_CheckPlace WHERE count > nb_places;
+-- Vue utilisée pour calculer le taux de remplissage    
 
 
 ------------------------------------------------------------------------------------------

@@ -1,8 +1,13 @@
 -- A faire
--- vues (fichier séparé ?) pour les projections, pour les conditions 2 et pour les contraintes en fin de document (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
--- INSERT (fichier séparé ?)
--- SELECT avec GROUP BY (fichier séparé ?)
+--      VIEW (fichier séparé ?) pour les projections, pour les conditions 2 et pour les contraintes en commentaire (Ligne x3, ConcerneCalendrier, Voyage, ArretVoyage x2, CompositionBillet)
+--      INSERT (fichier séparé ? Compléter si jugé nécessaire)
+--      SELECT avec GROUP BY (fichier séparé ?)
 
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+-- CREATE
 
 DROP TABLE IF EXISTS Gare;
 DROP TABLE IF EXISTS Hotel;
@@ -28,6 +33,11 @@ DROP TABLE IF EXISTS CompositionBillet;
 
 
 DROP VIEW IF EXISTS v_DisposeHotel;
+
+
+-- L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
+-- Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
+-- Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
 
 
 CREATE TABLE Gare (
@@ -202,10 +212,10 @@ CREATE TABLE CompositionBillet (
 );
 
 
--- L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
--- Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
--- Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
+-- VIEW
 
 CREATE VIEW v_DisposeHotel AS
 SELECT d.nom_hotel, d.adresse_hotel
@@ -219,3 +229,116 @@ FROM DisposeHotel d RIGHT OUTER JOIN Hotel h
 ON h.nom = d.nom_hotel
 AND h.adresse = d.adresse_hotel) a
 GROUP BY (a.nom_hotel, a.adresse_hotel);
+
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+-- INSERT
+
+INSERT INTO Gare VALUES ('Gare ferroviaire', 'Compiegne', 'rue Ferdinand Bacs', 'France');
+INSERT INTO Gare VALUES ('Gare du Nord', 'Paris', '18 rue de Dunkerque', 'France');
+INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris', 'place Louis-Armand', 'France');
+INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris', '17 boulevard de Vaugirard', 'France');
+INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil', 'rue Despinas', 'France');
+INSERT INTO Gare VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence', 'rue de la Paix', 'France');
+INSERT INTO Gare VALUES ('Gare ferroviaire', 'Amiens', '47 place Alphonse Fiquet,', 'France');
+INSERT INTO Gare VALUES ('Gare Bruxelles-Midi', 'Bruxelles', '47B avenue Fonsny', 'Belgique');
+
+INSERT INTO Hotel VALUES ('B&B', '10 avenue Marcellin Berthelot');
+INSERT INTO Hotel VALUES ('Marriott', '70 avenue des Champs-Elysees');
+INSERT INTO Hotel VALUES ('Ritz', '15 place Vendôme');
+
+INSERT INTO DisposeHotel VALUES ('Gare ferroviaire', 'Compiegne', 'B&B', '10 avenue Marcellin Berthelot');
+INSERT INTO DisposeHotel VALUES ('Gare du Nord', 'Paris', 'Marriott', '70 avenue des Champs-Elysees');
+INSERT INTO DisposeHotel VALUES ('Gare de Lyon', 'Paris', 'Marriott', '70 avenue des Champs-Elysees');
+INSERT INTO DisposeHotel VALUES ('Gare Montparnasse', 'Paris', 'Marriott', '70 avenue des Champs-Elysees');
+INSERT INTO DisposeHotel VALUES ('Gare du Nord', 'Paris', 'Ritz', '15 place Vendôme');
+INSERT INTO DisposeHotel VALUES ('Gare de Lyon', 'Paris', 'Ritz', '15 place Vendôme');
+INSERT INTO DisposeHotel VALUES ('Gare Montparnasse', 'Paris', 'Ritz', '15 place Vendôme');
+
+INSERT INTO Taxi VALUES (1096, '0654782945');
+INSERT INTO Taxi VALUES (2003, '0751762378');
+
+INSERT INTO DisposeTaxi VALUES ('Gare ferroviaire', 'Creil', '1096');
+INSERT INTO DisposeTaxi VALUES ('Gare ferroviaire', 'Compiegne', '2003');
+
+INSERT INTO TransportPublic VALUES (23);
+
+INSERT INTO DisposeTransportPublic VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence', 23);
+
+INSERT INTO TypeTrain VALUES ('TER', 204, 170, FALSE);
+INSERT INTO TypeTrain VALUES ('TGV', 500, 190, TRUE);
+INSERT INTO TypeTrain VALUES ('RER', 204, 100, FALSE);
+INSERT INTO TypeTrain VALUES ('metro', 204, 80, FALSE);
+
+INSERT INTO Train VALUES (1, 'metro');
+INSERT INTO Train VALUES (2, 'metro');
+INSERT INTO Train VALUES (3, 'metro');
+INSERT INTO Train VALUES (4, 'metro');
+INSERT INTO Train VALUES (5, 'metro');
+INSERT INTO Train VALUES (9, 'TGV');
+INSERT INTO Train VALUES (34, 'TGV');
+INSERT INTO Train VALUES (45, 'TGV');
+INSERT INTO Train VALUES (345, 'TER');
+INSERT INTO Train VALUES (745, 'TER');
+INSERT INTO Train VALUES (675, 'TER');
+INSERT INTO Train VALUES (7, 'RER');
+
+INSERT INTO Ligne VALUES (1, 'metro');
+INSERT INTO Ligne VALUES (4, 'metro');
+INSERT INTO Ligne VALUES (14, 'metro');
+INSERT INTO Ligne VALUES (156, 'TGV');
+INSERT INTO Ligne VALUES (1567, 'TGV');
+INSERT INTO Ligne VALUES (27, 'TER');
+INSERT INTO Ligne VALUES (56, 'RER');
+
+INSERT INTO ArretLigne VALUES (1, 27, FALSE, 'Gare du Nord', 'Paris');
+INSERT INTO ArretLigne VALUES (2, 27, FALSE, 'Gare ferroviaire', 'Creil');
+INSERT INTO ArretLigne VALUES (3, 27, FALSE, 'Gare ferroviaire', 'Pont-Sainte-Maxence');
+INSERT INTO ArretLigne VALUES (4, 27, FALSE, 'Gare ferroviaire', 'Compiegne');
+INSERT INTO ArretLigne VALUES (5, 27, TRUE, 'Gare ferroviaire', 'Amiens');
+INSERT INTO ArretLigne VALUES (1, 156, FALSE, 'Gare du Nord', 'Paris');
+INSERT INTO ArretLigne VALUES (2, 156, TRUE, 'Gare Bruxelles-Midi', 'Bruxelles');
+
+INSERT INTO Calendrier VALUES (1, '01/01/2020', '31/12/2022', '12:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+INSERT INTO Calendrier VALUES (2, '24/11/1999', '14/02/2016', '09:30:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE);
+INSERT INTO Calendrier VALUES (3, '01/05/2017', '30/09/2025', '14:00:00', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+
+INSERT INTO DateException VALUES ('14/07/2021', FALSE);
+INSERT INTO DateException VALUES ('07/05/2023', TRUE);
+
+INSERT INTO ConcerneCalendrier VALUES ('14/07/2021', FALSE, 1);
+INSERT INTO ConcerneCalendrier VALUES ('07/05/2023', TRUE, 3);
+
+
+INSERT INTO Voyage VALUES (234, 27, 675, 1);
+INSERT INTO Voyage VALUES (27, 156, 34, 2);
+
+INSERT INTO ArretVoyage VALUES (1, 234, '11:55:00', '12:00:00', 1, 27);
+INSERT INTO ArretVoyage VALUES (2, 234, '12:28:00', '12:30:00', 3, 27);
+INSERT INTO ArretVoyage VALUES (3, 234, '13:00:00', '13:05:00', 4, 27);
+INSERT INTO ArretVoyage VALUES (4, 234, '13:20:00', '13:22:00', 5, 27);
+INSERT INTO ArretVoyage VALUES (1, 27, '17:45:00', '18:00:00', 1, 156);
+INSERT INTO ArretVoyage VALUES (2, 27, '20:27:00', '20:36:00', 2, 156);
+
+INSERT INTO Trajet VALUES (1, 23, '27/03/2021');
+INSERT INTO Trajet VALUES (2, 57, '04/07/2020');
+INSERT INTO Trajet VALUES (3, 567, '04/07/2020');
+
+INSERT INTO ArretTrajet VALUES (1, 1, 234, TRUE);
+INSERT INTO ArretTrajet VALUES (1, 3, 234, FALSE);
+INSERT INTO ArretTrajet VALUES (2, 2, 234, TRUE);
+INSERT INTO ArretTrajet VALUES (2, 4, 234, FALSE);
+INSERT INTO ArretTrajet VALUES (3, 1, 27, TRUE);
+INSERT INTO ArretTrajet VALUES (3, 2, 27, FALSE);
+
+INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, occasionnel) VALUES ('Beauchamp', 'Elisabeth', '45 rue de la République', '0765438729', 'carte', TRUE);
+INSERT INTO Voyageur VALUES ('Smith', 'Henry', '288 avanue du Général de Gaulle', '0614263798', 'monnaie', 563, 'bronze', FALSE);
+
+INSERT INTO Billet VALUES (1, FALSE, 34.70, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
+INSERT INTO Billet VALUES (2, TRUE, 9.45, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
+
+INSERT INTO CompositionBillet VALUES (1, 1);
+INSERT INTO CompositionBillet VALUES (1, 2);
+INSERT INTO CompositionBillet VALUES (2, 1);

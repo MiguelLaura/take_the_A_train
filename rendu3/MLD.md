@@ -54,7 +54,7 @@ avec <
     (Projection(ArrêtVoyage, ligne, voyage) = Projection(Voyage, ligne, id_voyage))
     AND (Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage))
     AND (Un voyage possède au moins deux arrêts)
-    AND (heure_départ <  heure_arrivée)
+    AND (heure_départ >  heure_arrivée)
     AND (arrêt_ligne, ligne, voyage) KEY
     >
 

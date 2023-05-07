@@ -1,6 +1,5 @@
 -- A faire
---      VIEW (fichier séparé ?) pour les contraintes en commentaire
---      INSERT (fichier séparé ? Compléter si jugé nécessaire)
+--      INSERT : compléter si il y a besoin
 --      SELECT avec GROUP BY (fichier séparé ?)
 
 
@@ -33,11 +32,6 @@ DROP TABLE IF EXISTS CompositionBillet;
 
 
 DROP VIEW IF EXISTS v_DisposeHotel;
-
-
--- L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
--- Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
--- Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
 
 
 CREATE TABLE Gare (
@@ -163,7 +157,7 @@ CREATE TABLE ArretVoyage (
     PRIMARY KEY (num_arret, voyage),
     UNIQUE (arret_ligne, ligne, voyage),
     FOREIGN KEY (arret_ligne, ligne) REFERENCES ArretLigne(num_arret, ligne),
-    CHECK (heure_depart < heure_arrivee)
+    CHECK (heure_depart > heure_arrivee)
 );
 
 CREATE TABLE Trajet (
@@ -218,26 +212,32 @@ CREATE TABLE CompositionBillet (
 -- VIEW
 
 CREATE VIEW v_DisposeHotel AS
-SELECT COUNT(*) AS count_not_in_disposehotel
+SELECT h.nom, h.adresse
 FROM DisposeHotel d RIGHT OUTER JOIN Hotel h
 ON h.nom = d.nom_hotel
 AND h.adresse = d.adresse_hotel
 WHERE d.nom_hotel IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(DisposeHotel, nom_hôtel, adresse_hôtel) = Projection(Hôtel, nom, adresse)
+-- en donnant la liste des hotels ne respectant pas la contrainte
 
 CREATE VIEW v_DisposeTaxi AS
-SELECT COUNT(*) AS count_not_in_disposetaxi
+SELECT t.num
 FROM DisposeTaxi d RIGHT OUTER JOIN Taxi t
 ON t.num = d.num_taxi
 WHERE d.num_taxi IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(DisposeTaxi, num_taxi) = Projection(Taxi, num)
+-- en donnant la liste des taxis ne respectant pas la contrainte
 
 CREATE VIEW v_DisposeTransportPublic AS
-SELECT COUNT(*) AS count_not_in_disposetransporpublic
+SELECT t.num
 FROM DisposeTransportPublic d RIGHT OUTER JOIN TransportPublic t
 ON t.num = d.num_transport_public
 WHERE d.num_transport_public IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(DisposeTransportPublic, num_transport_public) = Projection(TransportPublic, num)
+-- en donnant la liste des transports publics ne respectant pas la contrainte
 
 CREATE VIEW v_ArretLigne AS
 SELECT coalesce(a.ligne, NULL) AS ligne, COUNT(*) AS count
@@ -256,19 +256,23 @@ GROUP BY a.ligne;
 -- (il faut que chaque valeur renvoyée soit >= 2)
 
 CREATE VIEW v_Voyage AS
-SELECT COUNT(*) AS count_not_in_voyage
+SELECT l.num
 FROM Voyage v RIGHT OUTER JOIN Ligne l
 ON l.num = v.ligne
 WHERE v.ligne IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(Voyage, ligne) = Projection(Ligne, num)
+-- en donnant la liste des lignes ne respectant pas la contrainte
 
 CREATE VIEW v_ConcerneCalendrier AS
-SELECT COUNT(*) AS count_not_in_concernecalendrier
+SELECT d.date_, d.ajout
 FROM ConcerneCalendrier c RIGHT OUTER JOIN DateException d
 ON d.date_ = c.date_exception
 AND d.ajout = c.ajout_exception
 WHERE c.date_exception IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(ConcerneCalendrier, date_exception, ajout_exception) = Projection(DateException, date, ajout)
+-- en donnant la liste des dates exceptions ne respectant pas la contrainte
 
 CREATE VIEW v_ArretVoyage AS
 SELECT coalesce(a.voyage, NULL) AS voyage, COUNT(*) AS count
@@ -287,12 +291,14 @@ GROUP BY a.voyage;
 -- (il faut que chaque valeur renvoyée soit >= 2)
 
 CREATE VIEW v_ArretVoyage2 AS
-SELECT COUNT(*) AS count_not_in_arretvoyage
+SELECT v.id_voyage, v.ligne
 FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
 ON v.id_voyage = a.voyage
 AND v.ligne = a.ligne
 WHERE a.ligne IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(ArrêtVoyage, ligne, voyage) = Projection(Voyage, ligne, id_voyage)
+-- en donnant la liste des voyages et lignes ne respectant pas la contrainte
 
 CREATE VIEW v_ArretTrajet AS
 SELECT coalesce(a.trajet, NULL) AS trajet, COUNT(*) AS count
@@ -311,19 +317,59 @@ GROUP BY a.trajet;
 -- (il faut que chaque valeur renvoyée soit = 2)
 
 CREATE VIEW v_CompositionBillet AS
-SELECT COUNT(*) AS count_not_in_compisitionbillet
+SELECT b.id_billet
 FROM CompositionBillet c RIGHT OUTER JOIN Billet b
 ON b.id_billet = c.billet
 WHERE c.billet IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+-- Permet de vérifier
+--      Projection(CompositionBillet, billet) = Projection(Billet, id_billet)
+-- en donnant la liste des billets ne respectant pas la contrainte
 
 CREATE VIEW v_LigneVoyageTypeTrain AS
-SELECT COUNT(*) AS count_not_in_lignevoyagetypetrain
-FROM Train t INNER JOIN Voyage v
-ON t.num = v.train RIGHT OUTER JOIN Ligne l
-ON l.type_train = t.type_train
-WHERE t.type_train IS NULL;
--- Dans l'application Python, on pourra directement vérifier que la valeur dans la table = 0
+SELECT t.type_train, v.id_voyage, v.ligne, v.train, l.type_train AS type_train_ligne
+FROM Train t, Voyage v, Ligne l
+WHERE t.num = v.train AND l.num = v.ligne AND l.type_train != t.type_train;
+-- Permet de vérifier
+--      Projection(Jointure(Train, Voyage, Train.num = Voyage.train), type_train) = Projection(Ligne, type_train)
+-- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte
+
+CREATE VIEW v_CheckDate AS
+SELECT t.date_ AS trajet_date, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
+FROM Trajet t JOIN ArretTrajet a
+ON t.id_trajet = a.trajet JOIN ArretVoyage av
+ON a.num_arret_voyage = av.num_arret
+AND a.voyage = av.voyage JOIN Voyage v
+ON av.voyage = v.id_voyage JOIN Calendrier c
+ON v.calendrier = c.id_calendrier LEFT OUTER JOIN ConcerneCalendrier cc
+ON c.id_calendrier = cc.calendrier LEFT OUTER JOIN DateException d
+ON cc.date_exception = d.date_
+AND cc.ajout_exception = d.ajout;
+-- La contrainte qu'on cherche à vérifier est
+--      L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
+
+CREATE VIEW v_CheckTime AS
+SELECT c.horaire horaire_calendrier, a.heure_depart
+FROM Calendrier c JOIN Voyage v
+ON c.id_calendrier = v.calendrier JOIN ArretVoyage a
+ON v.id_voyage = a.voyage WHERE a.num_arret = 1;
+-- La contrainte qu'on cherche à vérifier est
+--      Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
+
+CREATE VIEW v_CheckPlace AS
+SELECT tt.nb_places, t.id_trajet, COUNT(*)
+FROM Billet b JOIN CompositionBillet cb
+ON b.id_billet = cb.billet JOIN Trajet t
+ON cb.trajet = t.id_trajet JOIN ArretTrajet a
+ON t.id_trajet = a.trajet JOIN ArretVoyage av
+ON a.num_arret_voyage = av.num_arret
+AND a.voyage = av.voyage JOIN Voyage v
+ON av.voyage = v.id_voyage JOIN Train tr
+ON v.train = tr.num JOIN TypeTrain tt
+ON tr.type_train = tt.nom WHERE a.depart GROUP BY (nb_places, id_trajet);
+-- La contrainte qu'on cherche à vérifier est
+--      Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
+-- Pour avoir le nombre de places par trajet :
+--      SELECT id_trajet, COUNT(id_trajet) FROM v_CheckPlace GROUP BY id_trajet;
 
 
 ------------------------------------------------------------------------------------------
@@ -392,7 +438,7 @@ INSERT INTO ArretLigne VALUES (1, 156, FALSE, 'Gare du Nord', 'Paris');
 INSERT INTO ArretLigne VALUES (2, 156, TRUE, 'Gare Bruxelles-Midi', 'Bruxelles');
 
 INSERT INTO Calendrier VALUES (1, '01/01/2020', '31/12/2022', '12:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-INSERT INTO Calendrier VALUES (2, '24/11/1999', '14/02/2016', '09:30:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE);
+INSERT INTO Calendrier VALUES (2, '24/11/1999', '14/02/2016', '18:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE);
 INSERT INTO Calendrier VALUES (3, '01/05/2017', '30/09/2025', '14:00:00', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
 
 INSERT INTO DateException VALUES ('14/07/2021', FALSE);
@@ -401,16 +447,15 @@ INSERT INTO DateException VALUES ('07/05/2023', TRUE);
 INSERT INTO ConcerneCalendrier VALUES ('14/07/2021', FALSE, 1);
 INSERT INTO ConcerneCalendrier VALUES ('07/05/2023', TRUE, 3);
 
-
 INSERT INTO Voyage VALUES (234, 27, 675, 1);
 INSERT INTO Voyage VALUES (27, 156, 34, 2);
 
-INSERT INTO ArretVoyage VALUES (1, 234, '11:55:00', '12:00:00', 1, 27);
-INSERT INTO ArretVoyage VALUES (2, 234, '12:28:00', '12:30:00', 3, 27);
-INSERT INTO ArretVoyage VALUES (3, 234, '13:00:00', '13:05:00', 4, 27);
-INSERT INTO ArretVoyage VALUES (4, 234, '13:20:00', '13:22:00', 5, 27);
-INSERT INTO ArretVoyage VALUES (1, 27, '17:45:00', '18:00:00', 1, 156);
-INSERT INTO ArretVoyage VALUES (2, 27, '20:27:00', '20:36:00', 2, 156);
+INSERT INTO ArretVoyage VALUES (1, 234, '12:00:00', '11:55:00', 1, 27);
+INSERT INTO ArretVoyage VALUES (2, 234, '12:30:00', '12:28:00', 3, 27);
+INSERT INTO ArretVoyage VALUES (3, 234, '13:05:00', '13:00:00', 4, 27);
+INSERT INTO ArretVoyage VALUES (4, 234, '13:22:00', '13:20:00', 5, 27);
+INSERT INTO ArretVoyage VALUES (1, 27, '18:00:00', '17:45:00', 1, 156);
+INSERT INTO ArretVoyage VALUES (2, 27, '20:36:00', '20:27:00', 2, 156);
 
 INSERT INTO Trajet VALUES (1, 23, '27/03/2021');
 INSERT INTO Trajet VALUES (2, 57, '04/07/2020');

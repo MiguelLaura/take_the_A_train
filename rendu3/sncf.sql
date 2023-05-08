@@ -269,18 +269,8 @@ WHERE c.date_exception IS NULL;
 --      Projection(ConcerneCalendrier, date_exception, ajout_exception) = Projection(DateException, date, ajout)
 -- en donnant la liste des dates exceptions ne respectant pas la contrainte
 
-SELECT COUNT(a.ligne), l.num
-FROM ArretLigne a RIGHT OUTER JOIN Ligne l
-ON l.num = a.ligne
-GROUP BY (a.ligne, l.num)
-HAVING COUNT(*) < 2;
--- Permet de vérifier
---      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
---      une ligne doit relier au moins deux arrêts
--- en donnant la liste des lignes ne respectant pas les contraintes
-
 CREATE VIEW v_ArretVoyage AS
-SELECT COUNT(a.voyage)
+SELECT COUNT(a.voyage), v.id_voyage
 FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
 ON v.id_voyage = a.voyage
 GROUP BY (v.id_voyage, a.voyage)
@@ -301,7 +291,7 @@ WHERE a.ligne IS NULL;
 -- en donnant la liste des voyages et lignes ne respectant pas la contrainte
 
 CREATE VIEW v_ArretTrajet AS
-SELECT COUNT(a.trajet)
+SELECT COUNT(a.trajet), t.id_trajet
 FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
 ON t.id_trajet = a.trajet
 GROUP BY (t.id_trajet, a.trajet)

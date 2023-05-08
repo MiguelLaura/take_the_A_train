@@ -500,3 +500,16 @@ ORDER BY nb_billets DESC;
 -- La requête renvoie les noms et villes des gares les plus fréquentées en se basant sur les billets des voyageurs
 -- On a fait l'hypothèse qu'un voyageur fréquente une gare par rapport aux trajets sur son billet. Donc plus il y a de billets vendus où leur trajet passe par une gare, plus cette gare sera fréquentée
 -- Les gares sont affichées par ordre décroissant, de la plus fréquentée à la moins fréquentée
+
+SELECT l.num, COUNT(b.id_billet) AS nb_billets FROM Ligne l
+INNER JOIN ArretLigne al ON al.ligne = l.num
+INNER JOIN ArretVoyage av ON av.arret_ligne = al.num_arret AND av.ligne = al.ligne
+INNER JOIN ArretTrajet at ON at.num_arret_voyage = av.num_arret AND at.voyage = av.voyage
+INNER JOIN Trajet t ON t.id_trajet = at.trajet
+INNER JOIN CompositionBillet cb ON cb.trajet = t.id_trajet
+INNER JOIN Billet b ON b.id_billet = cb.billet
+GROUP BY (l.num)
+ORDER BY nb_billets DESC;
+-- La requête renvoie les numéros des lignes les plus fréquentées en se basant sur les billets des voyageurs
+-- On a fait l'hypothèse qu'un voyageur voyage dans une ligne par rapport aux trajets sur son billet. Donc plus il y a de billets vendus où leur trajet utilise une ligne, plus cette ligne sera fréquentée
+-- Les lignes sont affichées par ordre décroissant, de la plus fréquentée à la moins fréquentée

@@ -277,7 +277,7 @@ GROUP BY (v.id_voyage, a.voyage)
 HAVING COUNT(*) < 2;
 -- Permet de vérifier
 --      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
---      une ligne doit relier au moins deux arrêts
+--      un voyage possède au moins deux arrêts
 -- en donnant la liste des voyages ne respectant pas les contraintes
 
 CREATE VIEW v_ArretVoyage2 AS
@@ -295,10 +295,10 @@ SELECT COUNT(a.trajet), t.id_trajet
 FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
 ON t.id_trajet = a.trajet
 GROUP BY (t.id_trajet, a.trajet)
-HAVING COUNT(*) < 2;
+HAVING COUNT(*) <> 2;
 -- Permet de vérifier
 --      Projection(ArrêtTrajet, trajet) = Projection(Trajet, id_trajet)
---      une ligne doit relier au moins deux arrêts
+--      un trajet possède exactement deux arrêts de voyage
 -- en donnant la liste des trajets ne respectant pas les contraintes
 
 CREATE VIEW v_CompositionBillet AS

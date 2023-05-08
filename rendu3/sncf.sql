@@ -360,7 +360,7 @@ ON v.id_voyage = a.voyage WHERE a.num_arret = 1 AND c.horaire <> a.heure_depart;
 --      Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 
 CREATE VIEW v_CheckPlace AS
-SELECT tt.nb_places, t.id_trajet, COUNT(*)
+SELECT tt.nb_places, t.id_trajet, COUNT(*) AS nb_billets
 FROM Billet b JOIN CompositionBillet cb
 ON b.id_billet = cb.billet JOIN Trajet t
 ON cb.trajet = t.id_trajet JOIN ArretTrajet a

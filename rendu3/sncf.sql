@@ -1,6 +1,12 @@
 -- A faire
 --      INSERT : compléter si il y a besoin
+--      VIEW : insérer des choses impossibles et vérifier que les vues renvoient une information permettant de régler le problème
 --      SELECT avec GROUP BY (fichier séparé ?)
+--          Statistiques sur le fonctionnement de la société :
+--              taux de remplissage des trains,
+--              gares les plus fréquentées,
+--              les lignes les plus empruntées,
+--              etc.
 
 
 ------------------------------------------------------------------------------------------

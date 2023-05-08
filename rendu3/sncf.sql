@@ -240,18 +240,15 @@ WHERE d.num_transport_public IS NULL;
 -- en donnant la liste des transports publics ne respectant pas la contrainte
 
 CREATE VIEW v_ArretLigne AS
-SELECT l.num, a.ligne
+SELECT COUNT(a.ligne), l.num
 FROM ArretLigne a RIGHT OUTER JOIN Ligne l
-ON l.num = a.ligne;
--- Dans l'application Python, on utilisera la commande
---      SELECT num FROM v_ArretLigne WHERE ligne IS NULL;
--- pour vérifier la contrainte du MLD
+ON l.num = a.ligne
+GROUP BY (a.ligne, l.num)
+HAVING COUNT(*) < 2;
+-- Permet de vérifier
 --      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
--- (il faut que le SELECT ne renvoie rien)
--- Dans l'application Python, on utilisera la commande
---      SELECT ligne FROM v_ArretLigne WHERE ligne IS NOT NULL GROUP BY ligne HAVING COUNT(*) < 2;
--- pour vérifier la contrainte du MLD
 --      une ligne doit relier au moins deux arrêts
+-- en donnant la liste des lignes ne respectant pas les contraintes
 
 CREATE VIEW v_Voyage AS
 SELECT l.num
@@ -272,19 +269,26 @@ WHERE c.date_exception IS NULL;
 --      Projection(ConcerneCalendrier, date_exception, ajout_exception) = Projection(DateException, date, ajout)
 -- en donnant la liste des dates exceptions ne respectant pas la contrainte
 
-CREATE VIEW v_ArretVoyage AS
-SELECT v.id_voyage, a.voyage
-FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
-ON v.id_voyage = a.voyage;
--- Dans l'application Python, on utilisera la commande
---      SELECT id_voyage FROM v_ArretVoyage WHERE voyage IS NULL;
--- pour vérifier la contrainte du MLD
---      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
--- (il faut que le SELECT ne renvoie rien)
--- Dans l'application Python, on utilisera la commande
---      SELECT voyage FROM v_ArretVoyage WHERE voyage IS NOT NULL GROUP BY voyage HAVING COUNT(*) < 2;
--- pour vérifier la contrainte du MLD
+SELECT COUNT(a.ligne), l.num
+FROM ArretLigne a RIGHT OUTER JOIN Ligne l
+ON l.num = a.ligne
+GROUP BY (a.ligne, l.num)
+HAVING COUNT(*) < 2;
+-- Permet de vérifier
+--      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
 --      une ligne doit relier au moins deux arrêts
+-- en donnant la liste des lignes ne respectant pas les contraintes
+
+CREATE VIEW v_ArretVoyage AS
+SELECT COUNT(a.voyage)
+FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
+ON v.id_voyage = a.voyage
+GROUP BY (v.id_voyage, a.voyage)
+HAVING COUNT(*) < 2;
+-- Permet de vérifier
+--      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
+--      une ligne doit relier au moins deux arrêts
+-- en donnant la liste des voyages ne respectant pas les contraintes
 
 CREATE VIEW v_ArretVoyage2 AS
 SELECT v.id_voyage, v.ligne
@@ -297,18 +301,15 @@ WHERE a.ligne IS NULL;
 -- en donnant la liste des voyages et lignes ne respectant pas la contrainte
 
 CREATE VIEW v_ArretTrajet AS
-SELECT t.id_trajet, a.trajet
+SELECT COUNT(a.trajet)
 FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
-ON t.id_trajet = a.trajet;
--- Dans l'application Python, on utilisera la commande
---      SELECT id_trajet FROM v_ArretTrajet WHERE trajet IS NULL;
--- pour vérifier la contrainte du MLD
+ON t.id_trajet = a.trajet
+GROUP BY (t.id_trajet, a.trajet)
+HAVING COUNT(*) < 2;
+-- Permet de vérifier
 --      Projection(ArrêtTrajet, trajet) = Projection(Trajet, id_trajet)
--- (il faut que le SELECT ne renvoie rien)
--- Dans l'application Python, on utilisera la commande
---      SELECT trajet FROM v_ArretTrajet WHERE trajet IS NOT NULL GROUP BY trajet HAVING COUNT(*) < 2;
--- pour vérifier la contrainte du MLD
 --      une ligne doit relier au moins deux arrêts
+-- en donnant la liste des trajets ne respectant pas les contraintes
 
 CREATE VIEW v_CompositionBillet AS
 SELECT b.id_billet

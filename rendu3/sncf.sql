@@ -488,6 +488,45 @@ INSERT INTO CompositionBillet VALUES (2, 1);
 
 -- SELECT
 
+--Affiche le nombre de trajets par date (SELECT COUNT)
+SELECT date_, COUNT(*) AS nombre_trajets
+FROM Trajet
+GROUP BY date_;
+
+--Affiche le nombre de voyages par ligne de train (SELECT COUNT)
+SELECT Ligne.num, COUNT(*) AS nombre_voyages
+FROM Voyage
+JOIN Ligne ON Voyage.ligne = Ligne.num
+GROUP BY Ligne.num;
+
+--Affiche la somme des prix des billets par voyageur (SELECT SUM)
+SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
+FROM Billet
+GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
+
+--Afficher le nombre de trajets par jour de la semaine (SELECT CASE)
+SELECT
+    CASE
+        WHEN lundi THEN 'Lundi'
+        WHEN mardi THEN 'Mardi'
+        WHEN mercredi THEN 'Mercredi'
+        WHEN jeudi THEN 'Jeudi'
+        WHEN vendredi THEN 'Vendredi'
+        WHEN samedi THEN 'Samedi'
+        WHEN dimanche THEN 'Dimanche'
+    END AS jour_semaine,
+    COUNT(*) AS nombre_trajets
+FROM Calendrier
+JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier
+GROUP BY jour_semaine;
+
+--Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
+SELECT nom, prenom, adresse
+FROM Voyageur
+WHERE statut = 'gold';
+
+
+
 SELECT g.nom, g.ville, COUNT(b.id_billet) AS nb_billets FROM Gare g
 INNER JOIN ArretLigne al ON al.nom_gare = g.nom AND al.ville_gare = g.ville
 INNER JOIN ArretVoyage av ON av.arret_ligne = al.num_arret AND av.ligne = al.ligne

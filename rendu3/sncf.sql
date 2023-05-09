@@ -1,17 +1,3 @@
--- A faire
---      INSERT : compléter si il y a besoin
---      VIEW : insérer des choses impossibles et vérifier que les vues renvoient une information permettant de régler le problème
---      SELECT avec GROUP BY (fichier séparé ?)
---          Statistiques sur le fonctionnement de la société :
---              taux de remplissage des trains,
---              gares les plus fréquentées,
---              les lignes les plus empruntées,
---              etc.
-
-
-------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------
-
 -- CREATE
 
 DROP VIEW IF EXISTS v_CheckPlace;
@@ -232,102 +218,99 @@ CREATE TABLE CompositionBillet (
 
 CREATE VIEW v_DisposeHotel AS
 SELECT h.nom, h.adresse
-FROM DisposeHotel d RIGHT OUTER JOIN Hotel h
-ON h.nom = d.nom_hotel
-AND h.adresse = d.adresse_hotel
+FROM DisposeHotel d
+RIGHT OUTER JOIN Hotel h ON h.nom = d.nom_hotel AND h.adresse = d.adresse_hotel
 WHERE d.nom_hotel IS NULL;
 -- Permet de vérifier
 --      Projection(DisposeHotel, nom_hôtel, adresse_hôtel) = Projection(Hôtel, nom, adresse)
--- en donnant la liste des hotels ne respectant pas la contrainte
+-- en donnant la liste des hotels ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_DisposeTaxi AS
 SELECT t.num
-FROM DisposeTaxi d RIGHT OUTER JOIN Taxi t
-ON t.num = d.num_taxi
+FROM DisposeTaxi d
+RIGHT OUTER JOIN Taxi t ON t.num = d.num_taxi
 WHERE d.num_taxi IS NULL;
 -- Permet de vérifier
 --      Projection(DisposeTaxi, num_taxi) = Projection(Taxi, num)
--- en donnant la liste des taxis ne respectant pas la contrainte
+-- en donnant la liste des taxis ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_DisposeTransportPublic AS
 SELECT t.num
-FROM DisposeTransportPublic d RIGHT OUTER JOIN TransportPublic t
-ON t.num = d.num_transport_public
+FROM DisposeTransportPublic d
+RIGHT OUTER JOIN TransportPublic t ON t.num = d.num_transport_public
 WHERE d.num_transport_public IS NULL;
 -- Permet de vérifier
 --      Projection(DisposeTransportPublic, num_transport_public) = Projection(TransportPublic, num)
--- en donnant la liste des transports publics ne respectant pas la contrainte
+-- en donnant la liste des transports publics ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_ArretLigne AS
 SELECT COUNT(a.ligne), l.num
-FROM ArretLigne a RIGHT OUTER JOIN Ligne l
-ON l.num = a.ligne
+FROM ArretLigne a
+RIGHT OUTER JOIN Ligne l ON l.num = a.ligne
 GROUP BY (a.ligne, l.num)
 HAVING COUNT(*) < 2;
 -- Permet de vérifier
 --      Projection(Ligne, num) = Projection(ArrêtLigne, ligne)
 --      une ligne doit relier au moins deux arrêts
--- en donnant la liste des lignes ne respectant pas les contraintes
+-- en donnant la liste des lignes ne respectant pas les contraintes (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_Voyage AS
 SELECT l.num
-FROM Voyage v RIGHT OUTER JOIN Ligne l
-ON l.num = v.ligne
+FROM Voyage v
+RIGHT OUTER JOIN Ligne l ON l.num = v.ligne
 WHERE v.ligne IS NULL;
 -- Permet de vérifier
 --      Projection(Voyage, ligne) = Projection(Ligne, num)
--- en donnant la liste des lignes ne respectant pas la contrainte
+-- en donnant la liste des lignes ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_ConcerneCalendrier AS
 SELECT d.date_, d.ajout
-FROM ConcerneCalendrier c RIGHT OUTER JOIN DateException d
-ON d.date_ = c.date_exception
-AND d.ajout = c.ajout_exception
+FROM ConcerneCalendrier c
+RIGHT OUTER JOIN DateException d ON d.date_ = c.date_exception AND d.ajout = c.ajout_exception
 WHERE c.date_exception IS NULL;
 -- Permet de vérifier
 --      Projection(ConcerneCalendrier, date_exception, ajout_exception) = Projection(DateException, date, ajout)
--- en donnant la liste des dates exceptions ne respectant pas la contrainte
+-- en donnant la liste des dates exceptions ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_ArretVoyage AS
 SELECT COUNT(a.voyage), v.id_voyage
-FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
-ON v.id_voyage = a.voyage
+FROM ArretVoyage a
+RIGHT OUTER JOIN Voyage v ON v.id_voyage = a.voyage
 GROUP BY (v.id_voyage, a.voyage)
 HAVING COUNT(*) < 2;
 -- Permet de vérifier
 --      Projection(ArrêtVoyage, voyage) = Projection(Voyage, id_voyage)
 --      un voyage possède au moins deux arrêts
--- en donnant la liste des voyages ne respectant pas les contraintes
+-- en donnant la liste des voyages ne respectant pas les contraintes (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_ArretVoyage2 AS
 SELECT v.id_voyage, v.ligne
-FROM ArretVoyage a RIGHT OUTER JOIN Voyage v
-ON v.id_voyage = a.voyage
-AND v.ligne = a.ligne
+FROM ArretVoyage a
+RIGHT OUTER JOIN Voyage v ON v.id_voyage = a.voyage AND v.ligne = a.ligne
 WHERE a.ligne IS NULL;
 -- Permet de vérifier
 --      Projection(ArrêtVoyage, ligne, voyage) = Projection(Voyage, ligne, id_voyage)
--- en donnant la liste des voyages et lignes ne respectant pas la contrainte
+-- en donnant la liste des voyages et lignes ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_ArretTrajet AS
 SELECT COUNT(a.trajet), t.id_trajet
-FROM ArretTrajet a RIGHT OUTER JOIN Trajet t
-ON t.id_trajet = a.trajet
+FROM ArretTrajet a
+RIGHT OUTER JOIN Trajet t ON t.id_trajet = a.trajet
 GROUP BY (t.id_trajet, a.trajet)
 HAVING COUNT(*) <> 2;
 -- Permet de vérifier
 --      Projection(ArrêtTrajet, trajet) = Projection(Trajet, id_trajet)
 --      un trajet possède exactement deux arrêts de voyage
--- en donnant la liste des trajets ne respectant pas les contraintes
+-- en donnant la liste des trajets ne respectant pas les contraintes (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_CompositionBillet AS
 SELECT b.id_billet
-FROM CompositionBillet c RIGHT OUTER JOIN Billet b
-ON b.id_billet = c.billet
+FROM CompositionBillet c
+RIGHT OUTER JOIN Billet b ON b.id_billet = c.billet
 WHERE c.billet IS NULL;
 -- Permet de vérifier
 --      Projection(CompositionBillet, billet) = Projection(Billet, id_billet)
--- en donnant la liste des billets ne respectant pas la contrainte
+-- en donnant la liste des billets ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_LigneVoyageTypeTrain AS
 SELECT t.type_train, v.id_voyage, v.ligne, v.train, l.type_train AS type_train_ligne
@@ -335,43 +318,43 @@ FROM Train t, Voyage v, Ligne l
 WHERE t.num = v.train AND l.num = v.ligne AND l.type_train <> t.type_train;
 -- Permet de vérifier
 --      Projection(Jointure(Train, Voyage, Train.num = Voyage.train), type_train) = Projection(Ligne, type_train)
--- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte
+-- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_CheckDate AS
 SELECT t.date_ AS trajet_date, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
-FROM Trajet t JOIN ArretTrajet a
-ON t.id_trajet = a.trajet JOIN ArretVoyage av
-ON a.num_arret_voyage = av.num_arret
-AND a.voyage = av.voyage JOIN Voyage v
-ON av.voyage = v.id_voyage JOIN Calendrier c
-ON v.calendrier = c.id_calendrier LEFT OUTER JOIN ConcerneCalendrier cc
-ON c.id_calendrier = cc.calendrier LEFT OUTER JOIN DateException d
-ON cc.date_exception = d.date_
-AND cc.ajout_exception = d.ajout;
+FROM Trajet t
+JOIN ArretTrajet a ON t.id_trajet = a.trajet
+JOIN ArretVoyage av ON a.num_arret_voyage = av.num_arret AND a.voyage = av.voyage
+JOIN Voyage v ON av.voyage = v.id_voyage
+JOIN Calendrier c ON v.calendrier = c.id_calendrier
+LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
+LEFT OUTER JOIN DateException d ON cc.date_exception = d.date_ AND cc.ajout_exception = d.ajout;
 -- La contrainte qu'on cherche à vérifier est
 --      L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
 
 CREATE VIEW v_CheckTime AS
 SELECT c.horaire horaire_calendrier, a.heure_depart
-FROM Calendrier c JOIN Voyage v
-ON c.id_calendrier = v.calendrier JOIN ArretVoyage a
-ON v.id_voyage = a.voyage WHERE a.num_arret = 1 AND c.horaire <> a.heure_depart;
+FROM Calendrier c
+JOIN Voyage v ON c.id_calendrier = v.calendrier
+JOIN ArretVoyage a ON v.id_voyage = a.voyage
+WHERE a.num_arret = 1 AND c.horaire <> a.heure_depart;
 -- La contrainte qu'on cherche à vérifier est
 --      Il faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est égale à l'heure de départ du premier ArretVoyage.
 
 CREATE VIEW v_CheckPlace AS
-SELECT tt.nb_places, t.id_trajet, COUNT(*) AS nb_billets
-FROM Billet b JOIN CompositionBillet cb
-ON b.id_billet = cb.billet JOIN Trajet t
-ON cb.trajet = t.id_trajet JOIN ArretTrajet a
-ON t.id_trajet = a.trajet JOIN ArretVoyage av
-ON a.num_arret_voyage = av.num_arret
-AND a.voyage = av.voyage JOIN Voyage v
-ON av.voyage = v.id_voyage JOIN Train tr
-ON v.train = tr.num JOIN TypeTrain tt
-ON tr.type_train = tt.nom WHERE a.depart GROUP BY (nb_places, id_trajet);
+SELECT tt.nb_places, t.date_, v.id_voyage, COUNT(*) AS nb_billets
+FROM Billet b
+JOIN CompositionBillet cb ON b.id_billet = cb.billet
+JOIN Trajet t ON cb.trajet = t.id_trajet
+JOIN ArretTrajet a ON t.id_trajet = a.trajet
+JOIN ArretVoyage av ON a.num_arret_voyage = av.num_arret AND a.voyage = av.voyage
+JOIN Voyage v ON av.voyage = v.id_voyage
+JOIN Train tr ON v.train = tr.num
+JOIN TypeTrain tt ON tr.type_train = tt.nom
+WHERE a.depart
+GROUP BY (tt.nb_places, v.id_voyage, t.date_);
 -- La contrainte qu'on cherche à vérifier est
---      Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage.
+--      Il faut s'assurer que le nombre de places réservées ne dépasse pas nb_places du TypeTrain pour chaque Voyage par jour.
 -- Pour savoir pour quel(s) trajet(s) le nombre de places est dépassé :
 --      SELECT * FROM v_CheckPlace WHERE count > nb_places;
 -- Vue utilisée pour calculer le taux de remplissage    
@@ -488,7 +471,7 @@ INSERT INTO CompositionBillet VALUES (2, 1);
 
 -- SELECT
 
---Affiche le nombre de trajets par date (SELECT COUNT)
+--Affiche le nombre de trajets par date (SELECT COUNT) (= nombre de voyageurs de la société de train par date)
 SELECT date_, COUNT(*) AS nombre_trajets
 FROM Trajet
 GROUP BY date_;
@@ -499,12 +482,16 @@ FROM Voyage
 JOIN Ligne ON Voyage.ligne = Ligne.num
 GROUP BY Ligne.num;
 
+--Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
+SELECT SUM(prix) AS somme_prix
+FROM Billet;
+
 --Affiche la somme des prix des billets par voyageur (SELECT SUM)
 SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
 FROM Billet
 GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
 
---Afficher le nombre de trajets par jour de la semaine (SELECT CASE)
+--Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
 SELECT
     CASE
         WHEN lundi THEN 'Lundi'
@@ -515,7 +502,7 @@ SELECT
         WHEN samedi THEN 'Samedi'
         WHEN dimanche THEN 'Dimanche'
     END AS jour_semaine,
-    COUNT(*) AS nombre_trajets
+    COUNT(*) AS nombre_voyages
 FROM Calendrier
 JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier
 GROUP BY jour_semaine;
@@ -523,24 +510,31 @@ GROUP BY jour_semaine;
 --Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
 SELECT nom, prenom, adresse
 FROM Voyageur
-WHERE statut = 'gold';
+WHERE statut = 'bronze';
 
+-- Récupère le taux de remplissage des trains (en %)
+SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage
+FROM v_CheckPlace;
 
-
-SELECT g.nom, g.ville, COUNT(b.id_billet) AS nb_billets FROM Gare g
-INNER JOIN ArretLigne al ON al.nom_gare = g.nom AND al.ville_gare = g.ville
-INNER JOIN ArretVoyage av ON av.arret_ligne = al.num_arret AND av.ligne = al.ligne
-INNER JOIN ArretTrajet at ON at.num_arret_voyage = av.num_arret AND at.voyage = av.voyage
-INNER JOIN Trajet t ON t.id_trajet = at.trajet
-INNER JOIN CompositionBillet cb ON cb.trajet = t.id_trajet
-INNER JOIN Billet b ON b.id_billet = cb.billet
-GROUP BY (g.nom,g.ville)
-ORDER BY nb_billets DESC;
 -- La requête renvoie les noms et villes des gares les plus fréquentées en se basant sur les billets des voyageurs
 -- On a fait l'hypothèse qu'un voyageur fréquente une gare par rapport aux trajets sur son billet. Donc plus il y a de billets vendus où leur trajet passe par une gare, plus cette gare sera fréquentée
 -- Les gares sont affichées par ordre décroissant, de la plus fréquentée à la moins fréquentée
+SELECT g.nom, g.ville, COUNT(b.id_billet) AS nb_billets
+FROM Gare g
+INNER JOIN ArretLigne al ON al.nom_gare = g.nom AND al.ville_gare = g.ville
+INNER JOIN ArretVoyage av ON av.arret_ligne = al.num_arret AND av.ligne = al.ligne
+INNER JOIN ArretTrajet a ON a.num_arret_voyage = av.num_arret AND a.voyage = av.voyage
+INNER JOIN Trajet t ON t.id_trajet = a.trajet
+INNER JOIN CompositionBillet cb ON cb.trajet = t.id_trajet
+INNER JOIN Billet b ON b.id_billet = cb.billet
+GROUP BY (g.nom, g.ville)
+ORDER BY nb_billets DESC;
 
-SELECT l.num, COUNT(b.id_billet) AS nb_billets FROM Ligne l
+-- La requête renvoie les numéros des lignes les plus fréquentées en se basant sur les billets des voyageurs
+-- On a fait l'hypothèse qu'un voyageur voyage dans une ligne par rapport aux trajets sur son billet. Donc plus il y a de billets vendus où leur trajet utilise une ligne, plus cette ligne sera fréquentée
+-- Les lignes sont affichées par ordre décroissant, de la plus fréquentée à la moins fréquentée
+SELECT l.num, COUNT(b.id_billet) / 2 AS nb_billets
+FROM Ligne l
 INNER JOIN ArretLigne al ON al.ligne = l.num
 INNER JOIN ArretVoyage av ON av.arret_ligne = al.num_arret AND av.ligne = al.ligne
 INNER JOIN ArretTrajet at ON at.num_arret_voyage = av.num_arret AND at.voyage = av.voyage
@@ -549,6 +543,3 @@ INNER JOIN CompositionBillet cb ON cb.trajet = t.id_trajet
 INNER JOIN Billet b ON b.id_billet = cb.billet
 GROUP BY (l.num)
 ORDER BY nb_billets DESC;
--- La requête renvoie les numéros des lignes les plus fréquentées en se basant sur les billets des voyageurs
--- On a fait l'hypothèse qu'un voyageur voyage dans une ligne par rapport aux trajets sur son billet. Donc plus il y a de billets vendus où leur trajet utilise une ligne, plus cette ligne sera fréquentée
--- Les lignes sont affichées par ordre décroissant, de la plus fréquentée à la moins fréquentée

@@ -1,0 +1,159 @@
+@startuml
+
+class Gare {
+  nom: string
+  adresse: string
+  ville: string
+  pays: string
+  __
+  GMT(): TimeZone
+}
+
+class Gare
+note left: key: {nom, ville}
+
+class Hotel {
+  nom: string
+  adresse: string
+}
+
+class Hotel
+note right: key: {nom, adresse}
+
+class Taxi {
+  num: int {key}
+  telephone: string
+}
+
+class TransportPublic {
+  num: int {key}
+}
+
+class Train {
+  num: int {key}
+}
+
+class TypeTrain {
+  nom: string {key}
+  nb_places: int
+  vitesse: int
+  premiere_classe: boolean
+}
+
+class ArretLigne {
+  num_arret: int
+  arrive: boolean
+}
+
+class ArretVoyage {
+  num_arret: int
+  heure_depart: time
+  heure_arrive: time
+}
+
+class ArretTrajet {
+  depart: boolean
+}
+
+class Ligne {
+  num: int {key}
+}
+
+class Voyage {
+}
+
+class Calendrier {
+  date_debut: date
+  date_fin: date
+  horaire: time
+  lundi: boolean
+  mardi: boolean
+  mercredi: boolean
+  jeudi: boolean
+  vendredi: boolean
+  samedi: boolean
+  dimanche: boolean
+}
+
+class DateException {
+  date: date
+  ajout: boolean
+}
+note right: key: {date, ajout}
+
+class Voyageur <<abstract>> {
+  nom: string
+  prenom: string
+  adresse: string
+  telephone: string
+  paiement: Paiement
+}
+
+class Voyageur
+note right: key: {nom, prenom, adresse}
+
+class Occasionnel {
+}
+
+class Regulier {
+  carte: int
+  statut: Statut
+}
+
+class Billet {
+  assurance: boolean
+  prix: float
+  __
+  Annulation(): boolean
+  Modification(assurance:boolean)
+}
+
+class Trajet {
+  num_place: int
+  date: date
+  __
+  Durée(): time
+}
+
+class Paiement << enumeration >> {
+  carte
+  chèque
+  monnaie
+}
+
+class Statut << enumeration >> {
+  bronze
+  silver
+  gold
+  platine
+}
+
+
+Voyageur <|-- Occasionnel
+Voyageur <|-- Regulier
+
+Gare "1..n" -- "0..n" Hotel: dispose_de >
+Gare "1..n" -- "0..n" Taxi: dispose_de >
+Gare "1..n" -- "0..n" TransportPublic: dessert <
+
+Gare "1" -- "0..n" ArretLigne: comprend >
+ArretLigne "2..n" -- "1" Ligne: est_composée_de <
+ArretLigne "1" -- "0..1" ArretVoyage: compose >
+ArretVoyage "2..n" -- "1" Voyage: se_compose_de <
+ArretVoyage "2" -- "0..n" Trajet: contient <
+(ArretVoyage, Trajet) .. ArretTrajet
+Ligne "1" -- "1..n" Voyage: est_assurée_par >
+
+Ligne "0..n" -- "1" TypeTrain: est_assurée_par >
+TypeTrain "1" -- "0..n" Train: est_de_type <
+Voyage "0..n" -- "1" Train: est_assuré_par >
+Voyage "0..n" -- "1" Calendrier: est_programmé_par >
+Calendrier "1..n" -- "0..n" DateException: concerne <
+
+
+Billet "0..n" -- "1..n" Trajet: est_composé_de >
+Voyageur "1" -- "0..n" Billet: possède >
+
+note "Les attributs sont non nuls par défaut.\n\nL'héritage est exclusif.\n\nIl faut s'assurer que la ligne reliée à un voyage est la même que celle\nreliée à ArretVoyage à travers ArretLigne.\n\nUn Trajet est relié à deux arrêts d'un même voyage.\n\nL'attribut date dans Trajet doit être une date présente\ndans le Calendrier du Voyage et non supprimée dans DateException,\nou bien une date ajoutée dans DateException du Voyage.\n\nIl faut s'assurer que l'horaire de Voyage (présente dans Calendrier) est\négale à l'heure de départ du premier ArretVoyage.\n\nIl faut s'assurer que le nombre de places réservées ne dépasse pas\nnb_places du TypeTrain pour chaque Voyage.\n\nIl faut s'assuer que le train qui assure un voyage est bien du type\ncorrespondant à la ligne sur laquelle le voyage est effectué." as N1
+
+@enduml

@@ -321,14 +321,14 @@ WHERE t.num = v.train AND l.num = v.ligne AND l.type_train <> t.type_train;
 -- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
 CREATE VIEW v_CheckDate AS
-SELECT t.date_ AS trajet_date, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
+SELECT t.id_trajet, t.date_ AS trajet_date, c.id_calendrier, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
 FROM Trajet t
 JOIN ArretTrajet a ON t.id_trajet = a.trajet
 JOIN ArretVoyage av ON a.num_arret_voyage = av.num_arret AND a.voyage = av.voyage
 JOIN Voyage v ON av.voyage = v.id_voyage
 JOIN Calendrier c ON v.calendrier = c.id_calendrier
 LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
-LEFT OUTER JOIN DateException d ON cc.date_exception = d.date_ AND cc.ajout_exception = d.ajout;
+LEFT OUTER JOIN DateException d ON cc.date_exception = d.date_ AND cc.ajout_exception = d.ajout AND d.date_ = t.date_;
 -- La contrainte qu'on cherche à vérifier est
 --      L'attribut date dans Trajet doit être une date présente dans le Calendrier du Voyage et non supprimée dans DateException, ou bien une date ajoutée dans DateException du Voyage.
 

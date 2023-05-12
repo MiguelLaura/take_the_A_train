@@ -6,11 +6,11 @@ Utilisateur
 -chercher trajet en fonction de villes de départ et d'arrivée
 -chercher date de voyage
 -prix du billent (filte -prix max/prix min/affichage ordre décroissant)
--annulation(méthode)
+-annulation(méthode)/modification
 
 
 Employé
--Création d'un voyage 
+-Création d'un voyage
 -création période calendrier
 -gérer gare/nombres de train/itinéraire
 -stat sur la société ( taux de remplissage)

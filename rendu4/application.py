@@ -273,9 +273,6 @@ if check_bdd():
                     print()
                 if choice == 9:
                     print()
-                    print("Fonction Python 9")
-                    print()
-                if choice == 10:
                     choice = 1
                     print()
                     break

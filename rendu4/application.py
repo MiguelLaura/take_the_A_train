@@ -326,7 +326,6 @@ def consulter_voyages_proposes():
 
 
 #fonction4 nadia
-
 def consulter_horaire_train(ville_depart, ville_arrivee):
     # SQL pour trouver train en fonction des infos
     cursor.execute('''

@@ -297,6 +297,7 @@ if check_bdd():
                 if choice == 1:
                     print()
                     print("Fonction Python 1")
+                    creerVoyageur()
                     print()
                 if choice == 2:
                     print()

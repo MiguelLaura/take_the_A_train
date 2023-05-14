@@ -374,7 +374,7 @@ if check_bdd():
                 print ("Pour acheter un billet, entrez 2")
                 print ("Pour consulter la liste des voyages, entrez 3")#ok
                 print ("Pour consulter les horaires de trains en fonction de gare de départ et d'arrivée, entrez 4")#ok
-                print ("Pour chercher un voyage aller simple en fonction du date donnée, entrez 7")
+                print ("Pour chercher un voyage aller simple en fonction du date/gare donnée, entrez 7")
                 print ("Pour chercher un voyage aller/retour en fonction des dates données , entrez 7")
                 print ("Pour chercher un trajet en fonction du prix du billet, entrez 8") # ? on le garde ?
                 print ("Pour annuler (ou modifier un voyage), entrez 9")

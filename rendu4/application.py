@@ -168,9 +168,67 @@ def nb_trajets_par_date():
     for row in rows:
         print("\tDate : %s\tNombre de trajets : %s" % (row))
 
+#Affiche le nombre de voyages par ligne de train (SELECT COUNT)
+#Elisa
+def nb_voyages_par_ligne():
+    print("Nombre de voyages par ligne de train :\n")
+    sql = "SELECT Ligne.num, COUNT(*) AS nombre_voyages FROM Voyage JOIN Ligne ON Voyage.ligne = Ligne.num GROUP BY Ligne.num;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows :
+        print("\nLigne : %s\tNombre de voyages : %i"%(row))
+
+#Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
+#Elisa
+def argent_gagne():
+    sql = "SELECT SUM(prix) AS somme_prix FROM Billet;"
+    cur.execute(sql)
+    row = cur.fetchall()
+    print("Argent gagné par la société : %f"%(row))
+
+#Affiche la somme des prix des billets par voyageur (SELECT SUM)
+#Elisa
+def argent_par_voyageur():
+    print("Somme des prix des billets par voyageur :\n")
+    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\nNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %f"%(row))
+
+#Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
+#Elisa
+def nb_voyages_par_jour():
+    print("Nombre de voyages par jour de la semaine :\n")
+    sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\nJour : %s\tNombre de voyages : %i"%(row))
+
+#Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
+#Elisa
+def voyageur_bronze():
+    print("Voyageurs ayant le statut bronze :\n")
+    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\nNom : %s\tPrenom : %s\tAdresse : %s"%(row))
+
+#Récupère le taux de remplissage des trains (en %)
+#Elisa
+def taux_remplissage():
+    print("Taux de remplissage des trains :\n")
+    sql = "SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage FROM v_CheckPlace;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\nNuméro de voyage : %i\tDate : %s\tTaux de remplissage : %f"%(row))
+
 # Création d'un voyageur
-#elisa
-def creerVoyageur():
+#Elisa
+def creer_voyageur():
     nom = input("Nom : ")
     prenom = input("Prénom : ")
     adresse = input("Adresse : ")
@@ -186,9 +244,12 @@ def creerVoyageur():
         print("Vous êtes déjà inscrit.")
     else :
         if occas == 1:
-            sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true);"%(nom,prenom,adresse,tel,paiement)
-            cur.execute(sql)
-            conn.commit()
+            try :
+                sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true);"%(nom,prenom,adresse,tel,paiement)
+                cur.execute(sql)
+                conn.commit()
+            except psycopg2.Error as e:
+                print("Erreur : ",e)
         else :
             verif = 0
             while verif == 0 :
@@ -202,9 +263,12 @@ def creerVoyageur():
                     print("Le numéro de carte existe déjà.")
                     print("\n Veuillez en saisir un autre.")
             statut = input("Statut :")
-            sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false);"%(nom,prenom,adresse,tel,paiement,carte,statut)
-            cur.execute(sql)
-            conn.commit()
+            try :
+                sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false);"%(nom,prenom,adresse,tel,paiement,carte,statut)
+                cur.execute(sql)
+                conn.commit()
+            except psycopg2.Error as e:
+                print("Erreur : ",e)
 
 #creerVoyageur- nadia
 def creer_compte_voyageur():

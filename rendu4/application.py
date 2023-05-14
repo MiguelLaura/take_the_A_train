@@ -168,7 +168,7 @@ def nb_trajets_par_date():
     for row in rows:
         print("\tDate : %s\tNombre de trajets : %s" % (row))
 
-# Création d'un voyageur
+# Création d'un voyageur (Elisa)
 def creerVoyageur():
     nom = input("Nom : ")
     prenom = input("Prénom : ")
@@ -224,17 +224,16 @@ if check_bdd():
         except ValueError:
             choice = 0
         if choice == 1:
-            while choice in range(1, 10):
+            while choice in range(1, 9):
                 print ("Pour créer un compte voyageur, entrez 1")
                 print ("Pour acheter un billet, entrez 2")
                 print ("Pour consulter la liste des voyages, entrez 3")
                 print ("Pour consulter les horaires de trains, entrez 4")
-                print ("Pour consulter la liste des voyages, entrez 5")
-                print ("Pour chercher trajet en fonction de villes de départ et d'arrivée, entrez 6")
-                print ("Pour chercher une date de voyage, entrez 7")
-                print ("Pour chercher un trajet en fonction du prix du billet, entrez 8")
-                print ("Pour annuler (ou modifier un voyage), entrez 9")
-                print ("Pour revenir en arrière, entrez 10")
+                print ("Pour chercher trajet en fonction de villes de départ et d'arrivée, entrez 5")
+                print ("Pour chercher une date de voyage, entrez 6")
+                print ("Pour chercher un trajet en fonction du prix du billet, entrez 7")
+                print ("Pour annuler (ou modifier un voyage), entrez 8")
+                print ("Pour revenir en arrière, entrez 9")
                 print ("Pour sortir, entrez autre chose")
                 try:
                     choice = int(input())

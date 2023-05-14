@@ -168,7 +168,8 @@ def nb_trajets_par_date():
     for row in rows:
         print("\tDate : %s\tNombre de trajets : %s" % (row))
 
-# Création d'un voyageur (Elisa)
+# Création d'un voyageur
+#elisa
 def creerVoyageur():
     nom = input("Nom : ")
     prenom = input("Prénom : ")
@@ -205,6 +206,42 @@ def creerVoyageur():
             cur.execute(sql)
             conn.commit()
 
+#creerVoyageur- nadia
+def creer_compte_voyageur():
+    print("----- Création d'un compte voyageur -----")
+    nom = input("Nom : ")
+    prenom = input("Prénom : ")
+    adresse = input("Adresse : ")
+    telephone = input("Téléphone : ")
+    paiement = input("Méthode de paiement (carte/cheque/monnaie) : ")
+    carte = input("Numéro de carte (optionnel) : ")
+    statut = input("Statut (bronze/silver/gold/platine) : ")
+    occasionnel = input("Voyageur occasionnel ? (oui/non) : ")
+    # Conversion 
+    occasionnel = True if occasionnel.lower() == "oui" else False
+    # Verification Donnees completes
+    if not nom or not prenom or not adresse or not telephone or not paiement:
+        print("Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
+        return
+    # Verification si le voyageur existe deja dans la base d
+    cursor.execute("SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
+                   (nom, prenom, adresse))
+    count = cursor.fetchone()[0]
+    if count > 0:
+        print("Le voyageur existe déjà dans la base de données.")
+        return
+    # Insertion du compte voyageur dans la base de données
+    try:
+        cursor.execute("INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                       (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel))
+        conn.commit()
+        print("Le compte voyageur a été créé avec succès.")
+    except psycopg2.Error as e:
+        print("Une erreur s'est produite lors de la création du compte voyageur :", e)
+
+
+
 if check_bdd():
 
     # MENU
@@ -224,16 +261,17 @@ if check_bdd():
         except ValueError:
             choice = 0
         if choice == 1:
-            while choice in range(1, 9):
+            while choice in range(1, 10):
                 print ("Pour créer un compte voyageur, entrez 1")
                 print ("Pour acheter un billet, entrez 2")
                 print ("Pour consulter la liste des voyages, entrez 3")
                 print ("Pour consulter les horaires de trains, entrez 4")
-                print ("Pour chercher trajet en fonction de villes de départ et d'arrivée, entrez 5")
-                print ("Pour chercher une date de voyage, entrez 6")
-                print ("Pour chercher un trajet en fonction du prix du billet, entrez 7")
-                print ("Pour annuler (ou modifier un voyage), entrez 8")
-                print ("Pour revenir en arrière, entrez 9")
+                print ("Pour consulter la liste des voyages, entrez 5")
+                print ("Pour chercher trajet en fonction de villes de départ et d'arrivée, entrez 6")
+                print ("Pour chercher une date de voyage, entrez 7")
+                print ("Pour chercher un trajet en fonction du prix du billet, entrez 8")
+                print ("Pour annuler (ou modifier un voyage), entrez 9")
+                print ("Pour revenir en arrière, entrez 10")
                 print ("Pour sortir, entrez autre chose")
                 try:
                     choice = int(input())
@@ -273,6 +311,9 @@ if check_bdd():
                     print()
                 if choice == 9:
                     print()
+                    print("Fonction Python 9")
+                    print()
+                if choice == 10:
                     choice = 1
                     print()
                     break

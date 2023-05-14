@@ -338,7 +338,6 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
         INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom AND ArretLigne.ville_gare = GareArrivee.ville
         WHERE GareDepart.ville = ? AND GareArrivee.ville = ?
     ''', (ville_depart, ville_arrivee))
-
     results = cursor.fetchall()
     if results:
         print(f"Horaire Trains de {ville_depart} à {ville_arrivee}:")
@@ -349,6 +348,38 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
         print(f"Pas de train allant de {ville_depart} à {ville_arrivee}.")
 
 
+
+#fonction 5 nadia renvoie aller simple  en fonction de la date/gare depart/arrivee donner par le user
+def consulter_trajet_aller_simple_date_gare():
+    date_trajet = input("Entrer la date (YYYY-MM-DD): ")
+    station_depart = input("Entrer la gare de depart: ")
+    station arrivee = input("Entrer la gare d'arrivee: ")
+    # SQL pour rechercher trajet en fonction des données entrees par le user
+    cursor.execute('''
+        SELECT Trajet.id_trajet, Trajet.num_place, Trajet.date_
+        FROM Trajet
+        INNER JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet
+        INNER JOIN ArretVoyage ON ArretTrajet.num_arret_voyage = ArretVoyage.num_arret
+            AND ArretTrajet.voyage = ArretVoyage.voyage
+        INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret
+            AND ArretVoyage.ligne = ArretLigne.ligne
+        INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom
+            AND ArretLigne.ville_gare = GareDepart.ville
+        INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom
+            AND ArretLigne.ville_gare = GareArrivee.ville
+        WHERE Trajet.date_ = ? AND GareDepart.ville = ? AND GareArrivee.ville = ?
+    ''', (date_trajet, station_depart, station arrivee))
+
+    results = cursor.fetchall()
+    if results:
+        print(f"Trajets le {date_trajet} de {station_depart} à {station arrivee}:")
+        for row in results:
+            trajet_id, num_place, trajet_date = row
+            print(f"Trajet ID: {trajet_id}, Num Place: {num_place}, Date: {trajet_date}")
+    else:
+        print(f"Pas de trajet pour le {date_trajet} de {station_depart} à {station arrivee}.")
+
+ 
 
 if check_bdd():
 
@@ -374,10 +405,10 @@ if check_bdd():
                 print ("Pour acheter un billet, entrez 2")
                 print ("Pour consulter la liste des voyages, entrez 3")#ok
                 print ("Pour consulter les horaires de trains en fonction de gare de départ et d'arrivée, entrez 4")#ok
-                print ("Pour chercher un voyage aller simple en fonction du date/gare donnée, entrez 7")
-                print ("Pour chercher un voyage aller/retour en fonction des dates données , entrez 7")
-                print ("Pour chercher un trajet en fonction du prix du billet, entrez 8") # ? on le garde ?
-                print ("Pour annuler (ou modifier un voyage), entrez 9")
+                print ("Pour chercher un voyage aller simple en fonction de date/gare donnée, entrez 5") #ok
+                print ("Pour chercher un voyage aller/retour en fonction des dates données , entrez 6")
+                print ("Pour chercher un trajet en fonction du prix du billet, entrez 7") # ? on le garde ?
+                print ("Pour annuler (ou modifier un voyage), entrez 8")
                 print ("Pour revenir en arrière, entrez 10")
                 print ("Pour sortir, entrez autre chose")
                 try:

@@ -304,6 +304,51 @@ def creer_compte_voyageur():
     except psycopg2.Error as e:
         print("Une erreur s'est produite lors de la création du compte voyageur :", e)
 
+#fonction 3 nadia
+def consulter_voyages_proposes():
+    print("----- Voyages proposés -----")
+    try:
+        cursor.execute("SELECT Voyage.num, Ligne.num, Ligne.type_train, ArretLigne.nom_gare_depart, ArretLigne.ville_gare_depart, ArretLigne.nom_gare_arrivee, ArretLigne.ville_gare_arrivee, Voyage.date_depart, Voyage.date_arrivee FROM Voyage "
+                       "JOIN Ligne ON Voyage.ligne = Ligne.num "
+                       "JOIN ArretLigne ON Ligne.num = ArretLigne.ligne "
+                       "WHERE ArretLigne.num_arret = 1") # num_arret=1
+        voyages = cursor.fetchall()
+        if voyages:
+            print("Numéro de voyage\tNuméro de ligne\tType de ligne\tGare de départ\t\tVille de départ\t\tGare d'arrivée\t\tVille d'arrivée\t\tDate de départ\t\tDate d'arrivée")
+            print("--------------------------------------------------------------------------------------------------------------------------------------------------------")
+            for voyage in voyages:
+                num_voyage, num_ligne, type_ligne, gare_depart, ville_depart, gare_arrivee, ville_arrivee, date_depart, date_arrivee = voyage
+                print(f"{num_voyage}\t\t\t{num_ligne}\t\t\t{type_ligne}\t\t{gare_depart}\t\t{ville_depart}\t\t{gare_arrivee}\t\t{ville_arrivee}\t\t{date_depart}\t\t{date_arrivee}")
+        else:
+            print("Aucun voyage n'est actuellement proposé.")
+    except psycopg2.Error as e:
+        print("Une erreur s'est produite lors de la récupération des voyages proposés :", e)
+
+
+#fonction4 nadia
+
+def consulter_horaire_train(ville_depart, ville_arrivee):
+    # SQL pour trouver train en fonction des infos
+    cursor.execute('''
+        SELECT DISTINCT Voyage.id_voyage, ArretVoyage.heure_depart, ArretVoyage.heure_arrivee
+        FROM ArretVoyage
+        INNER JOIN Ligne ON ArretVoyage.ligne = Ligne.num
+        INNER JOIN Voyage ON ArretVoyage.voyage = Voyage.id_voyage
+        INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret AND ArretLigne.ligne = Ligne.num
+        INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom AND ArretLigne.ville_gare = GareDepart.ville
+        INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom AND ArretLigne.ville_gare = GareArrivee.ville
+        WHERE GareDepart.ville = ? AND GareArrivee.ville = ?
+    ''', (ville_depart, ville_arrivee))
+
+    results = cursor.fetchall()
+    if results:
+        print(f"Horaire Trains de {ville_depart} à {ville_arrivee}:")
+        for row in results:
+            voyage_id, heure-depart, heure_arrivee = row
+            print(f"Voyage ID: {voyage_id}, Depart: {heure-depart}, Arrivé: {heure_arrivee}")
+    else:
+        print(f"Pas de train allant de {ville_depart} à {ville_arrivee}.")
+
 
 
 if check_bdd():
@@ -352,11 +397,13 @@ if check_bdd():
                 if choice == 3:
                     print()
                     print("Fonction Python 3")
-                    print()
+                    consulter_voyages_proposes()
                 if choice == 4:
                     print()
-                    print("Fonction Python 4")
-                    print()
+                    print("Fonction Python 4")                    
+                    ville_depart = input("Entrer la gare de ville de départ : ")
+                    ville_arrivee = input("Entrer la gare de ville d'arrivée: ")
+consulter_horaire_train(ville_depart, ville_arrivee)
                 if choice == 5:
                     print()
                     print("Fonction Python 5")

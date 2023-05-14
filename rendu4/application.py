@@ -419,6 +419,12 @@ if check_bdd():
                 if choice == 6:
                     print()
                     nb_trajets_par_date()
+                    nb_voyages_par_ligne()
+                    nb_voyages_par_jour()
+                    argent_gagne()
+                    argent_par_voyageur()
+                    voyageur_bronze()
+                    taux_remplissage()
                     print()
                 if choice == 7:
                     choice = 1

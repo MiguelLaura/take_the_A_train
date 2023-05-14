@@ -168,6 +168,43 @@ def nb_trajets_par_date():
     for row in rows:
         print("\tDate : %s\tNombre de trajets : %s" % (row))
 
+# Création d'un voyageur
+def creerVoyageur():
+    nom = input("Nom : ")
+    prenom = input("Prénom : ")
+    adresse = input("Adresse : ")
+    tel = input("Téléphone : ")
+    paiement = input("Moyen de paiement : ")
+    occas = input("Entrez 1 si vous voulez être un voyageur occasionnel, 0 sinon : ")
+    
+    sql = "SELECT * FROM Voyageur WHERE nom=%s AND prenom=%s AND adresse=%s;"%(nom,prenom,adresse)
+    cur.execute(sql)
+    rows = cur.fetchall()
+    
+    if rows :
+        print("Vous êtes déjà inscrit.")
+    else :
+        if occas == 1:
+            sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true);"%(nom,prenom,adresse,tel,paiement)
+            cur.execute(sql)
+            conn.commit()
+        else :
+            verif = 0
+            while verif == 0 :
+                carte = int(input("Numéro de carte"))
+                sql = "SELECT carte FROM Voyageur WHERE carte=%i;"%carte
+                cur.execute(sql)
+                rows = cur.fetchall()
+                if not rows :
+                    verif = 1
+                else :
+                    print("Le numéro de carte existe déjà.")
+                    print("\n Veuillez en saisir un autre.")
+            statut = input("Statut :")
+            sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false);"%(nom,prenom,adresse,tel,paiement,carte,statut)
+            cur.execute(sql)
+            conn.commit()
+
 if check_bdd():
 
     # MENU

@@ -1,26 +1,25 @@
 import psycopg2
 from datetime import date
 
-'''
-database = input("A quelle base de données voulez-vous vous connecter ? ")
-host = input("Quel est l'host ? ")
-user = input("Entrez votre nom d'utilisateur : ")
-password = input("Entrez votre mot de passe : ")
 
-# Connect to the PostgreSQL database server
-conn = psycopg2.connect(
-    host=host,
-    database=database,
-    user=user,
-    password=password
-)'''
+# database = input("A quelle base de données voulez-vous vous connecter ? ")
+# host = input("Quel est l'host ? ")
+# user = input("Entrez votre nom d'utilisateur : ")
+# password = input("Entrez votre mot de passe : ")
+#
+# # Connect to the PostgreSQL database server
+# conn = psycopg2.connect(
+#     host=host,
+#     database=database,
+#     user=user,
+#     password=password
+# )
 
 conn = psycopg2.connect(
-    host="localhost",
-    port =1114,
-    database="postgres",
-    user="postgres",
-    password="hu1999414"
+    host='tuxa.sme.utc',
+    database='dbnf18p091',
+    user='nf18p091',
+    password='MA2Z5AsflnpB'
 )
 
 
@@ -244,11 +243,11 @@ def creer_voyageur():
     tel = input("Téléphone : ")
     paiement = input("Moyen de paiement : ")
     occas = input("Entrez 1 si vous voulez être un voyageur occasionnel, 0 sinon : ")
-    
+
     sql = "SELECT * FROM Voyageur WHERE nom=%s AND prenom=%s AND adresse=%s;"%(nom,prenom,adresse)
     cur.execute(sql)
     rows = cur.fetchall()
-    
+
     if rows :
         print("Vous êtes déjà inscrit.")
     else :
@@ -287,51 +286,65 @@ def creer_compte_voyageur():
     adresse = input("Adresse : ")
     telephone = input("Téléphone : ")
     paiement = input("Méthode de paiement (carte/cheque/monnaie) : ")
-    carte = input("Numéro de carte (optionnel) : ")
-    statut = input("Statut (bronze/silver/gold/platine) : ")
-    occasionnel = input("Voyageur occasionnel ? (oui/non) : ")
-    # Conversion 
+    occasionnel = input("Voyageur occasionnel ? oui/non (entrez autre chose que oui) : ")
+    carte = None
+    statut = None
+    if occasionnel.lower() != "oui":
+        carte = input("Numéro de carte : ")
+        statut = input("Statut (bronze/silver/gold/platine) : ")
+        try:
+            carte = int(carte)
+        except ValueError:
+            print("\nERREUR : Veuillez entrer un entier pour le numéro de carte.")
+            return
+        if statut.lower() not in ["bronze", "silver", "gold", "platine"]:
+            print("\nERREUR : Veuillez entrer 'bronze', 'silver', 'gold', ou 'platine' comme statut.")
+            return
+    # Conversion
     occasionnel = True if occasionnel.lower() == "oui" else False
     # Verification Donnees completes
     if not nom or not prenom or not adresse or not telephone or not paiement:
-        print("Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
+        print("\nERREUR : Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
+        return
+    if paiement.lower() not in ["carte", "cheque", "monnaie"]:
+        print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
         return
     # Verification si le voyageur existe deja dans la base d
-    cur.execute("SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
-                   (nom, prenom, adresse))
+    cur.execute(
+        "SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
+        (nom, prenom, adresse)
+    )
     count = cur.fetchone()[0]
     if count > 0:
-        print("Le voyageur existe déjà dans la base de données.")
+        print("\nERREUR : Le voyageur existe déjà dans la base de données.")
         return
     # Insertion du compte voyageur dans la base de données
     try:
-        cur.execute("INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) "
-                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel))
+        cur.execute(
+            "INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel)
+        )
         conn.commit()
-        print("Le compte voyageur a été créé avec succès.")
+        print("\nLe compte voyageur a été créé avec succès.")
     except psycopg2.Error as e:
-        print("Une erreur s'est produite lors de la création du compte voyageur :", e)
+        print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
 #fonction 3 nadia
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
-        cur.execute("SELECT Voyage.num, Ligne.num, Ligne.type_train, ArretLigne.nom_gare_depart, ArretLigne.ville_gare_depart, ArretLigne.nom_gare_arrivee, ArretLigne.ville_gare_arrivee, Voyage.date_depart, Voyage.date_arrivee FROM Voyage "
-                    "JOIN Ligne ON Voyage.ligne = Ligne.num "
-                    "JOIN ArretLigne ON Ligne.num = ArretLigne.ligne "
-                    "WHERE ArretLigne.num_arret = 1;") # num_arret=1
+        cur.execute(
+            "SELECT ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret, ArretVoyage.heure_depart, ArretLigne.nom_gare, ArretLigne.ville_gare, ArretVoyage.heure_arrivee, ArretLigne.nom_gare, ArretLigne.ville_gare FROM ArretVoyage JOIN ArretLigne ON Arretligne.ligne = ArretVoyage.ligne AND ArretLigne.num_arret = ArretVoyage.arret_ligne ORDER BY (ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret)")
         voyages = cur.fetchall()
         if voyages:
-            print("Numéro de voyage\tNuméro de ligne\tType de ligne\tGare de départ\t\tVille de départ\t\tGare d'arrivée\t\tVille d'arrivée\t\tDate de départ\t\tDate d'arrivée")
-            print("--------------------------------------------------------------------------------------------------------------------------------------------------------")
+            print("\nLigne, voyage, numéro d'arrêt, heure de depart, gare de départ, ville de départ, heure d'arrivée, gare d'arrivée, ville d'arrivée")
+            print("--------------------------------------------------------------------------------------------------------------------------------------------------------------")
             for voyage in voyages:
-                num_voyage, num_ligne, type_ligne, gare_depart, ville_depart, gare_arrivee, ville_arrivee, date_depart, date_arrivee = voyage
-                print(f"{num_voyage}\t\t\t{num_ligne}\t\t\t{type_ligne}\t\t{gare_depart}\t\t{ville_depart}\t\t{gare_arrivee}\t\t{ville_arrivee}\t\t{date_depart}\t\t{date_arrivee}")
+                print("%d, %d, %d, %s, %s, %s, %s, %s, %s" % voyage)
         else:
-            print("Aucun voyage n'est actuellement proposé.")
+            print("\nAucun voyage n'est actuellement proposé.")
     except psycopg2.Error as e:
-        print("Une erreur s'est produite lors de la récupération des voyages proposés :", e)
+        print("\nERREUR : Une erreur s'est produite lors de la récupération des voyages proposés :", e)
 
 
 #fonction4 nadia
@@ -398,7 +411,7 @@ def ajouter_ligne():
     print("Lignes dans la base de données :")
     for row in rows:
         print("Numéro : %i\tType de train : %s"%(row))
-    
+
     verif = 0
     while verif == 0 :
         ligne = int(input("Numéro de ligne :"))
@@ -410,14 +423,14 @@ def ajouter_ligne():
         else :
             print("Le numéro de ligne existe déjà.")
             print("\nVeuillez en saisir un autre.")
-    
+
     sql = "SELECT nom FROM TypeTrain;"
     cur.execute(sql)
     rows = cur.fetchall()
     print("Types de train dans la base de données :")
     for row in rows:
         print("%s"%(row))
-    
+
     verif = 0
     while verif == 0 :
         type_train = input("Type de train :")
@@ -429,14 +442,14 @@ def ajouter_ligne():
         else :
             print("Le type de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
-    
+
     try:
         sql = "INSERT INTO Ligne VALUES (%i,%s);"%(ligne,type_train)
         cur.execute(sql)
         conn.commit()
     except psycopg2.Error as e:
         print("Erreur :",e)
-        
+
     print("Ligne ajoutée.")
 
 #Supprimer une ligne
@@ -448,7 +461,7 @@ def supprimer_ligne():
     print("Lignes dans la base de données :")
     for row in rows:
         print("Numéro : %i\tType de train : %s"%(row))
-    
+
     verif = 0
     while verif == 0 :
         ligne = int(input("Numéro de ligne :"))
@@ -460,14 +473,14 @@ def supprimer_ligne():
         else :
             print("Le numéro de ligne n'existe pas.")
             print("\nVeuillez en saisir un autre.")
-    
+
     try:
         sql = "DELETE * FROM Ligne WHERE num=%i;"%ligne
         cur.execute(sql)
         conn.commit()
     except psycopg2.Error as e:
         print("Erreur :",e)
-    
+
     print("Ligne supprimée.")
 
 #Modifier une ligne
@@ -480,7 +493,7 @@ def modifier_ligne():
     print("\nLignes dans la base de données :")
     for row in rows:
         print("Numéro : %i\tType de train : %s"%(row))
-    
+
     verif = 0
     while verif == 0 :
         ligne = int(input("Numéro de ligne :"))
@@ -492,14 +505,14 @@ def modifier_ligne():
         else :
             print("Le numéro de ligne n'existe pas.")
             print("\nVeuillez en saisir un autre.")
-    
+
     sql = "SELECT nom FROM TypeTrain;"
     cur.execute(sql)
     rows = cur.fetchall()
     print("Types de train dans la base de données :")
     for row in rows:
         print("%s"%(row))
-    
+
     verif = 0
     while verif == 0 :
         type_train = input("Type de train :")
@@ -511,17 +524,17 @@ def modifier_ligne():
         else :
             print("Le type de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
-    
+
     try:
         sql = "UPDATE Ligne SET type_train=%s WHERE num=%i;"%(type_train,ligne)
         cur.execute(sql)
         conn.commit()
     except psycopg2.Error as e:
         print("Erreur :",e)
-    
+
     print("Ligne modifiée.")
 
- 
+
 
 if check_bdd():
 
@@ -537,7 +550,7 @@ if check_bdd():
         print("Choix du profil :")
         print ("\n1 : voyageur")
         print ("\n2 : membre de la société")
-        print ("\nAutre numéro : sortie")
+        print ("\nAutre numéro : sortie\n")
         try:
             choice = int(input("Votre choix : "))
         except ValueError:
@@ -554,54 +567,52 @@ if check_bdd():
                 print ("\n7 : chercher un trajet en fonction du prix du billet") # ? on le garde ?
                 print ("\n8 : annuler (ou modifier un voyage)")
                 print ("\n9 : revenir en arrière dans le menu")
-                print ("\nAutre numéro : sortie")
+                print ("\nAutre numéro : sortie\n")
                 try:
                     choice = int(input("Votre choix : "))
                 except ValueError:
                     choice = 0
                 if choice == 1:
                     print()
-                    print("Fonction Python 1")
-                    creer_compte_voyageur() # ok
-                    print()
+                    creer_compte_voyageur()
+                    input()
                 if choice == 2:
                     print()
                     print("Fonction Python 2")
-                    print()
+                    input()
                 if choice == 3:
                     print()
-                    print("Fonction Python 3")
-                    consulter_voyages_proposes() 
+                    consulter_voyages_proposes()
+                    input()
                 if choice == 4:
                     print()
-                    print("Fonction Python 4")                    
                     ville_depart = input("Entrer la gare de ville de départ : ")
                     ville_arrivee = input("Entrer la gare de ville d'arrivée: ")
                     consulter_horaire_train(ville_depart, ville_arrivee)
+                    input()
                 if choice == 5:
                     print()
                     print("Fonction Python 5")
                     consulter_trajet_aller_simple_date_gare()
-                    print()
+                    input()
                 if choice == 6:
                     print()
                     print("Fonction Python 6")
-                    print()
+                    input()
                 if choice == 7:
                     print()
                     print("Fonction Python 7")
-                    print()
+                    input()
                 if choice == 8:
                     print()
                     print("Fonction Python 8")
-                    print()
+                    input()
                 if choice == 9:
                     print()
                     choice = 1
-                    print()
                     break
         if choice == 2:
-            while choice in range(1, 8): #Vous voulez pas enlever un truc ? ça fait beaucoup de fonctions
+            while choice in range(1, 16): #Vous voulez pas enlever un truc ? ça fait beaucoup de fonctions
                 print("Choix de l'action :")
                 print ("\n1 : ajouter un voyage")
                 print ("\n2 : supprimer un voyage")
@@ -627,58 +638,58 @@ if check_bdd():
                     print()
                     print("Fonction Python 1")
                     creerVoyageur()
-                    print()
+                    input()
                 if choice == 2:
                     print()
                     print("Fonction Python 2")
-                    print()
+                    input()
                 if choice == 3:
                     print()
                     print("Fonction Python 3")
-                    print()
+                    input()
                 if choice == 4:
                     print()
                     print("Fonction Python 4")
-                    print()
+                    input()
                 if choice == 5:
                     print()
                     print("Fonction Python 5")
-                    print()
+                    input()
                 if choice == 6:
                     print()
                     print("Fonction Python 6")
-                    print()
+                    input()
                 if choice == 7:
                     print()
                     print("Fonction Python 7")
-                    print()
+                    input()
                 if choice == 8:
                     print()
                     print("Fonction Python 8")
-                    print()
+                    input()
                 if choice == 9:
                     print()
                     print("Fonction Python 9")
-                    print()
+                    input()
                 if choice == 10:
                     print()
                     print("Fonction Python 10")
-                    print()
+                    input()
                 if choice == 11:
                     print()
                     print("Fonction Python 11")
                     ajouter_ligne()
-                    print()
+                    input()
                 if choice == 12:
                     print()
                     print("Fonction Python 12")
                     supprimer_ligne()
-                    print()
+                    input()
                 if choice == 13:
                     print()
                     print("Fonction Python 13")
                     modifier_ligne()
-                    print()
+                    input()
                 if choice == 14:
                     print()
                     nb_trajets_par_date()
@@ -688,12 +699,12 @@ if check_bdd():
                     argent_par_voyageur()
                     voyageur_bronze()
                     taux_remplissage()
-                    print()
+                    input()
                 if choice == 15:
-                    choice = 1
                     print()
+                    choice = 1
                     break
 
-    print("Au revoir")
+    print("\nAu revoir")
 
 conn.close()

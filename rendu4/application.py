@@ -218,6 +218,9 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
             "WHERE nom = %s AND prenom = %s AND adresse = %s",
             (voyageur_nom, voyageur_prenom, voyageur_adresse)
         )
+    except psycopg2.Error as e:
+        print("\nERREUR : Une erreur s'est produite : ", e)
+        return
 
         traveler_exists = cursor.fetchone()[0]
 
@@ -226,24 +229,32 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
             creer_compte_voyageur()
 
         # recupérer le prix du billet
-        cursor.execute(
-            "SELECT prix FROM Billet "
-            "JOIN CompositionBillet ON Billet.id_billet = CompositionBillet.billet "
-            "JOIN Trajet ON CompositionBillet.trajet = Trajet.id_trajet "
-            "JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
-            "WHERE voyageur_nom = %s AND voyageur_prenom = %s AND voyageur_adresse = %s "
-            "AND ArretTrajet.num_arret_voyage = %s AND ArretTrajet.voyage = %s",
-            (voyageur_nom, voyageur_prenom, voyageur_adresse, num_arret_voyage, ligne)
-        )
+        try:
+            cursor.execute(
+                "SELECT prix FROM Billet "
+                "JOIN CompositionBillet ON Billet.id_billet = CompositionBillet.billet "
+                "JOIN Trajet ON CompositionBillet.trajet = Trajet.id_trajet "
+                "JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
+                "WHERE voyageur_nom = %s AND voyageur_prenom = %s AND voyageur_adresse = %s "
+                "AND ArretTrajet.num_arret_voyage = %s AND ArretTrajet.voyage = %s",
+                (voyageur_nom, voyageur_prenom, voyageur_adresse, num_arret_voyage, ligne)
+            )
+        except psycopg2.Error as e:
+            print("\nERREUR : Une erreur s'est produite : ", e)
+            return
 
         prix = cursor.fetchone()[0]
 
         # Insertion d'un billet dans la base
-        cursor.execute(
-            "INSERT INTO Billet (assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
-            "VALUES (FALSE, %s, %s, %s, %s) RETURNING id_billet",
-            (prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
-        )
+        try:
+            cursor.execute(
+                "INSERT INTO Billet (assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
+                "VALUES (FALSE, %s, %s, %s, %s) RETURNING id_billet",
+                (prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+            )
+        except psycopg2.Error as e:
+            print("\nERREUR : Une erreur s'est produite : ", e)
+            return
 
         # recupère l'ID du billet
         billet_id = cursor.fetchone()[0]
@@ -253,14 +264,11 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
 
         return prix, billet_id
 
-
-
 #Consulter la liste des voyages
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
-        cur.execute(
-            "SELECT ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret, ArretVoyage.heure_depart, ArretLigne.nom_gare, ArretLigne.ville_gare, ArretVoyage.heure_arrivee, ArretLigne.nom_gare, ArretLigne.ville_gare FROM ArretVoyage JOIN ArretLigne ON Arretligne.ligne = ArretVoyage.ligne AND ArretLigne.num_arret = ArretVoyage.arret_ligne ORDER BY (ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret)")
+        cur.execute("SELECT ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret, ArretVoyage.heure_depart, ArretLigne.nom_gare, ArretLigne.ville_gare, ArretVoyage.heure_arrivee, ArretLigne.nom_gare, ArretLigne.ville_gare FROM ArretVoyage JOIN ArretLigne ON Arretligne.ligne = ArretVoyage.ligne AND ArretLigne.num_arret = ArretVoyage.arret_ligne ORDER BY (ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret)")
         voyages = cur.fetchall()
         if voyages:
             print("\nLigne, voyage, numéro d'arrêt, heure de depart, gare de départ, ville de départ, heure d'arrivée, gare d'arrivée, ville d'arrivée")
@@ -314,10 +322,15 @@ def consulter_voyage_aller_simple_date_gare():
     )
     results = cursor.fetchall()
     if results:
-        print(f"Voyages le {date_trajet} de {ville_depart} à {ville_arrivee}:")
+        to_print = True
         for row in results:
             if (date_trajet >= row[8] and date_trajet <= row[9] and row[date_trajet.weekday() + 5] and row[17] != date_trajet) or (row[17] == date_trajet and row[18] == True):
+                if to_print:
+                    print(f"Voyages le {date_trajet} de {ville_depart} à {ville_arrivee}:")
+                    to_print = False
                 print("Date : %s, Voyage ID : %s, Ligne : %s, Départ : %s, Gare : %s, Ville : %s, Arrivé : %s, Gare : %s, Ville : %s" % (date_trajet, row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+        if to_print:
+            print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
     else:
         print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
@@ -584,7 +597,7 @@ if check_bdd():
             choice = 0
         if choice == 1:
             while choice in range(1, 10):
-                print("Choix de l'action :")
+                print("\nChoix de l'action :")
                 print ("\n1 : créer un compte voyageur")
                 print ("\n2 : acheter un billet") # A FAIRE
                 print ("\n3 : consulter la liste des voyages")
@@ -636,7 +649,7 @@ if check_bdd():
                     break
         if choice == 2:
             while choice in range(1, 9):
-                print("Choix de l'action :")
+                print("\nruChoix de l'action :")
                 print ("\n1 : ajouter une gare") # A FAIRE -> Fait
                 print ("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
                 print ("\n3 : ajouter un train")

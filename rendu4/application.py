@@ -200,41 +200,85 @@ def creer_compte_voyageur():
 
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
-        # Voyageur existe-t-il ?
+        # verification existence voyaegur
         cur.execute(
             "SELECT occasionnel FROM Voyageur "
             "WHERE nom = %s AND prenom = %s AND adresse = %s",
             (voyageur_nom, voyageur_prenom, voyageur_adresse)
         )
-    except psycopg2.Error as e:
-        print("\nERREUR : Une erreur s'est produite : ", e)
-        return
+        traveler_exists = cur.fetchone()
 
-    traveler_exists = cur.fetchone()
-    occasionnel = traveler_exists[0]
+        if not traveler_exists:
+            print("Le voyageur n'existe pas. Vous devez d'abord le créer.")
+            creer_compte_voyageur()
+            return
 
-    if not traveler_exists:
-        print("Le voyageur n'existe pas vous devez d'abord le créer.")
-        creer_compte_voyageur()
+        occasionnel = traveler_exists[0]
 
-    # recupérer le prix du billet
-    time_now = int(time.time())
-    prix = time_now / 10000000
+        #Verifiction si ligne existe
+        cursor.execute("SELECT COUNT(*) FROM Ligne WHERE num = %s", (ligne,))
+        line_exists = cursor.fetchone()[0]
 
-    # Insertion d'un billet dans la base
-    try:
-        cur.execute(
-            "INSERT INTO Billet VALUES (%s, %s, %s, %s, %s, %s)",
-            (time_now, occasionnel, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+        if not line_exists:
+            print("La ligne entrée n'existe pas.")
+            return None
+
+        # Verification si nul_arret existe
+        cursor.execute(
+            "SELECT COUNT(*) FROM ArretLigne WHERE num_arret = %s AND ligne = %s",
+            (num_arret_voyage, ligne)
         )
+        num_arret_exists = cursor.fetchone()[0]
+
+        if not num_arret_exists:
+            print("num_arret n'existe pas.")
+            return None
+
+        # RRecupère le prix du billet
+        time_now = int(time.time())
+        prix = time_now / 10000000
+
+        # Insertion d'un nouveau billet dans la base
+        try:
+            cur.execute(
+                "INSERT INTO Billet (id_billet, assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
+                "VALUES (%s, FALSE, %s, %s, %s, %s)",
+                (time_now, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+            )
+            billet_id = cur.fetchone()[0]
+        except psycopg2.Error as e:
+            print("\nERREUR : Une erreur s'est produite : ", e)
+            return
+
+        # Insertion d'un nouveau trajet dans la base
+        try:
+            cursor.execute(
+                "INSERT INTO Trajet (id_trajet, num_place, date_) "
+                "VALUES (%s, 1, CURRENT_DATE) RETURNING id_trajet",
+                (time_now,)
+            )
+            trajet_id = cursor.fetchone()[0]
+        except psycopg2.Error as e:
+            print("\nERREUR : Une erreur s'est produite : ", e)
+            return
+
+        # Insertion d'un nouveau CompoitionBillet dans la base
+        try:
+            cursor.execute(
+                "INSERT INTO CompositionBillet (billet, trajet) "
+                "VALUES (%s, %s)",
+                (billet_id, trajet_id)
+            )
+        except psycopg2.Error as e:
+            print("\nERREUR : Une erreur s'est produite : ", e)
+            return
+
+        return prix, time_now
+
     except psycopg2.Error as e:
         print("\nERREUR : Une erreur s'est produite : ", e)
         return
 
-    # Commit the transaction
-    conn.commit()
-
-    return prix, time_now
 
 
 # Consulter la liste des voyages

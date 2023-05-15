@@ -200,7 +200,7 @@ def creer_compte_voyageur():
 
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
-        # verification existence voyageur
+        # vérification existence voyageur
         cur.execute(
             "SELECT occasionnel FROM Voyageur "
             "WHERE nom = %s AND prenom = %s AND adresse = %s",
@@ -215,7 +215,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
 
         occasionnel = traveler_exists[0]
 
-        #Verifiction si ligne existe
+        #Vérification si ligne existe
         cursor.execute("SELECT COUNT(*) FROM Ligne WHERE num = %s", (ligne,))
         line_exists = cursor.fetchone()[0]
 
@@ -223,7 +223,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
             print("La ligne entrée n'existe pas.")
             return None
 
-        # Verification si nul_arret existe
+        # Vérification si nul_arret existe
         cursor.execute(
             "SELECT COUNT(*) FROM ArretLigne WHERE num_arret = %s AND ligne = %s",
             (num_arret_voyage, ligne)
@@ -234,7 +234,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
             print("num_arret n'existe pas.")
             return None
 
-        # RRecupère le prix du billet
+        # Récupère le prix du billet
         time_now = int(time.time())
         prix = time_now / 10000000
 
@@ -262,7 +262,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
             print("\nERREUR : Une erreur s'est produite : ", e)
             return
 
-        # Insertion d'un nouveau CompoitionBillet dans la base
+        # Insertion d'un nouveau CompositionBillet dans la base
         try:
             cursor.execute(
                 "INSERT INTO CompositionBillet (billet, trajet) "

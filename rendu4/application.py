@@ -197,7 +197,7 @@ def creer_compte_voyageur():
     # Insertion du compte voyageur dans la base de données
     try:
         cur.execute(
-            "INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            "INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');"%
             (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel)
         )
         conn.commit()
@@ -254,7 +254,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
                 "VALUES ('%s', FALSE, '%s', '%s', '%s', '%s');"%
                 (time_now, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
             )
-            billet_id = cur.fetchone()[0]
+            billet_id = time_now
         except psycopg2.Error as e:
             print("\nERREUR : Une erreur s'est produite : ", e)
             return -1, -1
@@ -266,7 +266,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
                 "VALUES ('%s', 1, CURRENT_DATE) RETURNING id_trajet;"%
                 (time_now)
             )
-            trajet_id = cur.fetchone()[0]
+            trajet_id = time_now
         except psycopg2.Error as e:
             print("\nERREUR : Une erreur s'est produite : ", e)
             return -1, -1
@@ -372,7 +372,7 @@ def annuler_billet():
         # Vérifier le type du voyageur (occasionnel/regulier)
         cur.execute(
             "SELECT occasionnel FROM Voyageur "
-            "WHERE nom = %s AND prenom = %s AND adresse = %s",
+            "WHERE nom = '%s' AND prenom = '%s' AND adresse = '%s';"%
             (voyageur_nom, voyageur_prenom, voyageur_adresse)
         )
         voyageur_type = cur.fetchone()[0]
@@ -381,8 +381,8 @@ def annuler_billet():
             # Supprimer le billet pour les voyageurs occasionnels
             cur.execute(
                 "DELETE FROM Billet "
-                "WHERE id_billet = %s",
-                (id_billet,)
+                "WHERE id_billet = '%s';"%
+                (id_billet)
             )
             print("Le billet a été annulé avec succès.")
         else:
@@ -390,11 +390,13 @@ def annuler_billet():
             # Modifier la date du voyage pour les voyageurs non occasionnels
             cur.execute(
                 "UPDATE Voyage "
-                "SET date_ = %s "
-                "WHERE id_billet = %s",
+                "SET date_ = '%s'"
+                "WHERE id_billet = '%s';"%
                 (nouvelle_date, id_billet)
             )
             print("La date du voyage a été modifiée avec succès.")
+    except:
+        print("Error: L'annulation du billet a échoué.")
 
 
 

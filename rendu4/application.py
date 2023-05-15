@@ -769,7 +769,7 @@ if check_bdd():
                 print("\n3 : consulter la liste des voyages")
                 print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
-                print("\n6 : annuler (ou modifier un voyage)")
+                print("\n6 : annuler un billet")
                 print("\n7 : revenir en arrière dans le menu")
                 print("\nAutre numéro : sortie\n")
                 try:

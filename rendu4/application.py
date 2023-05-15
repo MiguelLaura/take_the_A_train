@@ -453,7 +453,7 @@ def ajouter_train():
         except ValueError:
             print("\nVeuillez entrer un numéro.")
             continue
-        sql = "SELECT num FROM Train WHERE num=%i" % train
+        sql = "SELECT num FROM Train WHERE num=%i;" % train
         cur.execute(sql)
         rows = cur.fetchall()
         if not rows :
@@ -472,7 +472,7 @@ def ajouter_train():
     verif = 0
     while verif == 0 :
         type_train = input("Type de train : ")
-        sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
+        sql = "SELECT nom FROM TypeTrain WHERE nom='%s';" % type_train
         cur.execute(sql)
         rows = cur.fetchall()
         if rows :
@@ -482,7 +482,7 @@ def ajouter_train():
             print("\nVeuillez en saisir un autre.")
 
     try:
-        sql = "INSERT INTO Train VALUES (%i, '%s')" % (train, type_train)
+        sql = "INSERT INTO Train VALUES (%i, '%s');" % (train, type_train)
         cur.execute(sql)
         conn.commit()
         print("Train ajouté.")
@@ -500,7 +500,7 @@ def modifier_train():
     rows = cur.fetchall()
     print("Trains dans la base de données : ")
     for row in rows:
-        print("Numéro : %i\tType de train : %s" % row)
+        print("Numéro : %i\tType de train : %s;" % row)
 
     verif = 0
     while verif == 0 :
@@ -509,7 +509,7 @@ def modifier_train():
         except ValueError:
             print("\nVeuillez entrer un numéro.")
             continue
-        sql = "SELECT num, type_train FROM Train WHERE num=%i" % train
+        sql = "SELECT num, type_train FROM Train WHERE num=%i;" % train
         cur.execute(sql)
         row = cur.fetchone()
         if row:
@@ -519,7 +519,7 @@ def modifier_train():
             print("Le numéro de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
 
-    sql = "SELECT id_voyage FROM Voyage WHERE train=%i" % train
+    sql = "SELECT id_voyage FROM Voyage WHERE train=%i;" % train
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -531,7 +531,7 @@ def modifier_train():
             except ValueError:
                 print("\nVeuillez entrer un numéro.")
                 continue
-            sql = "SELECT num, type_train FROM Train WHERE num=%i" % nv_train
+            sql = "SELECT num, type_train FROM Train WHERE num=%i;" % nv_train
             cur.execute(sql)
             row = cur.fetchone()
             if row and type_train == row[1]:
@@ -543,7 +543,7 @@ def modifier_train():
                     print("Il faut un train du même type.")
                 print("\nVeuillez en saisir un autre.")
         try:
-            sql= "UPDATE Voyage SET train=%i WHERE train=%i" % (nv_train, train)
+            sql= "UPDATE Voyage SET train=%i WHERE train=%i;" % (nv_train, train)
             cur.execute(sql)
             conn.commit()
             print("Train mis à jour.")
@@ -561,7 +561,7 @@ def modifier_train():
     verif = 0
     while verif == 0 :
         type_train = input("Type de train : ")
-        sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
+        sql = "SELECT nom FROM TypeTrain WHERE nom='%s';" % type_train
         cur.execute(sql)
         rows = cur.fetchall()
         if rows :
@@ -570,7 +570,7 @@ def modifier_train():
             print("Le type de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
     try:
-        sql = "UPDATE Train SET type_train='%s' WHERE num=%i" % (type_train, train)
+        sql = "UPDATE Train SET type_train='%s' WHERE num=%i;" % (type_train, train)
         cur.execute(sql)
         conn.commit()
         print("Type du train modifié.")

@@ -2,24 +2,17 @@ import psycopg2
 from datetime import date
 
 
-# database = input("A quelle base de données voulez-vous vous connecter ? ")
-# host = input("Quel est l'host ? ")
-# user = input("Entrez votre nom d'utilisateur : ")
-# password = input("Entrez votre mot de passe : ")
-#
-# # Connect to the PostgreSQL database server
-# conn = psycopg2.connect(
-#     host=host,
-#     database=database,
-#     user=user,
-#     password=password
-# )
+database = input("A quelle base de données voulez-vous vous connecter ? ")
+host = input("Quel est l'host ? ")
+user = input("Entrez votre nom d'utilisateur : ")
+password = input("Entrez votre mot de passe : ")
 
+# Connect to the PostgreSQL database server
 conn = psycopg2.connect(
-    host='tuxa.sme.utc',
-    database='dbnf18p091',
-    user='nf18p091',
-    password='MA2Z5AsflnpB'
+    host=host,
+    database=database,
+    user=user,
+    password=password
 )
 
 

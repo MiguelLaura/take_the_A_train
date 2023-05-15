@@ -3,7 +3,7 @@ from datetime import date
 import time
 
 
-'''database = input("A quelle base de données voulez-vous vous connecter ? ")
+database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
 password = input("Entrez votre mot de passe : ")
@@ -15,15 +15,7 @@ conn = psycopg2.connect(
     user=user,
     password=password
 )
-'''
-# Connect to the PostgreSQL database server
-conn = psycopg2.connect(
-    host="localhost",
-    port =1114,
-    database="postgres",
-    user="postgres",
-    password="hu1999414"
-)
+
 
 cur = conn.cursor()
 

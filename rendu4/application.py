@@ -100,19 +100,9 @@ def check_bdd():
         print("Erreur sur les données dans la base : le voyage '%d' est assuré par un %s (train %s), mais sa ligne associée ('%s') est assurée par un %s" % (row[1], row[0], row[3], row[2], row[4]))
         status = False
 
-
     #===========================================================================================================
     # CHECK
 
-    # Check date
-    # 1er cas:
-    # - date complète date_début et date_fin
-    # - date => jour vrai
-    # - date.except => date = date_except avec ajout false
-    #
-    # 2e cas:
-    # - date=date_except avec ajout true
-    #
     sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE)"
     cur.execute(sql)
     rows = cur.fetchall()
@@ -129,7 +119,6 @@ def check_bdd():
         print("Erreur sur les données dans la base : la date (%s) du trajet '%d' est en contradiction avec le calendrier '%d'." % (row[1], row[0], row[2]))
         status = False
 
-    #  check time
     sql = "SELECT * FROM v_CheckTime;"
     cur.execute(sql)
     rows = cur.fetchall()
@@ -137,7 +126,6 @@ def check_bdd():
         print("Erreur sur les données dans la base : le voyage '%d' est programmé a %s dans le calendrier, mais il part à %s d'après l'arrêt de départ." % (row[2], row[0], row[1]))
         status = False
 
-    # check place
     sql = "SELECT * FROM v_CheckPlace;"
     cur.execute(sql)
     row = cur.fetchone()
@@ -157,7 +145,7 @@ def check_bdd():
 # SELECT requêtes
 
 
-#Créer un voyageur
+# Créer un voyageur
 def creer_compte_voyageur():
     print("----- Création d'un compte voyageur -----")
     nom = input("Nom : ")
@@ -209,7 +197,6 @@ def creer_compte_voyageur():
         print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
 
-#fonction2 nadia
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
         # Voyageur existe-t-il ?
@@ -264,7 +251,8 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
 
         return prix, billet_id
 
-#Consulter la liste des voyages
+
+# Consulter la liste des voyages
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
@@ -281,7 +269,7 @@ def consulter_voyages_proposes():
         print("\nERREUR : Une erreur s'est produite lors de la récupération des voyages proposés :", e)
 
 
-#Consulter les horaires d'un train
+# Consulter les horaires d'un train
 def consulter_horaire_train(ville_depart, ville_arrivee):
     ville_depart = ville_depart.title()
     ville_arrivee = ville_arrivee.title()
@@ -302,8 +290,7 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
         print(f"\nPas de train allant de {ville_depart} à {ville_arrivee}.")
 
 
-
-#Consulter un aller simple en fonction de la date, de la gare, du départ et de l'arrivée donnés par l'utilisateur
+# Consulter un aller simple en fonction de la date, de la gare, du départ et de l'arrivée donnés par l'utilisateur
 def consulter_voyage_aller_simple_date_gare():
     date_trajet = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
     ville_depart = input("Entrer la ville de depart : ").title()
@@ -448,6 +435,7 @@ def ajouter_train():
         print("ERREUR :", e)
         return
 
+
 # Modifier un train
 def modifier_train():
     sql = "SELECT * FROM Train;"
@@ -533,6 +521,7 @@ def modifier_train():
         print("ERREUR :", e)
         return
 
+
 # Modifier un train
 def modifier_train():
     sql = "SELECT * FROM Train;"
@@ -600,7 +589,9 @@ def modifier_train():
         print("ERREUR :", e)
         return
 
+
 # Statistiques
+
 # Affiche le nombre de trajets par date (SELECT COUNT)
 def nb_trajets_par_date():
     sql = "SELECT date_, COUNT(*) AS nombre_trajets FROM Trajet GROUP BY date_;"
@@ -610,7 +601,7 @@ def nb_trajets_par_date():
     for row in rows:
         print("\tDate : %s\tNombre de trajets : %s" % (row))
 
-#Affiche le nombre de voyages par ligne de train (SELECT COUNT)
+# Affiche le nombre de voyages par ligne de train (SELECT COUNT)
 def nb_voyages_par_ligne():
     print("Nombre de voyages par ligne de train :")
     sql = "SELECT Ligne.num, COUNT(*) AS nombre_voyages FROM Voyage JOIN Ligne ON Voyage.ligne = Ligne.num GROUP BY Ligne.num;"
@@ -619,14 +610,14 @@ def nb_voyages_par_ligne():
     for row in rows :
         print("\tLigne : %s\tNombre de voyages : %i"%(row))
 
-#Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
+# Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
 def argent_gagne():
     sql = "SELECT SUM(prix) AS somme_prix FROM Billet;"
     cur.execute(sql)
     row = cur.fetchall()
     print("Argent gagné par la société : %s" % row[0])
 
-#Affiche la somme des prix des billets par voyageur (SELECT SUM)
+# Affiche la somme des prix des billets par voyageur (SELECT SUM)
 def argent_par_voyageur():
     print("Somme des prix des billets par voyageur :")
     sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
@@ -635,7 +626,7 @@ def argent_par_voyageur():
     for row in rows:
         print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
 
-#Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
+# Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
 def nb_voyages_par_jour():
     print("Nombre de voyages par jour de la semaine :")
     sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
@@ -644,7 +635,7 @@ def nb_voyages_par_jour():
     for row in rows:
         print("\tJour : %s\tNombre de voyages : %i"%(row))
 
-#Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
+# Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
 def voyageur_bronze():
     print("Voyageurs ayant le statut bronze :")
     sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
@@ -653,7 +644,7 @@ def voyageur_bronze():
     for row in rows:
         print("\tNom : %s\tPrenom : %s\tAdresse : %s"%(row))
 
-#Récupère le taux de remplissage des trains (en %)
+# Récupère le taux de remplissage des trains (en %)
 def taux_remplissage():
     print("Taux de remplissage des trains :")
     sql = "SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage FROM v_CheckPlace;"
@@ -667,10 +658,6 @@ def taux_remplissage():
 if check_bdd():
 
     # MENU
-
-    # Pour le moment, comprend toutes les options dans Menu
-    # mais on peut avoir besoin d'en enlever/rassembler
-    # (pour-être des sous menus à faire dans les commandes Python)
 
     print()
     choice = 1
@@ -688,7 +675,7 @@ if check_bdd():
                 print("\nChoix de l'action :")
                 print("\n1 : créer un compte voyageur")
                 print("\n2 : acheter un billet") # A CORRIGER
-                print("\n3 : consulter la liste des voyages") # A CORRIGER
+                print("\n3 : consulter la liste des voyages")
                 print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
                 print("\n6 : annuler (ou modifier un voyage)") # A FAIRE

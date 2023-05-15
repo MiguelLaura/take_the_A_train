@@ -268,13 +268,13 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
-        cur.execute("SELECT ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret, ArretVoyage.heure_depart, ArretLigne.nom_gare, ArretLigne.ville_gare, ArretVoyage.heure_arrivee, ArretLigne.nom_gare, ArretLigne.ville_gare FROM ArretVoyage JOIN ArretLigne ON Arretligne.ligne = ArretVoyage.ligne AND ArretLigne.num_arret = ArretVoyage.arret_ligne ORDER BY (ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret)")
+        cur.execute("SELECT ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret, ArretLigne.nom_gare, ArretLigne.ville_gare, ArretVoyage.heure_depart, ArretVoyage.heure_arrivee FROM ArretVoyage JOIN ArretLigne ON Arretligne.ligne = ArretVoyage.ligne AND ArretLigne.num_arret = ArretVoyage.arret_ligne ORDER BY (ArretVoyage.ligne, ArretVoyage.voyage, ArretVoyage.num_arret)")
         voyages = cur.fetchall()
         if voyages:
-            print("\nLigne, voyage, numéro d'arrêt, heure de depart, gare de départ, ville de départ, heure d'arrivée, gare d'arrivée, ville d'arrivée")
+            print("\nLigne, voyage, numéro d'arrêt, gare de départ, ville de départ, heure de depart, heure d'arrivée")
             print("--------------------------------------------------------------------------------------------------------------------------------------------------------------")
             for voyage in voyages:
-                print("%d, %d, %d, %s, %s, %s, %s, %s, %s" % voyage)
+                print("%d, %d, %d, %s, %s, %s, %s" % voyage)
         else:
             print("\nAucun voyage n'est actuellement proposé.")
     except psycopg2.Error as e:
@@ -738,7 +738,7 @@ if check_bdd():
         if choice == 2:
             while choice in range(1, 9):
                 print("\nChoix de l'action :")
-                print("\n1 : ajouter une gare") # A FAIRE -> Fait
+                print("\n1 : ajouter une gare")
                 print("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
                 print("\n3 : ajouter un train")
                 print("\n4 : supprimer un train")
@@ -746,7 +746,7 @@ if check_bdd():
                 print("\n6 : ajouter une ligne") # PROBLEMES
                 print("\n7 : supprimer une ligne") # PROBLEMES
                 print("\n8 : modifier une ligne") # PROBLEMES
-                print("\n9 : statistiques sur la société") #ok
+                print("\n9 : statistiques sur la société")
                 print("\n10 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:

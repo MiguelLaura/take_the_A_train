@@ -1,5 +1,6 @@
 import psycopg2
 from datetime import date
+import time
 
 
 database = input("A quelle base de données voulez-vous vous connecter ? ")
@@ -200,8 +201,8 @@ def creer_compte_voyageur():
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
         # Voyageur existe-t-il ?
-        cursor.execute(
-            "SELECT COUNT(*) FROM Voyageur "
+        cur.execute(
+            "SELECT occasionnel FROM Voyageur "
             "WHERE nom = %s AND prenom = %s AND adresse = %s",
             (voyageur_nom, voyageur_prenom, voyageur_adresse)
         )
@@ -209,47 +210,31 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
         print("\nERREUR : Une erreur s'est produite : ", e)
         return
 
-        traveler_exists = cursor.fetchone()[0]
+    traveler_exists = cur.fetchone()
+    occasionnel = traveler_exists[0]
 
-        if not traveler_exists:
-            print("Le voyageur n'existe pas vous devez d'abord le créer.")
-            creer_compte_voyageur()
+    if not traveler_exists:
+        print("Le voyageur n'existe pas vous devez d'abord le créer.")
+        creer_compte_voyageur()
 
-        # recupérer le prix du billet
-        try:
-            cursor.execute(
-                "SELECT prix FROM Billet "
-                "JOIN CompositionBillet ON Billet.id_billet = CompositionBillet.billet "
-                "JOIN Trajet ON CompositionBillet.trajet = Trajet.id_trajet "
-                "JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
-                "WHERE voyageur_nom = %s AND voyageur_prenom = %s AND voyageur_adresse = %s "
-                "AND ArretTrajet.num_arret_voyage = %s AND ArretTrajet.voyage = %s",
-                (voyageur_nom, voyageur_prenom, voyageur_adresse, num_arret_voyage, ligne)
-            )
-        except psycopg2.Error as e:
-            print("\nERREUR : Une erreur s'est produite : ", e)
-            return
+    # recupérer le prix du billet
+    time_now = int(time.time())
+    prix = time_now / 10000000
 
-        prix = cursor.fetchone()[0]
+    # Insertion d'un billet dans la base
+    try:
+        cur.execute(
+            "INSERT INTO Billet VALUES (%s, %s, %s, %s, %s, %s)",
+            (time_now, occasionnel, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+        )
+    except psycopg2.Error as e:
+        print("\nERREUR : Une erreur s'est produite : ", e)
+        return
 
-        # Insertion d'un billet dans la base
-        try:
-            cursor.execute(
-                "INSERT INTO Billet (assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
-                "VALUES (FALSE, %s, %s, %s, %s) RETURNING id_billet",
-                (prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
-            )
-        except psycopg2.Error as e:
-            print("\nERREUR : Une erreur s'est produite : ", e)
-            return
+    # Commit the transaction
+    conn.commit()
 
-        # recupère l'ID du billet
-        billet_id = cursor.fetchone()[0]
-
-        # Commit the transaction
-        conn.commit()
-
-        return prix, billet_id
+    return prix, time_now
 
 
 # Consulter la liste des voyages
@@ -296,8 +281,7 @@ def consulter_voyage_aller_simple_date_gare():
     ville_depart = input("Entrer la ville de depart : ").title()
     ville_arrivee = input("Entrer la ville d'arrivee : ").title()
     # SQL pour rechercher trajet en fonction des données entrees par le user
-    cursor = conn.cursor()
-    cursor.execute(
+    cur.execute(
         """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
         FROM v_VilleVoyage v1
         JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
@@ -307,7 +291,7 @@ def consulter_voyage_aller_simple_date_gare():
         WHERE v1.num_arret_voyage < v2.num_arret_voyage AND v1.ville_gare = '%s' AND v2.ville_gare = '%s'"""
         % (ville_depart, ville_arrivee)
     )
-    results = cursor.fetchall()
+    results = cur.fetchall()
     if results:
         to_print = True
         for row in results:
@@ -694,6 +678,7 @@ if check_bdd():
                     voyageur_nom = input("Entrez votre nom : ")
                     voyageur_prenom = input("Entrez votre prénom: ")
                     voyageur_adresse = input("Entrez votre adresse: ")
+                    # Vérifications à faire sur l'existence des lignes et num_arret, et insérer le trajet, et CompositionBillet
                     ligne = int(input("Entrez le numéro de la ligne: "))
                     num_arret_voyage = int(input("Entrez le numéro de l'arrêt: "))
                     prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage)

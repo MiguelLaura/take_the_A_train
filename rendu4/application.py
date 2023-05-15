@@ -386,31 +386,6 @@ def ajouter_gare():
         return
 
 
-# # Modifier une gare
-# def modifier_gare():
-#     sql = "SELECT nom, ville FROM Gare;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("Gares dans la base de données :")
-#     for row in rows:
-#         print("Nom : %s\tVille : %s" % row)
-#
-#     verif = 0
-#     while verif == 0 :
-#         nom = input("Nom de la gare : ")
-#         ville = input("Ville de la gare : ")
-#         sql = "SELECT nom FROM Gare WHERE nom='%s' AND ville='%s';" % (nom,ville)
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if rows :
-#             verif = 1
-#         else :
-#             print("Cette gare n'existe pas.")
-#             print("\nVeuillez en saisir une autre.")
-#
-# A FINIR (concerne DisposeHotel, DisposeTaxi, DisposeTransportPublic, ArretLigne)
-
-
 # Ajouter un train
 def ajouter_train():
     sql = "SELECT * FROM Train;"
@@ -700,7 +675,7 @@ if check_bdd():
         except ValueError:
             choice = 0
         if choice == 1:
-            while choice in range(1, 10):
+            while choice in range(1, 8):
                 print("\nChoix de l'action :")
                 print("\n1 : créer un compte voyageur")
                 print("\n2 : acheter un billet")
@@ -723,7 +698,6 @@ if check_bdd():
                     voyageur_nom = input("Entrez votre nom : ")
                     voyageur_prenom = input("Entrez votre prénom: ")
                     voyageur_adresse = input("Entrez votre adresse: ")
-                    # Vérifications à faire sur l'existence des lignes et num_arret, et insérer le trajet, et CompositionBillet
                     ligne = int(input("Entrez le numéro de la ligne: "))
                     num_arret_voyage = int(input("Entrez le numéro de l'arrêt: "))
                     prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage)
@@ -753,15 +727,14 @@ if check_bdd():
                     choice = 1
                     break
         if choice == 2:
-            while choice in range(1, 9):
+            while choice in range(1, 7):
                 print("\nChoix de l'action :")
                 print("\n1 : ajouter une gare")
-                print("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
-                print("\n3 : ajouter un train")
-                print("\n4 : supprimer un train")
-                print("\n5 : modifier le type d'un train")
-                print("\n6 : statistiques sur la société")
-                print("\n7 : revenir en arrière")
+                print("\n2 : ajouter un train")
+                print("\n3 : supprimer un train")
+                print("\n4 : modifier le type d'un train")
+                print("\n5 : statistiques sur la société")
+                print("\n6 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:
                     choice = int(input("Votre choix : "))
@@ -773,21 +746,17 @@ if check_bdd():
                     input()
                 if choice == 2:
                     print()
-                    print("Fonction Python 2")
+                    ajouter_train()
                     input()
                 if choice == 3:
                     print()
-                    ajouter_train()
+                    modifier_train()
                     input()
                 if choice == 4:
                     print()
-                    modifier_train()
-                    input()
-                if choice == 5:
-                    print()
                     supprimer_train()
                     input()
-                if choice == 6:
+                if choice == 5:
                     print()
                     nb_trajets_par_date()
                     print()
@@ -804,7 +773,7 @@ if check_bdd():
                     taux_remplissage()
                     print()
                     input()
-                if choice == 7:
+                if choice == 6:
                     print()
                     choice = 1
                     break

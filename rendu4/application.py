@@ -670,7 +670,7 @@ def voyageur_bronze():
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
-        print("\tNom : %s\tPrenom : %s\tAdresse : %s"%(row))
+        print("\tNom : %s\tPrénom : %s\tAdresse : %s"%(row))
 
 # Récupère le taux de remplissage des trains (en %)
 def taux_remplissage():
@@ -702,7 +702,7 @@ if check_bdd():
             while choice in range(1, 10):
                 print("\nChoix de l'action :")
                 print("\n1 : créer un compte voyageur")
-                print("\n2 : acheter un billet") # A CORRIGER
+                print("\n2 : acheter un billet")
                 print("\n3 : consulter la liste des voyages")
                 print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")

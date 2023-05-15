@@ -722,6 +722,40 @@ def modifier_train():
 #
 #     print("Ligne modifiée.")
 
+#Ajouter une gare
+def ajouter_gare():
+    sql = "SELECT nom, ville FROM Gare;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    print("Gares dans la base de données :")
+    for row in rows:
+        print("Nom : %s\tVille : %s" % row)
+
+    verif = 0
+    while verif == 0 :
+        nom = input("Nom de la gare : ")
+        ville = input("Ville de la gare : ")
+        sql = "SELECT nom FROM Gare WHERE nom=%s AND ville=%s;" % (nom,ville)
+        cur.execute(sql)
+        rows = cur.fetchall()
+        if not rows :
+            verif = 1
+        else :
+            print("Cette gare existe déjà.")
+            print("\nVeuillez en saisir une autre.")
+
+    adresse = input("Adresse : ")
+    pays = input("Pays : ")
+
+    try:
+        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse,pays)
+        cur.execute(sql)
+        conn.commit()
+        print("Gare ajoutée.")
+    except psycopg2.Error as e:
+        print("ERREUR :", e)
+        return
+
 
 
 if check_bdd():

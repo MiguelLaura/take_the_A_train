@@ -160,118 +160,8 @@ def check_bdd():
 #
 # SELECT requêtes
 
-# Affiche le nombre de trajets par date (SELECT COUNT)
-def nb_trajets_par_date():
-    sql = "SELECT date_, COUNT(*) AS nombre_trajets FROM Trajet GROUP BY date_;"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    print("Voici le nombre de trajets par date :")
-    for row in rows:
-        print("\tDate : %s\tNombre de trajets : %s" % (row))
 
-#Affiche le nombre de voyages par ligne de train (SELECT COUNT)
-#Elisa
-def nb_voyages_par_ligne():
-    print("Nombre de voyages par ligne de train :")
-    sql = "SELECT Ligne.num, COUNT(*) AS nombre_voyages FROM Voyage JOIN Ligne ON Voyage.ligne = Ligne.num GROUP BY Ligne.num;"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows :
-        print("\tLigne : %s\tNombre de voyages : %i"%(row))
-
-#Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
-#Elisa
-def argent_gagne():
-    sql = "SELECT SUM(prix) AS somme_prix FROM Billet;"
-    cur.execute(sql)
-    row = cur.fetchall()
-    print("Argent gagné par la société : %s" % row[0])
-
-#Affiche la somme des prix des billets par voyageur (SELECT SUM)
-#Elisa
-def argent_par_voyageur():
-    print("Somme des prix des billets par voyageur :")
-    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
-
-#Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
-#Elisa
-def nb_voyages_par_jour():
-    print("Nombre de voyages par jour de la semaine :")
-    sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("\tJour : %s\tNombre de voyages : %i"%(row))
-
-#Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
-#Elisa
-def voyageur_bronze():
-    print("Voyageurs ayant le statut bronze :")
-    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("\tNom : %s\tPrenom : %s\tAdresse : %s"%(row))
-
-#Récupère le taux de remplissage des trains (en %)
-#Elisa
-def taux_remplissage():
-    print("Taux de remplissage des trains :")
-    sql = "SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage FROM v_CheckPlace;"
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("\tNuméro de voyage : %i\tDate : %s\tTaux de remplissage : %s"%(row))
-
-# # Création d'un voyageur
-# #Elisa
-# def creer_voyageur():
-#     nom = input("Nom : ")
-#     prenom = input("Prénom : ")
-#     adresse = input("Adresse : ")
-#     tel = input("Téléphone : ")
-#     paiement = input("Moyen de paiement : ")
-#     occas = input("Entrez 1 si vous voulez être un voyageur occasionnel, 0 sinon : ")
-#
-#     sql = "SELECT * FROM Voyageur WHERE nom=%s AND prenom=%s AND adresse=%s;"%(nom,prenom,adresse)
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#
-#     if rows :
-#         print("Vous êtes déjà inscrit.")
-#     else :
-#         if occas == 1:
-#             try :
-#                 sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true)" % (nom,prenom,adresse,tel,paiement)
-#                 cur.execute(sql)
-#                 conn.commit()
-#             except psycopg2.Error as e:
-#                 print("Erreur : ",e)
-#         else :
-#             verif = 0
-#             while verif == 0 :
-#                 carte = int(input("Numéro de carte"))
-#                 sql = "SELECT carte FROM Voyageur WHERE carte=%i;"%carte
-#                 cur.execute(sql)
-#                 rows = cur.fetchall()
-#                 if not rows :
-#                     verif = 1
-#                 else :
-#                     print("Le numéro de carte existe déjà.")
-#                     print("\nVeuillez en saisir un autre.")
-#             statut = input("Statut :")
-#             try :
-#                 sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false)" % (nom,prenom,adresse,tel,paiement,carte,statut)
-#                 cur.execute(sql)
-#                 conn.commit()
-#             except psycopg2.Error as e:
-#                 print("Erreur : ",e)
-
-#creerVoyageur- nadia
+#Créer un voyageur
 def creer_compte_voyageur():
     print("----- Création d'un compte voyageur -----")
     nom = input("Nom : ")
@@ -369,7 +259,7 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arr
 
 
 
-#fonction 3 nadia
+#Consulter la liste des voyages
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
@@ -387,7 +277,7 @@ def consulter_voyages_proposes():
         print("\nERREUR : Une erreur s'est produite lors de la récupération des voyages proposés :", e)
 
 
-#fonction4 nadia
+#Consulter les horaires d'un train
 def consulter_horaire_train(ville_depart, ville_arrivee):
     ville_depart = ville_depart.title()
     ville_arrivee = ville_arrivee.title()
@@ -409,7 +299,7 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
 
 
 
-#fonction 5 nadia renvoie aller simple  en fonction de la date/gare depart/arrivee donner par le user
+#Consulter un aller simple en fonction de la date, de la gare, du départ et de l'arrivée donnés par l'utilisateur
 def consulter_voyage_aller_simple_date_gare():
     date_trajet = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
     ville_depart = input("Entrer la ville de depart : ").title()
@@ -436,8 +326,43 @@ def consulter_voyage_aller_simple_date_gare():
         print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
 
+#Ajouter une gare
+#Elisa
+def ajouter_gare():
+    sql = "SELECT nom, ville FROM Gare;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    print("Gares dans la base de données :")
+    for row in rows:
+        print("Nom : %s\tVille : %s" % row)
+
+    verif = 0
+    while verif == 0 :
+        nom = input("Nom de la gare : ")
+        ville = input("Ville de la gare : ")
+        sql = "SELECT nom FROM Gare WHERE nom=%s AND ville=%s;" % (nom,ville)
+        cur.execute(sql)
+        rows = cur.fetchall()
+        if not rows :
+            verif = 1
+        else :
+            print("Cette gare existe déjà.")
+            print("\nVeuillez en saisir une autre.")
+
+    adresse = input("Adresse : ")
+    pays = input("Pays : ")
+
+    try:
+        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse,pays)
+        cur.execute(sql)
+        conn.commit()
+        print("Gare ajoutée.")
+    except psycopg2.Error as e:
+        print("ERREUR :", e)
+        return
+
+
 # Ajouter un train
-# Elisa
 def ajouter_train():
     sql = "SELECT * FROM Train;"
     cur.execute(sql)
@@ -492,8 +417,7 @@ def ajouter_train():
 
 
 
-# Supprimer un train
-# Elisa
+# Modifier un train
 def modifier_train():
     sql = "SELECT * FROM Train;"
     cur.execute(sql)
@@ -578,184 +502,68 @@ def modifier_train():
         print("ERREUR :", e)
         return
 
-# #Ajouter une ligne
-# #Elisa
-# def ajouter_ligne():
-#     sql = "SELECT * FROM Ligne;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("Lignes dans la base de données :")
-#     for row in rows:
-#         print("Numéro : %i\tType de train : %s" % row)
-#
-#     verif = 0
-#     while verif == 0 :
-#         try:
-#             ligne = int(input("Numéro de ligne : "))
-#         except ValueError:
-#             print("\nVeuillez entrer un numéro.")
-#             continue
-#         sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if not rows :
-#             verif = 1
-#         else :
-#             print("Le numéro de ligne existe déjà.")
-#             print("\nVeuillez en saisir un autre.")
-#
-#     sql = "SELECT nom FROM TypeTrain;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("Types de train dans la base de données :")
-#     for row in rows:
-#         print("%s"%(row))
-#
-#     verif = 0
-#     while verif == 0 :
-#         type_train = input("Type de train : ")
-#         sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if rows :
-#             verif = 1
-#         else :
-#             print("Le type de train n'existe pas.")
-#             print("\nVeuillez en saisir un autre.")
-#
-#     try:
-#         sql = "INSERT INTO Ligne VALUES (%i, '%s')" % (ligne,type_train)
-#         cur.execute(sql)
-#         conn.commit()
-#         print("Ligne ajoutée.")
-#     except psycopg2.Error as e:
-#         print("ERREUR :", e)
-#         return
-#
-#
-#
-# #Supprimer une ligne
-# #Elisa
-# def supprimer_ligne():
-#     sql = "SELECT * FROM Ligne;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("Lignes dans la base de données : ")
-#     for row in rows:
-#         print("Numéro : %i\tType de train : %s" % row)
-#
-#     verif = 0
-#     while verif == 0 :
-#         try:
-#             ligne = int(input("Numéro de ligne : "))
-#         except ValueError:
-#             print("\nVeuillez entrer un numéro.")
-#             continue
-#         sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if rows :
-#             verif = 1
-#         else :
-#             print("Le numéro de ligne n'existe pas.")
-#             print("\nVeuillez en saisir un autre.")
-#
-#     try:
-#         sql = "DELETE FROM Ligne WHERE num=%i" % ligne
-#         cur.execute(sql)
-#         conn.commit()
-#         print("Ligne supprimée.")
-#     except psycopg2.Error as e:
-#         print("ERREUR :", e)
-#         return
-#
-#
-#
-# #Modifier une ligne
-# #Elisa
-# def modifier_ligne():
-#     print("Modification du type du train d'une ligne.")
-#     sql = "SELECT * FROM Ligne;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("\nLignes dans la base de données :")
-#     for row in rows:
-#         print("Numéro : %i\tType de train : %s"%(row))
-#
-#     verif = 0
-#     while verif == 0 :
-#         ligne = int(input("Numéro de ligne :"))
-#         sql = "SELECT num FROM Ligne WHERE num=%i;"%ligne
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if rows :
-#             verif = 1
-#         else :
-#             print("Le numéro de ligne n'existe pas.")
-#             print("\nVeuillez en saisir un autre.")
-#
-#     sql = "SELECT nom FROM TypeTrain;"
-#     cur.execute(sql)
-#     rows = cur.fetchall()
-#     print("Types de train dans la base de données :")
-#     for row in rows:
-#         print("%s"%(row))
-#
-#     verif = 0
-#     while verif == 0 :
-#         type_train = input("Type de train :")
-#         sql = "SELECT nom FROM TypeTrain WHERE nom=%s;"%type_train
-#         cur.execute(sql)
-#         rows = cur.fetchall()
-#         if rows :
-#             verif = 1
-#         else :
-#             print("Le type de train n'existe pas.")
-#             print("\nVeuillez en saisir un autre.")
-#
-#     try:
-#         sql = "UPDATE Ligne SET type_train=%s WHERE num=%i;"%(type_train,ligne)
-#         cur.execute(sql)
-#         conn.commit()
-#     except psycopg2.Error as e:
-#         print("Erreur :",e)
-#
-#     print("Ligne modifiée.")
 
-#Ajouter une gare
-#Elisa
-def ajouter_gare():
-    sql = "SELECT nom, ville FROM Gare;"
+# Statistiques
+# Affiche le nombre de trajets par date (SELECT COUNT)
+def nb_trajets_par_date():
+    sql = "SELECT date_, COUNT(*) AS nombre_trajets FROM Trajet GROUP BY date_;"
     cur.execute(sql)
     rows = cur.fetchall()
-    print("Gares dans la base de données :")
+    print("Voici le nombre de trajets par date :")
     for row in rows:
-        print("Nom : %s\tVille : %s" % row)
+        print("\tDate : %s\tNombre de trajets : %s" % (row))
 
-    verif = 0
-    while verif == 0 :
-        nom = input("Nom de la gare : ")
-        ville = input("Ville de la gare : ")
-        sql = "SELECT nom FROM Gare WHERE nom=%s AND ville=%s;" % (nom,ville)
-        cur.execute(sql)
-        rows = cur.fetchall()
-        if not rows :
-            verif = 1
-        else :
-            print("Cette gare existe déjà.")
-            print("\nVeuillez en saisir une autre.")
+#Affiche le nombre de voyages par ligne de train (SELECT COUNT)
+def nb_voyages_par_ligne():
+    print("Nombre de voyages par ligne de train :")
+    sql = "SELECT Ligne.num, COUNT(*) AS nombre_voyages FROM Voyage JOIN Ligne ON Voyage.ligne = Ligne.num GROUP BY Ligne.num;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows :
+        print("\tLigne : %s\tNombre de voyages : %i"%(row))
 
-    adresse = input("Adresse : ")
-    pays = input("Pays : ")
+#Affiche l'argent gagné par la société (SELECT SUM) (= total des prix des billets)
+def argent_gagne():
+    sql = "SELECT SUM(prix) AS somme_prix FROM Billet;"
+    cur.execute(sql)
+    row = cur.fetchall()
+    print("Argent gagné par la société : %s" % row[0])
 
-    try:
-        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse,pays)
-        cur.execute(sql)
-        conn.commit()
-        print("Gare ajoutée.")
-    except psycopg2.Error as e:
-        print("ERREUR :", e)
-        return
+#Affiche la somme des prix des billets par voyageur (SELECT SUM)
+def argent_par_voyageur():
+    print("Somme des prix des billets par voyageur :")
+    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
+
+#Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
+def nb_voyages_par_jour():
+    print("Nombre de voyages par jour de la semaine :")
+    sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\tJour : %s\tNombre de voyages : %i"%(row))
+
+#Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
+def voyageur_bronze():
+    print("Voyageurs ayant le statut bronze :")
+    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\tNom : %s\tPrenom : %s\tAdresse : %s"%(row))
+
+#Récupère le taux de remplissage des trains (en %)
+def taux_remplissage():
+    print("Taux de remplissage des trains :")
+    sql = "SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage FROM v_CheckPlace;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        print("\tNuméro de voyage : %i\tDate : %s\tTaux de remplissage : %s"%(row))
 
 
 
@@ -799,11 +607,11 @@ if check_bdd():
                     input()
                 if choice == 2:
                     print("Achat d'un billet")
-                    voyageur_nom = input("Entrer votre nom : ")
-                    voyageur_prenom = input("Entrer votre prénom: ")
-                    voyageur_adresse = input("Entrer votre adresse: ")
-                    ligne = int(input("Entrer le numéro de la ligne: "))
-                    num_arret_voyage = int(input("Entrer le numéro de l'arrêt: "))
+                    voyageur_nom = input("Entrez votre nom : ")
+                    voyageur_prenom = input("Entrez votre prénom: ")
+                    voyageur_adresse = input("Entrez votre adresse: ")
+                    ligne = int(input("Entrez le numéro de la ligne: "))
+                    num_arret_voyage = int(input("Entrez le numéro de l'arrêt: "))
                     prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage)
                     print("Billet acheté avec succès!")
                     print("Prix de votre billet:", prix)
@@ -831,19 +639,17 @@ if check_bdd():
                     choice = 1
                     break
         if choice == 2:
-            while choice in range(1, 16): #Vous voulez pas enlever un truc ? ça fait beaucoup de fonctions
+            while choice in range(1, 9):
                 print("Choix de l'action :")
-                print ("\n1 : ajouter une gare") # A FAIRE
-                print ("\n2 : supprimer une gare") # A FAIRE
-                print ("\n3 : modifier une gare") # A FAIRE
-                print ("\n4 : ajouter un train")
-                print ("\n5 : supprimer un train")
-                print ("\n6 : modifier un train")
-                print ("\n7 : ajouter une ligne") # PROBLEMES
-                print ("\n8 : supprimer une ligne") # PROBLEMES
-                print ("\n9 : modifier une ligne") # PROBLEMES
-                print ("\n10 : statistiques sur la société") #ok
-                print ("\n11 : revenir en arrière")
+                print ("\n1 : ajouter une gare") # A FAIRE -> Fait
+                print ("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
+                print ("\n3 : ajouter un train")
+                print ("\n4 : modifier un train")
+                print ("\n5 : ajouter une ligne") # PROBLEMES
+                print ("\n6 : supprimer une ligne") # PROBLEMES
+                print ("\n7 : modifier une ligne") # PROBLEMES
+                print ("\n8 : statistiques sur la société") #ok
+                print ("\n9 : revenir en arrière")
                 print ("\nAutre numéro : sortie")
                 try:
                     choice = int(input("Votre choix : "))
@@ -859,33 +665,25 @@ if check_bdd():
                     input()
                 if choice == 3:
                     print()
-                    print("Fonction Python 3")
+                    ajouter_train()
                     input()
                 if choice == 4:
                     print()
-                    ajouter_train()
+                    modifier_train()
                     input()
                 if choice == 5:
                     print()
-                    supprimer_train()
+                    ajouter_ligne()
                     input()
                 if choice == 6:
                     print()
-                    modifier_train()
+                    supprimer_ligne()
                     input()
                 if choice == 7:
                     print()
-                    ajouter_ligne()
-                    input()
-                if choice == 8:
-                    print()
-                    supprimer_ligne()
-                    input()
-                if choice == 9:
-                    print()
                     modifier_ligne()
                     input()
-                if choice == 10:
+                if choice == 8:
                     print()
                     nb_trajets_par_date()
                     print()
@@ -902,7 +700,7 @@ if check_bdd():
                     taux_remplissage()
                     print()
                     input()
-                if choice == 15:
+                if choice == 9:
                     print()
                     choice = 1
                     break

@@ -2,17 +2,24 @@ import psycopg2
 from datetime import date
 
 
-database = input("A quelle base de données voulez-vous vous connecter ? ")
-host = input("Quel est l'host ? ")
-user = input("Entrez votre nom d'utilisateur : ")
-password = input("Entrez votre mot de passe : ")
+# database = input("A quelle base de données voulez-vous vous connecter ? ")
+# host = input("Quel est l'host ? ")
+# user = input("Entrez votre nom d'utilisateur : ")
+# password = input("Entrez votre mot de passe : ")
+#
+# # Connect to the PostgreSQL database server
+# conn = psycopg2.connect(
+#     host=host,
+#     database=database,
+#     user=user,
+#     password=password
+# )
 
-# Connect to the PostgreSQL database server
 conn = psycopg2.connect(
-    host=host,
-    database=database,
-    user=user,
-    password=password
+    host='tuxa.sme.utc',
+    database='dbnf18p091',
+    user='nf18p091',
+    password='MA2Z5AsflnpB'
 )
 
 
@@ -48,14 +55,14 @@ def check_bdd():
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
-        print("Erreur sur les données dans la base : le trajet '%d' doit être relié à au moins 2 gares (actuellement relié à %d gare)." % (row[1], row[0]))
+        print("Erreur sur les données dans la base : la ligne '%d' doit être reliée à au moins 2 gares (actuellement relié à %d gare)." % (row[1], row[0]))
         status = False
 
     sql = "SELECT * FROM v_Voyage;"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
-        print("Erreur sur les données dans la base : la ligne '%s' doit être reliée à au moins 1 voyage." % row)
+        print("Erreur sur les données dans la base : la ligne '%d' doit être reliée à au moins 1 voyage." % row)
         status = False
 
     sql = "SELECT * FROM v_ConcerneCalendrier;"
@@ -396,12 +403,16 @@ def ajouter_ligne():
     rows = cur.fetchall()
     print("Lignes dans la base de données :")
     for row in rows:
-        print("Numéro : %i\tType de train : %s"%(row))
+        print("Numéro : %i\tType de train : %s" % row)
 
     verif = 0
     while verif == 0 :
-        ligne = int(input("Numéro de ligne :"))
-        sql = "SELECT num FROM Ligne WHERE num=%i;"%ligne
+        try:
+            ligne = int(input("Numéro de ligne : "))
+        except ValueError:
+            print("\nVeuillez entrer un numéro.")
+            continue
+        sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
         cur.execute(sql)
         rows = cur.fetchall()
         if not rows :
@@ -419,8 +430,8 @@ def ajouter_ligne():
 
     verif = 0
     while verif == 0 :
-        type_train = input("Type de train :")
-        sql = "SELECT nom FROM TypeTrain WHERE nom=%s;"%type_train
+        type_train = input("Type de train : ")
+        sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
         cur.execute(sql)
         rows = cur.fetchall()
         if rows :
@@ -430,13 +441,15 @@ def ajouter_ligne():
             print("\nVeuillez en saisir un autre.")
 
     try:
-        sql = "INSERT INTO Ligne VALUES (%i,%s);"%(ligne,type_train)
+        sql = "INSERT INTO Ligne VALUES (%i, '%s')" % (ligne,type_train)
         cur.execute(sql)
         conn.commit()
+        print("Ligne ajoutée.")
     except psycopg2.Error as e:
-        print("Erreur :",e)
+        print("ERREUR :", e)
+        return
 
-    print("Ligne ajoutée.")
+
 
 #Supprimer une ligne
 #Elisa
@@ -444,14 +457,18 @@ def supprimer_ligne():
     sql = "SELECT * FROM Ligne;"
     cur.execute(sql)
     rows = cur.fetchall()
-    print("Lignes dans la base de données :")
+    print("Lignes dans la base de données : ")
     for row in rows:
-        print("Numéro : %i\tType de train : %s"%(row))
+        print("Numéro : %i\tType de train : %s" % row)
 
     verif = 0
     while verif == 0 :
-        ligne = int(input("Numéro de ligne :"))
-        sql = "SELECT num FROM Ligne WHERE num=%i;"%ligne
+        try:
+            ligne = int(input("Numéro de ligne : "))
+        except ValueError:
+            print("\nVeuillez entrer un numéro.")
+            continue
+        sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
         cur.execute(sql)
         rows = cur.fetchall()
         if rows :
@@ -461,13 +478,15 @@ def supprimer_ligne():
             print("\nVeuillez en saisir un autre.")
 
     try:
-        sql = "DELETE * FROM Ligne WHERE num=%i;"%ligne
+        sql = "DELETE FROM Ligne WHERE num=%i" % ligne
         cur.execute(sql)
         conn.commit()
+        print("Ligne supprimée.")
     except psycopg2.Error as e:
-        print("Erreur :",e)
+        print("ERREUR :", e)
+        return
 
-    print("Ligne supprimée.")
+
 
 #Modifier une ligne
 #Elisa
@@ -589,21 +608,17 @@ if check_bdd():
         if choice == 2:
             while choice in range(1, 16): #Vous voulez pas enlever un truc ? ça fait beaucoup de fonctions
                 print("Choix de l'action :")
-                print ("\n1 : ajouter un voyage")
-                print ("\n2 : supprimer un voyage")
-                print ("\n3 : modifier un voyage")
-                print ("\n4 : créer un calendrier")
-                print ("\n5 : ajouter une gare")
-                print ("\n6 : supprimer une gare")
-                print ("\n7 : modifier une gare")
-                print ("\n8 : ajouter un train")
-                print ("\n9 : supprimer un train")
-                print ("\n10 : modifier un train")
-                print ("\n11 : ajouter une ligne") #ok
-                print ("\n12 : supprimer une ligne") #ok
-                print ("\n13 : modifier une ligne") #ok
-                print ("\n14 : statistiques sur la société") #ok
-                print ("\n15 : revenir en arrière")
+                print ("\n1 : ajouter une gare")
+                print ("\n2 : supprimer une gare")
+                print ("\n3 : modifier une gare")
+                print ("\n4 : ajouter un train")
+                print ("\n5 : supprimer un train")
+                print ("\n6 : modifier un train")
+                print ("\n7 : ajouter une ligne") #ok
+                print ("\n8 : supprimer une ligne") #ok
+                print ("\n9 : modifier une ligne") #ok
+                print ("\n10 : statistiques sur la société") #ok
+                print ("\n11 : revenir en arrière")
                 print ("\nAutre numéro : sortie")
                 try:
                     choice = int(input("Votre choix : "))
@@ -612,7 +627,6 @@ if check_bdd():
                 if choice == 1:
                     print()
                     print("Fonction Python 1")
-                    creerVoyageur()
                     input()
                 if choice == 2:
                     print()
@@ -636,36 +650,17 @@ if check_bdd():
                     input()
                 if choice == 7:
                     print()
-                    print("Fonction Python 7")
+                    ajouter_ligne()
                     input()
                 if choice == 8:
                     print()
-                    print("Fonction Python 8")
+                    supprimer_ligne()
                     input()
                 if choice == 9:
                     print()
-                    print("Fonction Python 9")
-                    input()
-                if choice == 10:
-                    print()
-                    print("Fonction Python 10")
-                    input()
-                if choice == 11:
-                    print()
-                    print("Fonction Python 11")
-                    ajouter_ligne()
-                    input()
-                if choice == 12:
-                    print()
-                    print("Fonction Python 12")
-                    supprimer_ligne()
-                    input()
-                if choice == 13:
-                    print()
-                    print("Fonction Python 13")
                     modifier_ligne()
                     input()
-                if choice == 14:
+                if choice == 10:
                     print()
                     nb_trajets_par_date()
                     nb_voyages_par_ligne()

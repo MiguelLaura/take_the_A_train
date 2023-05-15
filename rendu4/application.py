@@ -359,6 +359,45 @@ def consulter_voyage_aller_simple_date_gare():
         print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
 
+#annuler Billet
+
+def annuler_billet():
+    try:
+        # Demander les informations à l'utilisateur
+        voyageur_nom = input("Veuillez saisir votre nom : ")
+        voyageur_prenom = input("Veuillez saisir votre prénom : ")
+        voyageur_adresse = input("Veuillez saisir votre adresse : ")
+        id_billet = input("Veuillez saisir le numéro de billet : ")
+
+        # Vérifier le type du voyageur (occasionnel/regulier)
+        cur.execute(
+            "SELECT occasionnel FROM Voyageur "
+            "WHERE nom = %s AND prenom = %s AND adresse = %s",
+            (voyageur_nom, voyageur_prenom, voyageur_adresse)
+        )
+        voyageur_type = cur.fetchone()[0]
+
+        if voyageur_type:
+            # Supprimer le billet pour les voyageurs occasionnels
+            cur.execute(
+                "DELETE FROM Billet "
+                "WHERE id_billet = %s",
+                (id_billet,)
+            )
+            print("Le billet a été annulé avec succès.")
+        else:
+            nouvelle_date = input("Veuillez saisir la nouvelle date du voyage (AAAA-MM-JJ) : ")
+            # Modifier la date du voyage pour les voyageurs non occasionnels
+            cur.execute(
+                "UPDATE Voyage "
+                "SET date_ = %s "
+                "WHERE id_billet = %s",
+                (nouvelle_date, id_billet)
+            )
+            print("La date du voyage a été modifiée avec succès.")
+
+
+
 # Ajouter une gare
 def ajouter_gare():
     sql = "SELECT nom, ville FROM Gare;"
@@ -690,7 +729,7 @@ if check_bdd():
                 print("\n3 : consulter la liste des voyages")
                 print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
-                print("\n6 : annuler (ou modifier un voyage)") # A FAIRE
+                print("\n6 : annuler (ou modifier un voyage)") 
                 print("\n7 : revenir en arrière dans le menu")
                 print("\nAutre numéro : sortie\n")
                 try:
@@ -729,7 +768,7 @@ if check_bdd():
                     input()
                 if choice == 6:
                     print()
-                    print("Fonction Python 6")
+                    annuler_billet()
                     input()
                 if choice == 7:
                     print()

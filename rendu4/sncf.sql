@@ -1,5 +1,6 @@
 -- CREATE
 
+DROP VIEW IF EXISTS v_VilleVoyage;
 DROP VIEW IF EXISTS v_CheckPlace;
 DROP VIEW IF EXISTS v_CheckTime;
 DROP VIEW IF EXISTS v_CheckDate;
@@ -358,6 +359,12 @@ GROUP BY (tt.nb_places, v.id_voyage, t.date_);
 -- Pour savoir pour quel(s) trajet(s) le nombre de places est dépassé :
 --      SELECT * FROM v_CheckPlace WHERE count > nb_places;
 -- Vue utilisée pour calculer le taux de remplissage
+
+CREATE VIEW v_VilleVoyage AS
+SELECT av.num_arret AS num_arret_voyage, av.voyage, av.heure_depart, av.heure_arrivee, av.arret_ligne, av.ligne, al.nom_gare, al.ville_gare
+FROM ArretVoyage av
+JOIN ArretLigne al ON av.ligne = al.ligne AND av.arret_ligne = al.num_arret;
+
 
 
 ------------------------------------------------------------------------------------------

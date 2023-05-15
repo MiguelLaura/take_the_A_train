@@ -2,24 +2,17 @@ import psycopg2
 from datetime import date
 
 
-# database = input("A quelle base de données voulez-vous vous connecter ? ")
-# host = input("Quel est l'host ? ")
-# user = input("Entrez votre nom d'utilisateur : ")
-# password = input("Entrez votre mot de passe : ")
-#
-# # Connect to the PostgreSQL database server
-# conn = psycopg2.connect(
-#     host=host,
-#     database=database,
-#     user=user,
-#     password=password
-# )
+database = input("A quelle base de données voulez-vous vous connecter ? ")
+host = input("Quel est l'host ? ")
+user = input("Entrez votre nom d'utilisateur : ")
+password = input("Entrez votre mot de passe : ")
 
+# Connect to the PostgreSQL database server
 conn = psycopg2.connect(
-    host='tuxa.sme.utc',
-    database='dbnf18p091',
-    user='nf18p091',
-    password='MA2Z5AsflnpB'
+    host=host,
+    database=database,
+    user=user,
+    password=password
 )
 
 
@@ -120,7 +113,7 @@ def check_bdd():
     # 2e cas:
     # - date=date_except avec ajout true
     #
-    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout)"
+    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE)"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -129,7 +122,7 @@ def check_bdd():
             print("Erreur sur les données dans la base : la date (%s) du trajet '%d' est en contradiction avec le calendrier '%d' (date sur un jour de la semaine non possible)." % (row[1], row[0], row[2]))
             status = False
 
-    sql = "SELECT id_trajet, trajet_date, id_calendrier FROM v_CheckDate WHERE (((trajet_date < date_debut OR trajet_date > date_fin) AND NOT ajout) OR NOT ajout)"
+    sql = "SELECT id_trajet, trajet_date, id_calendrier FROM v_CheckDate WHERE (((trajet_date < date_debut OR trajet_date > date_fin) AND ajout <> TRUE) OR ajout = FALSE)"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -234,49 +227,49 @@ def taux_remplissage():
     for row in rows:
         print("Numéro de voyage : %i\tDate : %s\tTaux de remplissage : %f"%(row))
 
-# Création d'un voyageur
-#Elisa
-def creer_voyageur():
-    nom = input("Nom : ")
-    prenom = input("Prénom : ")
-    adresse = input("Adresse : ")
-    tel = input("Téléphone : ")
-    paiement = input("Moyen de paiement : ")
-    occas = input("Entrez 1 si vous voulez être un voyageur occasionnel, 0 sinon : ")
-
-    sql = "SELECT * FROM Voyageur WHERE nom=%s AND prenom=%s AND adresse=%s;"%(nom,prenom,adresse)
-    cur.execute(sql)
-    rows = cur.fetchall()
-
-    if rows :
-        print("Vous êtes déjà inscrit.")
-    else :
-        if occas == 1:
-            try :
-                sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true);"%(nom,prenom,adresse,tel,paiement)
-                cur.execute(sql)
-                conn.commit()
-            except psycopg2.Error as e:
-                print("Erreur : ",e)
-        else :
-            verif = 0
-            while verif == 0 :
-                carte = int(input("Numéro de carte"))
-                sql = "SELECT carte FROM Voyageur WHERE carte=%i;"%carte
-                cur.execute(sql)
-                rows = cur.fetchall()
-                if not rows :
-                    verif = 1
-                else :
-                    print("Le numéro de carte existe déjà.")
-                    print("\nVeuillez en saisir un autre.")
-            statut = input("Statut :")
-            try :
-                sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false);"%(nom,prenom,adresse,tel,paiement,carte,statut)
-                cur.execute(sql)
-                conn.commit()
-            except psycopg2.Error as e:
-                print("Erreur : ",e)
+# # Création d'un voyageur
+# #Elisa
+# def creer_voyageur():
+#     nom = input("Nom : ")
+#     prenom = input("Prénom : ")
+#     adresse = input("Adresse : ")
+#     tel = input("Téléphone : ")
+#     paiement = input("Moyen de paiement : ")
+#     occas = input("Entrez 1 si vous voulez être un voyageur occasionnel, 0 sinon : ")
+#
+#     sql = "SELECT * FROM Voyageur WHERE nom=%s AND prenom=%s AND adresse=%s;"%(nom,prenom,adresse)
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#
+#     if rows :
+#         print("Vous êtes déjà inscrit.")
+#     else :
+#         if occas == 1:
+#             try :
+#                 sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,NULL,NULL,true)" % (nom,prenom,adresse,tel,paiement)
+#                 cur.execute(sql)
+#                 conn.commit()
+#             except psycopg2.Error as e:
+#                 print("Erreur : ",e)
+#         else :
+#             verif = 0
+#             while verif == 0 :
+#                 carte = int(input("Numéro de carte"))
+#                 sql = "SELECT carte FROM Voyageur WHERE carte=%i;"%carte
+#                 cur.execute(sql)
+#                 rows = cur.fetchall()
+#                 if not rows :
+#                     verif = 1
+#                 else :
+#                     print("Le numéro de carte existe déjà.")
+#                     print("\nVeuillez en saisir un autre.")
+#             statut = input("Statut :")
+#             try :
+#                 sql = "INSERT INTO Voyageur VALUES (%s,%s,%s,%s,%s,%i,%s,false)" % (nom,prenom,adresse,tel,paiement,carte,statut)
+#                 cur.execute(sql)
+#                 conn.commit()
+#             except psycopg2.Error as e:
+#                 print("Erreur : ",e)
 
 #creerVoyageur- nadia
 def creer_compte_voyageur():
@@ -349,58 +342,51 @@ def consulter_voyages_proposes():
 
 #fonction4 nadia
 def consulter_horaire_train(ville_depart, ville_arrivee):
+    ville_depart = ville_depart.title()
+    ville_arrivee = ville_arrivee.title()
     # SQL pour trouver train en fonction des infos
-    cur.execute('''
-        SELECT DISTINCT Voyage.id_voyage, ArretVoyage.heure_depart, ArretVoyage.heure_arrivee
-        FROM ArretVoyage
-        INNER JOIN Ligne ON ArretVoyage.ligne = Ligne.num
-        INNER JOIN Voyage ON ArretVoyage.voyage = Voyage.id_voyage
-        INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret AND ArretLigne.ligne = Ligne.num
-        INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom AND ArretLigne.ville_gare = GareDepart.ville
-        INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom AND ArretLigne.ville_gare = GareArrivee.ville
-        WHERE GareDepart.ville = '%s' AND GareArrivee.ville = '%s';
-    '''% (ville_depart, ville_arrivee))
+    cur.execute(
+        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee
+        FROM v_VilleVoyage v1
+        JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
+        WHERE v1.num_arret_voyage < v2.num_arret_voyage AND v1.ville_gare = '%s' AND v2.ville_gare = '%s'"""
+        % (ville_depart, ville_arrivee)
+    )
     results = cur.fetchall()
     if results:
-        print(f"Horaire Trains de {ville_depart} à {ville_arrivee}:")
+        print(f"\nHoraires des trains de {ville_depart} à {ville_arrivee} :")
         for row in results:
-            voyage_id, heure_depart, heure_arrivee = row
-            print(f"Voyage ID: {voyage_id}, Depart: {heure_depart}, Arrivé: {heure_arrivee}")
+            print("Voyage ID : %s, Ligne : %s, Départ : %s, Gare : %s, Ville : %s, Arrivé : %s, Gare : %s, Ville : %s" % row)
     else:
-        print(f"Pas de train allant de {ville_depart} à {ville_arrivee}.")
+        print(f"\nPas de train allant de {ville_depart} à {ville_arrivee}.")
 
 
 
 #fonction 5 nadia renvoie aller simple  en fonction de la date/gare depart/arrivee donner par le user
-def consulter_trajet_aller_simple_date_gare():
-    date_trajet = input("Entrer la date (YYYY-MM-DD): ")
-    station_depart = input("Entrer la gare de depart: ")
-    station_arrivee = input("Entrer la gare d'arrivee: ")
+def consulter_voyage_aller_simple_date_gare():
+    date_trajet = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
+    ville_depart = input("Entrer la ville de depart : ").title()
+    ville_arrivee = input("Entrer la ville d'arrivee : ").title()
     # SQL pour rechercher trajet en fonction des données entrees par le user
     cursor = conn.cursor()
     cursor.execute(
-    "SELECT Trajet.id_trajet, Trajet.num_place, Trajet.date_ "
-    "FROM Trajet "
-    "INNER JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
-    "INNER JOIN ArretVoyage ON ArretTrajet.num_arret_voyage = ArretVoyage.num_arret "
-    "AND ArretTrajet.voyage = ArretVoyage.voyage "
-    "INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret "
-    "AND ArretVoyage.ligne = ArretLigne.ligne "
-    "INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom "
-    "AND ArretLigne.ville_gare = GareDepart.ville "
-    "INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom "
-    "AND ArretLigne.ville_gare = GareArrivee.ville "
-    "WHERE Trajet.date_ = '%s' AND GareDepart.ville = '%s' AND GareArrivee.ville = '%s';" %
-    (date_trajet, station_depart, station_arrivee)
+        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
+        FROM v_VilleVoyage v1
+        JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
+        JOIN Voyage v ON v1.voyage = v.id_voyage
+        JOIN Calendrier c ON v.calendrier = c.id_calendrier
+        LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
+        WHERE v1.num_arret_voyage < v2.num_arret_voyage AND v1.ville_gare = '%s' AND v2.ville_gare = '%s'"""
+        % (ville_depart, ville_arrivee)
     )
     results = cursor.fetchall()
     if results:
-        print(f"Trajets le {date_trajet} de {station_depart} à {station_arrivee}:")
+        print(f"Voyages le {date_trajet} de {ville_depart} à {ville_arrivee}:")
         for row in results:
-            trajet_id, num_place, trajet_date = row
-            print(f"Trajet ID: {trajet_id}, Num Place: {num_place}, Date: {trajet_date}")
+            if (date_trajet >= row[8] and date_trajet <= row[9] and row[date_trajet.weekday() + 5] and row[17] != date_trajet) or (row[17] == date_trajet and row[18] == True):
+                print("Date : %s, Voyage ID : %s, Ligne : %s, Départ : %s, Gare : %s, Ville : %s, Arrivé : %s, Gare : %s, Ville : %s" % (date_trajet, row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
     else:
-        print(f"Pas de trajet pour le {date_trajet} de {station_depart} à {station_arrivee}.")
+        print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
 #Ajouter une ligne
 #Elisa
@@ -558,15 +544,13 @@ if check_bdd():
         if choice == 1:
             while choice in range(1, 10):
                 print("Choix de l'action :")
-                print ("\n1 : créer un compte voyageur")#ok
-                print ("\n2 : acheter un billet")
-                print ("\n3 : consulter la liste des voyages")#ok
-                print ("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")#ok
-                print ("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée") #ok
-                print ("\n6 : chercher un voyage aller/retour en fonction des dates données")
-                print ("\n7 : chercher un trajet en fonction du prix du billet") # ? on le garde ?
-                print ("\n8 : annuler (ou modifier un voyage)")
-                print ("\n9 : revenir en arrière dans le menu")
+                print ("\n1 : créer un compte voyageur")
+                print ("\n2 : acheter un billet") # A FAIRE
+                print ("\n3 : consulter la liste des voyages")
+                print ("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
+                print ("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
+                print ("\n6 : annuler (ou modifier un voyage)") # A FAIRE
+                print ("\n7 : revenir en arrière dans le menu")
                 print ("\nAutre numéro : sortie\n")
                 try:
                     choice = int(input("Votre choix : "))
@@ -586,28 +570,19 @@ if check_bdd():
                     input()
                 if choice == 4:
                     print()
-                    ville_depart = input("Entrer la gare de ville de départ : ")
-                    ville_arrivee = input("Entrer la gare de ville d'arrivée: ")
+                    ville_depart = input("Entrez la gare de ville de départ : ")
+                    ville_arrivee = input("Entrez la gare de ville d'arrivée : ")
                     consulter_horaire_train(ville_depart, ville_arrivee)
                     input()
                 if choice == 5:
                     print()
-                    print("Fonction Python 5")
-                    consulter_trajet_aller_simple_date_gare()
+                    consulter_voyage_aller_simple_date_gare()
                     input()
                 if choice == 6:
                     print()
                     print("Fonction Python 6")
                     input()
                 if choice == 7:
-                    print()
-                    print("Fonction Python 7")
-                    input()
-                if choice == 8:
-                    print()
-                    print("Fonction Python 8")
-                    input()
-                if choice == 9:
                     print()
                     choice = 1
                     break

@@ -198,6 +198,7 @@ def creer_compte_voyageur():
         print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
 
+# Création d'un billet
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
         # vérification existence voyageur

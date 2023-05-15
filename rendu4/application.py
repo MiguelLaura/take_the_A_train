@@ -723,6 +723,7 @@ def modifier_train():
 #     print("Ligne modifiée.")
 
 #Ajouter une gare
+#Elisa
 def ajouter_gare():
     sql = "SELECT nom, ville FROM Gare;"
     cur.execute(sql)

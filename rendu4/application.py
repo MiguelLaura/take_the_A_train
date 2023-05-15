@@ -1,7 +1,7 @@
 import psycopg2
 from datetime import date
 
-
+'''
 database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
@@ -13,7 +13,16 @@ conn = psycopg2.connect(
     database=database,
     user=user,
     password=password
+)'''
+
+conn = psycopg2.connect(
+    host="localhost",
+    port =1114,
+    database="postgres",
+    user="postgres",
+    password="hu1999414"
 )
+
 
 cur = conn.cursor()
 
@@ -288,15 +297,15 @@ def creer_compte_voyageur():
         print("Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
         return
     # Verification si le voyageur existe deja dans la base d
-    cursor.execute("SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
+    cur.execute("SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
                    (nom, prenom, adresse))
-    count = cursor.fetchone()[0]
+    count = cur.fetchone()[0]
     if count > 0:
         print("Le voyageur existe déjà dans la base de données.")
         return
     # Insertion du compte voyageur dans la base de données
     try:
-        cursor.execute("INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) "
+        cur.execute("INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) "
                        "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                        (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel))
         conn.commit()
@@ -308,11 +317,11 @@ def creer_compte_voyageur():
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
     try:
-        cursor.execute("SELECT Voyage.num, Ligne.num, Ligne.type_train, ArretLigne.nom_gare_depart, ArretLigne.ville_gare_depart, ArretLigne.nom_gare_arrivee, ArretLigne.ville_gare_arrivee, Voyage.date_depart, Voyage.date_arrivee FROM Voyage "
-                       "JOIN Ligne ON Voyage.ligne = Ligne.num "
-                       "JOIN ArretLigne ON Ligne.num = ArretLigne.ligne "
-                       "WHERE ArretLigne.num_arret = 1") # num_arret=1
-        voyages = cursor.fetchall()
+        cur.execute("SELECT Voyage.num, Ligne.num, Ligne.type_train, ArretLigne.nom_gare_depart, ArretLigne.ville_gare_depart, ArretLigne.nom_gare_arrivee, ArretLigne.ville_gare_arrivee, Voyage.date_depart, Voyage.date_arrivee FROM Voyage "
+                    "JOIN Ligne ON Voyage.ligne = Ligne.num "
+                    "JOIN ArretLigne ON Ligne.num = ArretLigne.ligne "
+                    "WHERE ArretLigne.num_arret = 1;") # num_arret=1
+        voyages = cur.fetchall()
         if voyages:
             print("Numéro de voyage\tNuméro de ligne\tType de ligne\tGare de départ\t\tVille de départ\t\tGare d'arrivée\t\tVille d'arrivée\t\tDate de départ\t\tDate d'arrivée")
             print("--------------------------------------------------------------------------------------------------------------------------------------------------------")
@@ -328,7 +337,7 @@ def consulter_voyages_proposes():
 #fonction4 nadia
 def consulter_horaire_train(ville_depart, ville_arrivee):
     # SQL pour trouver train en fonction des infos
-    cursor.execute('''
+    cur.execute('''
         SELECT DISTINCT Voyage.id_voyage, ArretVoyage.heure_depart, ArretVoyage.heure_arrivee
         FROM ArretVoyage
         INNER JOIN Ligne ON ArretVoyage.ligne = Ligne.num
@@ -336,14 +345,14 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
         INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret AND ArretLigne.ligne = Ligne.num
         INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom AND ArretLigne.ville_gare = GareDepart.ville
         INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom AND ArretLigne.ville_gare = GareArrivee.ville
-        WHERE GareDepart.ville = ? AND GareArrivee.ville = ?
-    ''', (ville_depart, ville_arrivee))
-    results = cursor.fetchall()
+        WHERE GareDepart.ville = '%s' AND GareArrivee.ville = '%s';
+    '''% (ville_depart, ville_arrivee))
+    results = cur.fetchall()
     if results:
         print(f"Horaire Trains de {ville_depart} à {ville_arrivee}:")
         for row in results:
-            voyage_id, heure-depart, heure_arrivee = row
-            print(f"Voyage ID: {voyage_id}, Depart: {heure-depart}, Arrivé: {heure_arrivee}")
+            voyage_id, heure_depart, heure_arrivee = row
+            print(f"Voyage ID: {voyage_id}, Depart: {heure_depart}, Arrivé: {heure_arrivee}")
     else:
         print(f"Pas de train allant de {ville_depart} à {ville_arrivee}.")
 
@@ -353,31 +362,32 @@ def consulter_horaire_train(ville_depart, ville_arrivee):
 def consulter_trajet_aller_simple_date_gare():
     date_trajet = input("Entrer la date (YYYY-MM-DD): ")
     station_depart = input("Entrer la gare de depart: ")
-    station arrivee = input("Entrer la gare d'arrivee: ")
+    station_arrivee = input("Entrer la gare d'arrivee: ")
     # SQL pour rechercher trajet en fonction des données entrees par le user
-    cursor.execute('''
-        SELECT Trajet.id_trajet, Trajet.num_place, Trajet.date_
-        FROM Trajet
-        INNER JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet
-        INNER JOIN ArretVoyage ON ArretTrajet.num_arret_voyage = ArretVoyage.num_arret
-            AND ArretTrajet.voyage = ArretVoyage.voyage
-        INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret
-            AND ArretVoyage.ligne = ArretLigne.ligne
-        INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom
-            AND ArretLigne.ville_gare = GareDepart.ville
-        INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom
-            AND ArretLigne.ville_gare = GareArrivee.ville
-        WHERE Trajet.date_ = ? AND GareDepart.ville = ? AND GareArrivee.ville = ?
-    ''', (date_trajet, station_depart, station arrivee))
-
+    cursor = conn.cursor()
+    cursor.execute(
+    "SELECT Trajet.id_trajet, Trajet.num_place, Trajet.date_ "
+    "FROM Trajet "
+    "INNER JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
+    "INNER JOIN ArretVoyage ON ArretTrajet.num_arret_voyage = ArretVoyage.num_arret "
+    "AND ArretTrajet.voyage = ArretVoyage.voyage "
+    "INNER JOIN ArretLigne ON ArretVoyage.arret_ligne = ArretLigne.num_arret "
+    "AND ArretVoyage.ligne = ArretLigne.ligne "
+    "INNER JOIN Gare AS GareDepart ON ArretLigne.nom_gare = GareDepart.nom "
+    "AND ArretLigne.ville_gare = GareDepart.ville "
+    "INNER JOIN Gare AS GareArrivee ON ArretLigne.nom_gare = GareArrivee.nom "
+    "AND ArretLigne.ville_gare = GareArrivee.ville "
+    "WHERE Trajet.date_ = '%s' AND GareDepart.ville = '%s' AND GareArrivee.ville = '%s';" %
+    (date_trajet, station_depart, station_arrivee)
+    )
     results = cursor.fetchall()
     if results:
-        print(f"Trajets le {date_trajet} de {station_depart} à {station arrivee}:")
+        print(f"Trajets le {date_trajet} de {station_depart} à {station_arrivee}:")
         for row in results:
             trajet_id, num_place, trajet_date = row
             print(f"Trajet ID: {trajet_id}, Num Place: {num_place}, Date: {trajet_date}")
     else:
-        print(f"Pas de trajet pour le {date_trajet} de {station_depart} à {station arrivee}.")
+        print(f"Pas de trajet pour le {date_trajet} de {station_depart} à {station_arrivee}.")
 
 #Ajouter une ligne
 #Elisa
@@ -552,6 +562,7 @@ if check_bdd():
                 if choice == 1:
                     print()
                     print("Fonction Python 1")
+                    creer_compte_voyageur() # ok
                     print()
                 if choice == 2:
                     print()
@@ -560,16 +571,17 @@ if check_bdd():
                 if choice == 3:
                     print()
                     print("Fonction Python 3")
-                    consulter_voyages_proposes()
+                    consulter_voyages_proposes() 
                 if choice == 4:
                     print()
                     print("Fonction Python 4")                    
                     ville_depart = input("Entrer la gare de ville de départ : ")
                     ville_arrivee = input("Entrer la gare de ville d'arrivée: ")
-consulter_horaire_train(ville_depart, ville_arrivee)
+                    consulter_horaire_train(ville_depart, ville_arrivee)
                 if choice == 5:
                     print()
                     print("Fonction Python 5")
+                    consulter_trajet_aller_simple_date_gare()
                     print()
                 if choice == 6:
                     print()

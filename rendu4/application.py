@@ -335,8 +335,7 @@ def consulter_voyage_aller_simple_date_gare():
         print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
 
-#Ajouter une gare
-#Elisa
+# Ajouter une gare
 def ajouter_gare():
     sql = "SELECT nom, ville FROM Gare;"
     cur.execute(sql)
@@ -349,7 +348,7 @@ def ajouter_gare():
     while verif == 0 :
         nom = input("Nom de la gare : ")
         ville = input("Ville de la gare : ")
-        sql = "SELECT nom FROM Gare WHERE nom=%s AND ville=%s;" % (nom,ville)
+        sql = "SELECT nom FROM Gare WHERE nom='%s' AND ville='%s';" % (nom,ville)
         cur.execute(sql)
         rows = cur.fetchall()
         if not rows :
@@ -369,6 +368,31 @@ def ajouter_gare():
     except psycopg2.Error as e:
         print("ERREUR :", e)
         return
+
+
+# # Modifier une gare
+# def modifier_gare():
+#     sql = "SELECT nom, ville FROM Gare;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("Gares dans la base de données :")
+#     for row in rows:
+#         print("Nom : %s\tVille : %s" % row)
+#
+#     verif = 0
+#     while verif == 0 :
+#         nom = input("Nom de la gare : ")
+#         ville = input("Ville de la gare : ")
+#         sql = "SELECT nom FROM Gare WHERE nom='%s' AND ville='%s';" % (nom,ville)
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if rows :
+#             verif = 1
+#         else :
+#             print("Cette gare n'existe pas.")
+#             print("\nVeuillez en saisir une autre.")
+#
+# A FINIR (concerne DisposeHotel, DisposeTaxi, DisposeTransportPublic, ArretLigne)
 
 
 # Ajouter un train
@@ -423,8 +447,6 @@ def ajouter_train():
     except psycopg2.Error as e:
         print("ERREUR :", e)
         return
-
-
 
 # Modifier un train
 def modifier_train():
@@ -511,6 +533,72 @@ def modifier_train():
         print("ERREUR :", e)
         return
 
+# Modifier un train
+def modifier_train():
+    sql = "SELECT * FROM Train;"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    print("Trains dans la base de données : ")
+    for row in rows:
+        print("Numéro : %i\tType de train : %s;" % row)
+
+    verif = 0
+    while verif == 0 :
+        try:
+            train = int(input("Numéro de train : "))
+        except ValueError:
+            print("\nVeuillez entrer un numéro.")
+            continue
+        sql = "SELECT num, type_train FROM Train WHERE num=%i;" % train
+        cur.execute(sql)
+        row = cur.fetchone()
+        if row:
+            type_train = row[1]
+            verif = 1
+        else:
+            print("Le numéro de train n'existe pas.")
+            print("\nVeuillez en saisir un autre.")
+
+    sql = "SELECT id_voyage FROM Voyage WHERE train=%i;" % train
+    cur.execute(sql)
+    rows = cur.fetchall()
+    for row in rows:
+        id_voyage = row
+        verif = 0
+        while verif == 0 :
+            try:
+                nv_train = int(input("Par quel train voulez-vous remplacer le train du voyage %d ? " % id_voyage))
+            except ValueError:
+                print("\nVeuillez entrer un numéro.")
+                continue
+            sql = "SELECT num, type_train FROM Train WHERE num=%i;" % nv_train
+            cur.execute(sql)
+            row = cur.fetchone()
+            if row and type_train == row[1]:
+                verif = 1
+            else:
+                if not row:
+                    print("Le numéro de train n'existe pas.")
+                else:
+                    print("Il faut un train du même type.")
+                print("\nVeuillez en saisir un autre.")
+        try:
+            sql= "UPDATE Voyage SET train=%i WHERE train=%i;" % (nv_train, train)
+            cur.execute(sql)
+            conn.commit()
+            print("Train mis à jour.")
+        except psycopg2.Error as e:
+            print("ERREUR :", e)
+            return
+
+    try:
+        sql = "DELETE FROM Train WHERE num=%i;" % train
+        cur.execute(sql)
+        conn.commit()
+        print("Train supprimé.")
+    except psycopg2.Error as e:
+        print("ERREUR :", e)
+        return
 
 # Statistiques
 # Affiche le nombre de trajets par date (SELECT COUNT)
@@ -598,14 +686,14 @@ if check_bdd():
         if choice == 1:
             while choice in range(1, 10):
                 print("\nChoix de l'action :")
-                print ("\n1 : créer un compte voyageur")
-                print ("\n2 : acheter un billet") # A FAIRE
-                print ("\n3 : consulter la liste des voyages")
-                print ("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
-                print ("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
-                print ("\n6 : annuler (ou modifier un voyage)") # A FAIRE
-                print ("\n7 : revenir en arrière dans le menu")
-                print ("\nAutre numéro : sortie\n")
+                print("\n1 : créer un compte voyageur")
+                print("\n2 : acheter un billet") # A CORRIGER
+                print("\n3 : consulter la liste des voyages") # A CORRIGER
+                print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
+                print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
+                print("\n6 : annuler (ou modifier un voyage)") # A FAIRE
+                print("\n7 : revenir en arrière dans le menu")
+                print("\nAutre numéro : sortie\n")
                 try:
                     choice = int(input("Votre choix : "))
                 except ValueError:
@@ -649,24 +737,25 @@ if check_bdd():
                     break
         if choice == 2:
             while choice in range(1, 9):
-                print("\nruChoix de l'action :")
-                print ("\n1 : ajouter une gare") # A FAIRE -> Fait
-                print ("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
-                print ("\n3 : ajouter un train")
-                print ("\n4 : modifier un train")
-                print ("\n5 : ajouter une ligne") # PROBLEMES
-                print ("\n6 : supprimer une ligne") # PROBLEMES
-                print ("\n7 : modifier une ligne") # PROBLEMES
-                print ("\n8 : statistiques sur la société") #ok
-                print ("\n9 : revenir en arrière")
-                print ("\nAutre numéro : sortie")
+                print("\nChoix de l'action :")
+                print("\n1 : ajouter une gare") # A FAIRE -> Fait
+                print("\n2 : modifier une gare") # A FAIRE -> même modèle que train, pas de supprimer()
+                print("\n3 : ajouter un train")
+                print("\n4 : supprimer un train")
+                print("\n5 : modifier le type d'un train")
+                print("\n6 : ajouter une ligne") # PROBLEMES
+                print("\n7 : supprimer une ligne") # PROBLEMES
+                print("\n8 : modifier une ligne") # PROBLEMES
+                print("\n9 : statistiques sur la société") #ok
+                print("\n10 : revenir en arrière")
+                print("\nAutre numéro : sortie")
                 try:
                     choice = int(input("Votre choix : "))
                 except ValueError:
                     choice = 0
                 if choice == 1:
                     print()
-                    print("Fonction Python 1")
+                    ajouter_gare()
                     input()
                 if choice == 2:
                     print()
@@ -682,17 +771,21 @@ if check_bdd():
                     input()
                 if choice == 5:
                     print()
-                    ajouter_ligne()
+                    supprimer_train()
                     input()
                 if choice == 6:
                     print()
-                    supprimer_ligne()
+                    ajouter_ligne()
                     input()
                 if choice == 7:
                     print()
-                    modifier_ligne()
+                    supprimer_ligne()
                     input()
                 if choice == 8:
+                    print()
+                    modifier_ligne()
+                    input()
+                if choice == 9:
                     print()
                     nb_trajets_par_date()
                     print()
@@ -709,7 +802,7 @@ if check_bdd():
                     taux_remplissage()
                     print()
                     input()
-                if choice == 9:
+                if choice == 10:
                     print()
                     choice = 1
                     break

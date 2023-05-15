@@ -333,6 +333,8 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
             print("\nERREUR : Une erreur s'est produite : ", e)
             return None, None
 
+        conn.commit()
+
         return prix, billet_id
 
     except psycopg2.Error as e:
@@ -415,39 +417,24 @@ def consulter_voyage_aller_simple_date_gare():
 def annuler_billet():
     try:
         # Demander les informations à l'utilisateur
-        voyageur_nom = input("Veuillez saisir votre nom : ")
-        voyageur_prenom = input("Veuillez saisir votre prénom : ")
-        voyageur_adresse = input("Veuillez saisir votre adresse : ")
         id_billet = input("Veuillez saisir le numéro de billet : ")
 
-        # Vérifier le type du voyageur (occasionnel/regulier)
+        # Supprimer le billet pour les voyageurs occasionnels
         cur.execute(
-            "SELECT occasionnel FROM Voyageur "
-            "WHERE nom = '%s' AND prenom = '%s' AND adresse = '%s';"%
-            (voyageur_nom, voyageur_prenom, voyageur_adresse)
+            "DELETE FROM CompositionBillet "
+            "WHERE billet = '%s';"%
+            (id_billet)
         )
-        voyageur_type = cur.fetchone()[0]
-
-        if voyageur_type:
-            # Supprimer le billet pour les voyageurs occasionnels
-            cur.execute(
-                "DELETE FROM Billet "
-                "WHERE id_billet = '%s';"%
-                (id_billet)
-            )
-            print("Le billet a été annulé avec succès.")
-        else:
-            nouvelle_date = input("Veuillez saisir la nouvelle date du voyage (AAAA-MM-JJ) : ")
-            # Modifier la date du voyage pour les voyageurs non occasionnels
-            cur.execute(
-                "UPDATE Voyage "
-                "SET date_ = '%s'"
-                "WHERE id_billet = '%s';"%
-                (nouvelle_date, id_billet)
-            )
-            print("La date du voyage a été modifiée avec succès.")
-    except:
-        print("Error: L'annulation du billet a échoué.")
+        print("Le billet a été annulé avec succès.")
+        cur.execute(
+            "DELETE FROM Billet "
+            "WHERE id_billet = '%s';"%
+            (id_billet)
+        )
+        print("Le billet a été annulé avec succès.")
+        conn.commit()
+    except e:
+        print("Error: L'annulation du billet a échoué.", e)
 
 
 

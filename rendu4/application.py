@@ -395,30 +395,31 @@ def consulter_voyage_aller_simple_date_gare():
     else:
         print(f"Pas de trajet pour le {date_trajet} de {ville_depart} à {ville_arrivee}.")
 
-#Ajouter une ligne
-#Elisa
-def ajouter_ligne():
-    sql = "SELECT * FROM Ligne;"
+
+# Ajouter un train
+# Elisa
+def ajouter_train():
+    sql = "SELECT * FROM Train;"
     cur.execute(sql)
     rows = cur.fetchall()
-    print("Lignes dans la base de données :")
+    print("Trains dans la base de données :")
     for row in rows:
-        print("Numéro : %i\tType de train : %s" % row)
+        print("Numéro : %i\tType de trains : %s" % row)
 
     verif = 0
     while verif == 0 :
         try:
-            ligne = int(input("Numéro de ligne : "))
+            train = int(input("Numéro du train : "))
         except ValueError:
             print("\nVeuillez entrer un numéro.")
             continue
-        sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
+        sql = "SELECT num FROM Train WHERE num=%i" % train
         cur.execute(sql)
         rows = cur.fetchall()
         if not rows :
             verif = 1
         else :
-            print("Le numéro de ligne existe déjà.")
+            print("Le numéro de train existe déjà.")
             print("\nVeuillez en saisir un autre.")
 
     sql = "SELECT nom FROM TypeTrain;"
@@ -441,87 +442,86 @@ def ajouter_ligne():
             print("\nVeuillez en saisir un autre.")
 
     try:
-        sql = "INSERT INTO Ligne VALUES (%i, '%s')" % (ligne,type_train)
+        sql = "INSERT INTO Train VALUES (%i, '%s')" % (train, type_train)
         cur.execute(sql)
         conn.commit()
-        print("Ligne ajoutée.")
+        print("Train ajouté.")
     except psycopg2.Error as e:
         print("ERREUR :", e)
         return
 
 
 
-#Supprimer une ligne
-#Elisa
-def supprimer_ligne():
-    sql = "SELECT * FROM Ligne;"
+# Supprimer un train
+# Elisa
+def modifier_train():
+    sql = "SELECT * FROM Train;"
     cur.execute(sql)
     rows = cur.fetchall()
-    print("Lignes dans la base de données : ")
+    print("Trains dans la base de données : ")
     for row in rows:
         print("Numéro : %i\tType de train : %s" % row)
 
     verif = 0
     while verif == 0 :
         try:
-            ligne = int(input("Numéro de ligne : "))
+            train = int(input("Numéro de train : "))
         except ValueError:
             print("\nVeuillez entrer un numéro.")
             continue
-        sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
+        sql = "SELECT num, type_train FROM Train WHERE num=%i" % train
         cur.execute(sql)
-        rows = cur.fetchall()
-        if rows :
+        row = cur.fetchone()
+        if row:
+            type_train = row[1]
             verif = 1
-        else :
-            print("Le numéro de ligne n'existe pas.")
+        else:
+            print("Le numéro de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
 
-    try:
-        sql = "DELETE FROM Ligne WHERE num=%i" % ligne
-        cur.execute(sql)
-        conn.commit()
-        print("Ligne supprimée.")
-    except psycopg2.Error as e:
-        print("ERREUR :", e)
-        return
-
-
-
-#Modifier une ligne
-#Elisa
-def modifier_ligne():
-    print("Modification du type du train d'une ligne.")
-    sql = "SELECT * FROM Ligne;"
+    sql = "SELECT id_voyage FROM Voyage WHERE train=%i" % train
     cur.execute(sql)
     rows = cur.fetchall()
-    print("\nLignes dans la base de données :")
     for row in rows:
-        print("Numéro : %i\tType de train : %s"%(row))
-
-    verif = 0
-    while verif == 0 :
-        ligne = int(input("Numéro de ligne :"))
-        sql = "SELECT num FROM Ligne WHERE num=%i;"%ligne
-        cur.execute(sql)
-        rows = cur.fetchall()
-        if rows :
-            verif = 1
-        else :
-            print("Le numéro de ligne n'existe pas.")
-            print("\nVeuillez en saisir un autre.")
+        id_voyage = row
+        verif = 0
+        while verif == 0 :
+            try:
+                nv_train = int(input("Par quel train voulez-vous remplacer le train du voyage %d ? " % id_voyage))
+            except ValueError:
+                print("\nVeuillez entrer un numéro.")
+                continue
+            sql = "SELECT num, type_train FROM Train WHERE num=%i" % nv_train
+            cur.execute(sql)
+            row = cur.fetchone()
+            if row and type_train == row[1]:
+                verif = 1
+            else:
+                if not row:
+                    print("Le numéro de train n'existe pas.")
+                else:
+                    print("Il faut un train du même type.")
+                print("\nVeuillez en saisir un autre.")
+        try:
+            sql= "UPDATE Voyage SET train=%i WHERE train=%i" % (nv_train, train)
+            cur.execute(sql)
+            conn.commit()
+            print("Train mis à jour.")
+        except psycopg2.Error as e:
+            print("ERREUR :", e)
+            return
 
     sql = "SELECT nom FROM TypeTrain;"
     cur.execute(sql)
     rows = cur.fetchall()
     print("Types de train dans la base de données :")
     for row in rows:
-        print("%s"%(row))
+        print(row[0])
 
     verif = 0
     while verif == 0 :
-        type_train = input("Type de train :")
-        sql = "SELECT nom FROM TypeTrain WHERE nom=%s;"%type_train
+        type_train = input("Type de train : ")
+        sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
         cur.execute(sql)
         rows = cur.fetchall()
         if rows :
@@ -529,15 +529,158 @@ def modifier_ligne():
         else :
             print("Le type de train n'existe pas.")
             print("\nVeuillez en saisir un autre.")
-
     try:
-        sql = "UPDATE Ligne SET type_train=%s WHERE num=%i;"%(type_train,ligne)
+        sql = "UPDATE Train SET type_train='%s' WHERE num=%i" % (type_train, train)
         cur.execute(sql)
         conn.commit()
+        print("Type du train modifié.")
     except psycopg2.Error as e:
-        print("Erreur :",e)
+        print("ERREUR :", e)
+        return
 
-    print("Ligne modifiée.")
+# #Ajouter une ligne
+# #Elisa
+# def ajouter_ligne():
+#     sql = "SELECT * FROM Ligne;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("Lignes dans la base de données :")
+#     for row in rows:
+#         print("Numéro : %i\tType de train : %s" % row)
+#
+#     verif = 0
+#     while verif == 0 :
+#         try:
+#             ligne = int(input("Numéro de ligne : "))
+#         except ValueError:
+#             print("\nVeuillez entrer un numéro.")
+#             continue
+#         sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if not rows :
+#             verif = 1
+#         else :
+#             print("Le numéro de ligne existe déjà.")
+#             print("\nVeuillez en saisir un autre.")
+#
+#     sql = "SELECT nom FROM TypeTrain;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("Types de train dans la base de données :")
+#     for row in rows:
+#         print("%s"%(row))
+#
+#     verif = 0
+#     while verif == 0 :
+#         type_train = input("Type de train : ")
+#         sql = "SELECT nom FROM TypeTrain WHERE nom='%s'" % type_train
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if rows :
+#             verif = 1
+#         else :
+#             print("Le type de train n'existe pas.")
+#             print("\nVeuillez en saisir un autre.")
+#
+#     try:
+#         sql = "INSERT INTO Ligne VALUES (%i, '%s')" % (ligne,type_train)
+#         cur.execute(sql)
+#         conn.commit()
+#         print("Ligne ajoutée.")
+#     except psycopg2.Error as e:
+#         print("ERREUR :", e)
+#         return
+#
+#
+#
+# #Supprimer une ligne
+# #Elisa
+# def supprimer_ligne():
+#     sql = "SELECT * FROM Ligne;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("Lignes dans la base de données : ")
+#     for row in rows:
+#         print("Numéro : %i\tType de train : %s" % row)
+#
+#     verif = 0
+#     while verif == 0 :
+#         try:
+#             ligne = int(input("Numéro de ligne : "))
+#         except ValueError:
+#             print("\nVeuillez entrer un numéro.")
+#             continue
+#         sql = "SELECT num FROM Ligne WHERE num=%i" % ligne
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if rows :
+#             verif = 1
+#         else :
+#             print("Le numéro de ligne n'existe pas.")
+#             print("\nVeuillez en saisir un autre.")
+#
+#     try:
+#         sql = "DELETE FROM Ligne WHERE num=%i" % ligne
+#         cur.execute(sql)
+#         conn.commit()
+#         print("Ligne supprimée.")
+#     except psycopg2.Error as e:
+#         print("ERREUR :", e)
+#         return
+#
+#
+#
+# #Modifier une ligne
+# #Elisa
+# def modifier_ligne():
+#     print("Modification du type du train d'une ligne.")
+#     sql = "SELECT * FROM Ligne;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("\nLignes dans la base de données :")
+#     for row in rows:
+#         print("Numéro : %i\tType de train : %s"%(row))
+#
+#     verif = 0
+#     while verif == 0 :
+#         ligne = int(input("Numéro de ligne :"))
+#         sql = "SELECT num FROM Ligne WHERE num=%i;"%ligne
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if rows :
+#             verif = 1
+#         else :
+#             print("Le numéro de ligne n'existe pas.")
+#             print("\nVeuillez en saisir un autre.")
+#
+#     sql = "SELECT nom FROM TypeTrain;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     print("Types de train dans la base de données :")
+#     for row in rows:
+#         print("%s"%(row))
+#
+#     verif = 0
+#     while verif == 0 :
+#         type_train = input("Type de train :")
+#         sql = "SELECT nom FROM TypeTrain WHERE nom=%s;"%type_train
+#         cur.execute(sql)
+#         rows = cur.fetchall()
+#         if rows :
+#             verif = 1
+#         else :
+#             print("Le type de train n'existe pas.")
+#             print("\nVeuillez en saisir un autre.")
+#
+#     try:
+#         sql = "UPDATE Ligne SET type_train=%s WHERE num=%i;"%(type_train,ligne)
+#         cur.execute(sql)
+#         conn.commit()
+#     except psycopg2.Error as e:
+#         print("Erreur :",e)
+#
+#     print("Ligne modifiée.")
 
 
 
@@ -608,15 +751,15 @@ if check_bdd():
         if choice == 2:
             while choice in range(1, 16): #Vous voulez pas enlever un truc ? ça fait beaucoup de fonctions
                 print("Choix de l'action :")
-                print ("\n1 : ajouter une gare")
-                print ("\n2 : supprimer une gare")
-                print ("\n3 : modifier une gare")
+                print ("\n1 : ajouter une gare") # A FAIRE
+                print ("\n2 : supprimer une gare") # A FAIRE
+                print ("\n3 : modifier une gare") # A FAIRE
                 print ("\n4 : ajouter un train")
                 print ("\n5 : supprimer un train")
                 print ("\n6 : modifier un train")
-                print ("\n7 : ajouter une ligne") #ok
-                print ("\n8 : supprimer une ligne") #ok
-                print ("\n9 : modifier une ligne") #ok
+                print ("\n7 : ajouter une ligne") # PROBLEMES
+                print ("\n8 : supprimer une ligne") # PROBLEMES
+                print ("\n9 : modifier une ligne") # PROBLEMES
                 print ("\n10 : statistiques sur la société") #ok
                 print ("\n11 : revenir en arrière")
                 print ("\nAutre numéro : sortie")
@@ -638,15 +781,15 @@ if check_bdd():
                     input()
                 if choice == 4:
                     print()
-                    print("Fonction Python 4")
+                    ajouter_train()
                     input()
                 if choice == 5:
                     print()
-                    print("Fonction Python 5")
+                    supprimer_train()
                     input()
                 if choice == 6:
                     print()
-                    print("Fonction Python 6")
+                    modifier_train()
                     input()
                 if choice == 7:
                     print()

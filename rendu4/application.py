@@ -550,8 +550,8 @@ def modifier_train():
         return
 
 
-# Modifier un train
-def modifier_train():
+# Supprimer un train
+def supprimer_train():
     sql = "SELECT * FROM Train;"
     cur.execute(sql)
     rows = cur.fetchall()
@@ -759,11 +759,8 @@ if check_bdd():
                 print("\n3 : ajouter un train")
                 print("\n4 : supprimer un train")
                 print("\n5 : modifier le type d'un train")
-                print("\n6 : ajouter une ligne") # PROBLEMES
-                print("\n7 : supprimer une ligne") # PROBLEMES
-                print("\n8 : modifier une ligne") # PROBLEMES
-                print("\n9 : statistiques sur la société")
-                print("\n10 : revenir en arrière")
+                print("\n6 : statistiques sur la société")
+                print("\n7 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:
                     choice = int(input("Votre choix : "))
@@ -791,18 +788,6 @@ if check_bdd():
                     input()
                 if choice == 6:
                     print()
-                    ajouter_ligne()
-                    input()
-                if choice == 7:
-                    print()
-                    supprimer_ligne()
-                    input()
-                if choice == 8:
-                    print()
-                    modifier_ligne()
-                    input()
-                if choice == 9:
-                    print()
                     nb_trajets_par_date()
                     print()
                     nb_voyages_par_ligne()
@@ -818,7 +803,7 @@ if check_bdd():
                     taux_remplissage()
                     print()
                     input()
-                if choice == 10:
+                if choice == 7:
                     print()
                     choice = 1
                     break

@@ -322,6 +322,53 @@ def creer_compte_voyageur():
     except psycopg2.Error as e:
         print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
+
+#fonction2 nadia
+def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
+    try:
+        # Voyageur existe-t-il ?
+        cursor.execute(
+            "SELECT COUNT(*) FROM Voyageur "
+            "WHERE nom = %s AND prenom = %s AND adresse = %s",
+            (voyageur_nom, voyageur_prenom, voyageur_adresse)
+        )
+
+        traveler_exists = cursor.fetchone()[0]
+
+        if not traveler_exists:
+            print("Le voyageur n'existe pas vous devez d'abord le créer.")
+            creer_compte_voyageur()
+
+        # recupérer le prix du billet
+        cursor.execute(
+            "SELECT prix FROM Billet "
+            "JOIN CompositionBillet ON Billet.id_billet = CompositionBillet.billet "
+            "JOIN Trajet ON CompositionBillet.trajet = Trajet.id_trajet "
+            "JOIN ArretTrajet ON Trajet.id_trajet = ArretTrajet.trajet "
+            "WHERE voyageur_nom = %s AND voyageur_prenom = %s AND voyageur_adresse = %s "
+            "AND ArretTrajet.num_arret_voyage = %s AND ArretTrajet.voyage = %s",
+            (voyageur_nom, voyageur_prenom, voyageur_adresse, num_arret_voyage, ligne)
+        )
+
+        prix = cursor.fetchone()[0]
+
+        # Insertion d'un billet dans la base
+        cursor.execute(
+            "INSERT INTO Billet (assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
+            "VALUES (FALSE, %s, %s, %s, %s) RETURNING id_billet",
+            (prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+        )
+
+        # recupère l'ID du billet
+        billet_id = cursor.fetchone()[0]
+
+        # Commit the transaction
+        conn.commit()
+
+        return prix, billet_id
+
+
+
 #fonction 3 nadia
 def consulter_voyages_proposes():
     print("----- Voyages proposés -----")
@@ -716,9 +763,16 @@ if check_bdd():
                     creer_compte_voyageur()
                     input()
                 if choice == 2:
-                    print()
-                    print("Fonction Python 2")
-                    input()
+                    print("Achat d'un billet")
+                    voyageur_nom = input("Entrer votre nom : ")
+                    voyageur_prenom = input("Entrer votre prénom: ")
+                    voyageur_adresse = input("Entrer votre adresse: ")
+                    ligne = int(input("Entrer le numéro de la ligne: "))
+                    num_arret_voyage = int(input("Entrer le numéro de l'arrêt: "))
+                    prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage)
+                    print("Billet acheté avec succès!")
+                    print("Prix de votre billet:", prix)
+                    print("Numéro (id) du billet:", billet_id)
                 if choice == 3:
                     print()
                     consulter_voyages_proposes()

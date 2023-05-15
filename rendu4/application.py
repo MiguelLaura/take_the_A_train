@@ -104,7 +104,7 @@ def check_bdd():
     #===========================================================================================================
     # CHECK
 
-    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE)"
+    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE);"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -113,7 +113,7 @@ def check_bdd():
             print("Erreur sur les données dans la base : la date (%s) du trajet '%d' est en contradiction avec le calendrier '%d' (date sur un jour de la semaine non possible)." % (row[1], row[0], row[2]))
             status = False
 
-    sql = "SELECT id_trajet, trajet_date, id_calendrier FROM v_CheckDate WHERE (((trajet_date < date_debut OR trajet_date > date_fin) AND ajout <> TRUE) OR ajout = FALSE)"
+    sql = "SELECT id_trajet, trajet_date, id_calendrier FROM v_CheckDate WHERE (((trajet_date < date_debut OR trajet_date > date_fin) AND ajout <> TRUE) OR ajout = FALSE);"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -124,7 +124,7 @@ def check_bdd():
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
-        print("Erreur sur les données dans la base : le voyage '%d' est programmé a %s dans le calendrier, mais il part à %s d'après l'arrêt de départ." % (row[2], row[0], row[1]))
+        print("Erreur sur les données dans la base : le voyage '%d' est programmé à %s dans le calendrier, mais il part à %s d'après l'arrêt de départ." % (row[2], row[0], row[1]))
         status = False
 
     sql = "SELECT * FROM v_CheckPlace;"
@@ -177,7 +177,7 @@ def creer_compte_voyageur():
     if paiement.lower() not in ["carte", "cheque", "monnaie"]:
         print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
         return
-    # Verification si le voyageur existe deja dans la base d
+    # Verification si le voyageur existe deja dans la base de données
     cur.execute(
         "SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
         (nom, prenom, adresse)
@@ -200,7 +200,7 @@ def creer_compte_voyageur():
 
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, ligne, num_arret_voyage):
     try:
-        # verification existence voyaegur
+        # verification existence voyageur
         cur.execute(
             "SELECT occasionnel FROM Voyageur "
             "WHERE nom = %s AND prenom = %s AND adresse = %s",

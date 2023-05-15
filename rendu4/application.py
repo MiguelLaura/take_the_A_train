@@ -152,10 +152,6 @@ def check_bdd():
 
     return status
 
-# INSERT un billet
-# if row[0] == row[2]:
-#     print("train complet")
-
 # ===========================================================================================================
 #
 # SELECT requêtes

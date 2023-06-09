@@ -43,13 +43,12 @@ DROP TABLE IF EXISTS Gare;
 CREATE TABLE Gare (
     nom VARCHAR(20),
     ville VARCHAR(20),
-
     adresse JSON NOT NULL,
+    -- adresse VARCHAR(80) NOT NULL,
+    -- pays VARCHAR(20) NOT NULL,
     PRIMARY KEY (nom, ville)
 );
 
-    '''adresse VARCHAR(80) NOT NULL,
-    pays VARCHAR(20) NOT NULL,'''
 CREATE TABLE Hotel (
     nom VARCHAR(20),
     adresse VARCHAR(80),
@@ -125,13 +124,13 @@ CREATE TABLE Calendrier (
     date_debut DATE NOT NULL,
     date_fin DATE NOT NULL,
     horaire TIME NOT NULL,
-  '''  lundi BOOLEAN NOT NULL,
-    mardi BOOLEAN NOT NULL,
-    mercredi BOOLEAN NOT NULL,
-    jeudi BOOLEAN NOT NULL,
-    vendredi BOOLEAN NOT NULL,
-    samedi BOOLEAN NOT NULL,
-    dimanche BOOLEAN NOT NULL'''
+    -- lundi BOOLEAN NOT NULL,
+    -- mardi BOOLEAN NOT NULL,
+    -- mercredi BOOLEAN NOT NULL,
+    -- jeudi BOOLEAN NOT NULL,
+    -- vendredi BOOLEAN NOT NULL,
+    -- samedi BOOLEAN NOT NULL,
+    -- dimanche BOOLEAN NOT NULL
     jour JSON NOT NULL
 );
 
@@ -324,6 +323,7 @@ WHERE t.num = v.train AND l.num = v.ligne AND l.type_train <> t.type_train;
 --      Projection(Jointure(Train, Voyage, Train.num = Voyage.train), type_train) = Projection(Ligne, type_train)
 -- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
+-- A CHANGER
 CREATE VIEW v_CheckDate AS
 SELECT t.id_trajet, t.date_ AS trajet_date, c.id_calendrier, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
 FROM Trajet t
@@ -378,70 +378,77 @@ JOIN ArretLigne al ON av.ligne = al.ligne AND av.arret_ligne = al.num_arret;
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Compiegne', 
     '[
         {
-            "numero":1,
-            "rue":"avenu des pppp",
-            "cp":"60200",
-            "pays":"France"
+            "numero": 1,
+            "rue": "avenue des papillons",
+            "cp": "60200",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare du Nord', 'Paris',
     '[
         {
-            "numero":18,
-            "rue":"rue de Dunkerque",
-            "cp":"France"
+            "numero": 18,
+            "rue": "rue de Dunkerque",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris',
     '[
         {
-            "rue":"place Louis-Armand"
-            "cp":"France"
+            "rue": "place Louis-Armand"
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
     '[
         {
-            "numero":17,
-            "rue":"boulevard de Vaugirard",
-            "cp":"France"
+            "numero": 17,
+            "rue": "boulevard de Vaugirard",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil',
     '[
         {
-            "rue":"rue Despinas",
-            "cp":"France"
+            "rue": "rue Despinas",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence',
     '[
         {
-            "rue":"rue de la Paix",
-            "cp":"France"
+            "rue": "rue de la Paix",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Amiens',
     '[
         {
-            "numero":47,
-            "rue":"place Alphonse Fiquet,",
-            "cp":"France"
+            "numero": 47,
+            "rue": "place Alphonse Fiquet,",
+            "pays": "France"
         }
-    ]');
+    ]'
+);
 
 INSERT INTO Gare VALUES ('Gare Bruxelles-Midi', 'Bruxelles',
     '[
         {
-            "numero":"47B",
-            "rue":"avenue Fonsny",
-            "cp":"Belgique"
+            "numero": "47B",
+            "rue": "avenue Fonsny",
+            "pays": "Belgique"
         }
     ]');
 
@@ -562,6 +569,7 @@ SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
 FROM Billet
 GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
 
+-- A CHANGER
 --Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
 SELECT
     CASE

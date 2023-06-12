@@ -131,7 +131,7 @@ CREATE TABLE Calendrier (
     -- vendredi BOOLEAN NOT NULL,
     -- samedi BOOLEAN NOT NULL,
     -- dimanche BOOLEAN NOT NULL
-    jour JSON NOT NULL
+    jours JSON NOT NULL
 );
 
 CREATE TABLE DateException (
@@ -323,9 +323,9 @@ WHERE t.num = v.train AND l.num = v.ligne AND l.type_train <> t.type_train;
 --      Projection(Jointure(Train, Voyage, Train.num = Voyage.train), type_train) = Projection(Ligne, type_train)
 -- en donnant la liste voyages (avec les types_train, ligne, train) ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
 
--- A CHANGER
 CREATE VIEW v_CheckDate AS
-SELECT t.id_trajet, t.date_ AS trajet_date, c.id_calendrier, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
+SELECT t.id_trajet, t.date_ AS trajet_date, c.id_calendrier, c.date_debut, c.date_fin, c.jours, d.date_ AS date_exception, d.ajout
+-- SELECT t.id_trajet, t.date_ AS trajet_date, c.id_calendrier, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, d.date_ AS date_exception, d.ajout
 FROM Trajet t
 JOIN ArretTrajet a ON t.id_trajet = a.trajet
 JOIN ArretVoyage av ON a.num_arret_voyage = av.num_arret AND a.voyage = av.voyage
@@ -376,81 +376,66 @@ JOIN ArretLigne al ON av.ligne = al.ligne AND av.arret_ligne = al.num_arret;
 -- INSERT
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Compiegne', 
-    '[
-        {
-            "numero": 1,
-            "rue": "avenue des papillons",
-            "cp": "60200",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "numero": 1,
+        "rue": "avenue des papillons",
+        "cp": "60200",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare du Nord', 'Paris',
-    '[
-        {
-            "numero": 18,
-            "rue": "rue de Dunkerque",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "numero": 18,
+        "rue": "rue de Dunkerque",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris',
-    '[
-        {
-            "rue": "place Louis-Armand"
-            "pays": "France"
-        }
-    ]'
+    '{
+        "rue": "place Louis-Armand",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
-    '[
-        {
-            "numero": 17,
-            "rue": "boulevard de Vaugirard",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "numero": 17,
+        "rue": "boulevard de Vaugirard",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil',
-    '[
-        {
-            "rue": "rue Despinas",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "rue": "rue Despinas",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence',
-    '[
-        {
-            "rue": "rue de la Paix",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "rue": "rue de la Paix",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Amiens',
-    '[
-        {
-            "numero": 47,
-            "rue": "place Alphonse Fiquet,",
-            "pays": "France"
-        }
-    ]'
+    '{
+        "numero": 47,
+        "rue": "place Alphonse Fiquet,",
+        "pays": "France"
+    }'
 );
 
 INSERT INTO Gare VALUES ('Gare Bruxelles-Midi', 'Bruxelles',
-    '[
-        {
-            "numero": "47B",
-            "rue": "avenue Fonsny",
-            "pays": "Belgique"
-        }
-    ]');
+    '{
+        "numero": "47B",
+        "rue": "avenue Fonsny",
+        "pays": "Belgique"
+    }'
+);
 
 INSERT INTO Hotel VALUES ('B&B', '10 avenue Marcellin Berthelot');
 INSERT INTO Hotel VALUES ('Marriott', '70 avenue des Champs-Elysees');
@@ -503,9 +488,13 @@ INSERT INTO ArretLigne VALUES (5, 27, TRUE, 'Gare ferroviaire', 'Amiens');
 INSERT INTO ArretLigne VALUES (1, 156, FALSE, 'Gare du Nord', 'Paris');
 INSERT INTO ArretLigne VALUES (2, 156, TRUE, 'Gare Bruxelles-Midi', 'Bruxelles');
 
-INSERT INTO Calendrier VALUES (1, '2020-01-01', '2022-12-31', '12:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-INSERT INTO Calendrier VALUES (2, '1999-11-24', '2016-02-14', '18:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE);
-INSERT INTO Calendrier VALUES (3, '2017-05-01', '2025-09-30', '14:00:00', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
+INSERT INTO Calendrier VALUES (1, '2020-01-01', '2022-12-31', '12:00:00', '["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]');
+INSERT INTO Calendrier VALUES (2, '1999-11-24', '2016-02-14', '18:00:00', '["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"]');
+INSERT INTO Calendrier VALUES (3, '2017-05-01', '2025-09-30', '14:00:00',  '["mardi", "mercredi", "jeudi", "vendredi"]');
+
+-- INSERT INTO Calendrier VALUES (1, '2020-01-01', '2022-12-31', '12:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+-- INSERT INTO Calendrier VALUES (2, '1999-11-24', '2016-02-14', '18:00:00', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE);
+-- INSERT INTO Calendrier VALUES (3, '2017-05-01', '2025-09-30', '14:00:00', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE);
 
 INSERT INTO DateException VALUES ('2021-07-14', FALSE);
 INSERT INTO DateException VALUES ('2023-05-07', TRUE);
@@ -569,22 +558,25 @@ SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
 FROM Billet
 GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
 
--- A CHANGER
 --Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
-SELECT
-    CASE
-        WHEN lundi THEN 'Lundi'
-        WHEN mardi THEN 'Mardi'
-        WHEN mercredi THEN 'Mercredi'
-        WHEN jeudi THEN 'Jeudi'
-        WHEN vendredi THEN 'Vendredi'
-        WHEN samedi THEN 'Samedi'
-        WHEN dimanche THEN 'Dimanche'
-    END AS jour_semaine,
-    COUNT(*) AS nombre_voyages
-FROM Calendrier
-JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier
-GROUP BY jour_semaine;
+SELECT j.jour_semaine, COUNT(*) AS nombre_voyages
+FROM Calendrier c, json_array_elements_text(c.jours) j(jour_semaine), Voyage v
+WHERE c.id_calendrier = v.calendrier GROUP BY j.jour_semaine;
+
+-- SELECT
+--     CASE
+--         WHEN lundi THEN 'Lundi'
+--         WHEN mardi THEN 'Mardi'
+--         WHEN mercredi THEN 'Mercredi'
+--         WHEN jeudi THEN 'Jeudi'
+--         WHEN vendredi THEN 'Vendredi'
+--         WHEN samedi THEN 'Samedi'
+--         WHEN dimanche THEN 'Dimanche'
+--     END AS jour_semaine,
+--     COUNT(*) AS nombre_voyages
+-- FROM Calendrier
+-- JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier
+-- GROUP BY jour_semaine;
 
 --Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
 SELECT nom, prenom, adresse

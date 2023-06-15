@@ -158,6 +158,40 @@ def check_bdd():
 #
 # SELECT requêtes
 
+# Créer un voyageur
+def creer_compte_voyageur():
+    nom = input("Nom : ")
+    prenom = input("Prénom : ")
+    adresse = input("Adresse : ")
+    telephone = input("Téléphone : ")
+    paiement = input("Méthode de paiement (carte/cheque/monnaie) : ")
+    occasionnel = input("Voyageur occasionnel ? oui/non (entrez autre chose que oui) : ")
+    carte = None
+    statut = None
+    if occasionnel.lower() != "oui":
+        carte = input("Numéro de carte : ")
+        statut = input("Statut (bronze/silver/gold/platine) : ")
+        try:
+            carte = int(carte)
+        except ValueError:
+            print("\nERREUR : Veuillez entrer un entier pour le numéro de carte.")
+            return
+        if statut.lower() not in ["bronze", "silver", "gold", "platine"]:
+            print("\nERREUR : Veuillez entrer 'bronze', 'silver', 'gold', ou 'platine' comme statut.")
+            return
+    # Conversion
+    occasionnel = True if occasionnel.lower() == "oui" else False
+    # Verification Donnees completes
+    if not nom or not prenom or not adresse or not telephone or not paiement:
+        print("\nERREUR : Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
+        return
+    if paiement.lower() not in ["carte", "cheque", "monnaie"]:
+        print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
+        return 
+    
+    # transformation JSON
+
+    return
 
 # Créer un voyageur
 # def creer_compte_voyageur():
@@ -212,22 +246,17 @@ def check_bdd():
 
 
 # Création d'un billet #A changer
-def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_arret_voyage, num_arrive, date_):
+def achat_billet():
     try:
-        # vérification existence voyageur
-        cur.execute(
-            "SELECT occasionnel FROM Voyageur "
-            "WHERE nom = %s AND prenom = %s AND adresse = %s",
-            (voyageur_nom, voyageur_prenom, voyageur_adresse)
-        )
-        traveler_exists = cur.fetchone()
+        print("Achat d'un billet")
+        voyage = int(input("Entrez le numéro du voyage : "))
+        num_arret_voyage = int(input("Entrez le numéro de l'arrêt : "))
+        num_arrive = int(input("Entrez le numéro de l'arrêt d'arrivée : "))
+        date_ = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
+        assurance = input("Voulez-vous souscrire à l'assurance (1 pour oui/0 pour non) :")
+        # mettre un truc pour vérifier qu'il rentre ce qu'on veut
 
-        if not traveler_exists:
-            print("\nLe voyageur n'existe pas. Vous devez d'abord le créer.")
-            creer_compte_voyageur()
-            return None, None
-
-        occasionnel = traveler_exists[0]
+        voyageur = creer_compte_voyageur()
 
         #Vérification si ligne existe
         cur.execute("SELECT COUNT(*) FROM Voyage WHERE id_voyage = %s", (voyage,))
@@ -271,19 +300,10 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
             WHERE v.id_voyage = '%s'"""
             % (voyage)
         )
-        # cur.execute(
-        #     """SELECT c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
-        #     FROM Voyage v
-        #     JOIN Calendrier c ON v.calendrier = c.id_calendrier
-        #     LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
-        #     WHERE v.id_voyage = '%s'"""
-        #     % (voyage)
-        # )
         results = cur.fetchall()
         if results:
             for row in results:
                 if not (date_ >= row[0] and date_ <= row[1] and (NUM_TO_FRENCH[date_.weekday()] not in row[2]) and row[3] != date_) and not (row[3] == date_ and row[4] == True):
-                # if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 2] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
                     print("\nERREUR : aucun voyage pour cette date.")
                     return None, None
 
@@ -332,13 +352,12 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
                 print("\nERREUR : Une erreur s'est produite : ", e)
                 return None, None
 
-        # Insertion d'un nouveau billet dans la base
         try:
             billet_id = time_now
             cur.execute(
-                "INSERT INTO Billet (id_billet, assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
+                "INSERT INTO Billet (id_billet, assurance, prix, voyageur) "
                 "VALUES (%s, %s, %s, %s, %s, %s)",
-                (billet_id, occasionnel, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+                (billet_id, assurance, prix, voyageur)
             )
         except psycopg2.Error as e:
             print("\nERREUR : Une erreur s'est produite : ", e)
@@ -357,11 +376,165 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
 
         conn.commit()
 
-        return prix, billet_id
+        if prix and billet_id:
+            print("Billet acheté avec succès ! (création du trajet associé)")
+            print("Prix de votre billet:", prix)
+            print("Numéro (id) du billet:", billet_id)
 
     except psycopg2.Error as e:
         print("\nERREUR : Une erreur s'est produite : ", e)
         return None, None
+
+# def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_arret_voyage, num_arrive, date_):
+#     try:
+#         # vérification existence voyageur
+#         cur.execute(
+#             "SELECT occasionnel FROM Voyageur "
+#             "WHERE nom = %s AND prenom = %s AND adresse = %s",
+#             (voyageur_nom, voyageur_prenom, voyageur_adresse)
+#         )
+#         traveler_exists = cur.fetchone()
+
+#         if not traveler_exists:
+#             print("\nLe voyageur n'existe pas. Vous devez d'abord le créer.")
+#             creer_compte_voyageur()
+#             return None, None
+
+#         occasionnel = traveler_exists[0]
+
+#         #Vérification si ligne existe
+#         cur.execute("SELECT COUNT(*) FROM Voyage WHERE id_voyage = %s", (voyage,))
+#         line_exists = cur.fetchone()[0]
+
+#         if not line_exists:
+#             print("ERREUR : Le voyage entré n'existe pas.")
+#             return None, None
+
+#         if num_arrive <= num_arret_voyage:
+#             print("ERREUR : num_arrive doit être supérieur à num_arret_voyage.")
+#             return None, None
+
+#         # Vérification si num_arret existe
+#         cur.execute(
+#             "SELECT COUNT(*) FROM ArretVoyage WHERE num_arret = %s AND voyage = %s",
+#             (num_arret_voyage, voyage)
+#         )
+#         num_arret_exists = cur.fetchone()[0]
+
+#         if not num_arret_exists:
+#             print("ERREUR : num_arret n'existe pas.")
+#             return None, None
+
+#         # Vérification si num_arrive existe
+#         cur.execute(
+#             "SELECT COUNT(*) FROM ArretVoyage WHERE num_arret = %s AND voyage = %s",
+#             (num_arrive, voyage)
+#         )
+#         num_arret_exists = cur.fetchone()[0]
+
+#         if not num_arret_exists:
+#             print("ERREUR : num_arrive n'existe pas.")
+#             return None, None
+
+#         cur.execute(
+#             """SELECT c.date_debut, c.date_fin, c.jour, cc.date_exception, cc.ajout_exception
+#             FROM Voyage v
+#             JOIN Calendrier c ON v.calendrier = c.id_calendrier
+#             LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
+#             WHERE v.id_voyage = '%s'"""
+#             % (voyage)
+#         )
+#         # cur.execute(
+#         #     """SELECT c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
+#         #     FROM Voyage v
+#         #     JOIN Calendrier c ON v.calendrier = c.id_calendrier
+#         #     LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
+#         #     WHERE v.id_voyage = '%s'"""
+#         #     % (voyage)
+#         # )
+#         results = cur.fetchall()
+#         if results:
+#             for row in results:
+#                 if not (date_ >= row[0] and date_ <= row[1] and (NUM_TO_FRENCH[date_.weekday()] not in row[2]) and row[3] != date_) and not (row[3] == date_ and row[4] == True):
+#                 # if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 2] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
+#                     print("\nERREUR : aucun voyage pour cette date.")
+#                     return None, None
+
+#         # Récupère le prix du billet
+#         time_now = int(time.time())
+#         prix = time_now / 10000000
+
+#         # Insertion d'un nouveau trajet dans la base
+#         cur.execute(
+#             "SELECT trajet FROM ArretTrajet WHERE num_arret_voyage = %s AND voyage = %s",
+#             (num_arret_voyage, voyage)
+#         )
+#         check_num_arret = cur.fetchone()[0]
+
+#         cur.execute(
+#             "SELECT trajet FROM ArretTrajet WHERE num_arret_voyage = %s AND voyage = %s",
+#             (num_arrive, voyage)
+#         )
+#         check_num_arrive = cur.fetchone()[0]
+
+#         trajet_id = check_num_arrive
+#         if not (check_num_arret and check_num_arrive and check_num_arret == check_num_arrive):
+#             trajet_id = time_now
+#             try:
+#                 cur.execute(
+#                     "INSERT INTO Trajet (id_trajet, num_place, date_) "
+#                     "VALUES (%s, %s, %s)",
+#                     (trajet_id, time_now, date_)
+#                 )
+#             except psycopg2.Error as e:
+#                 print("\nERREUR : Une erreur s'est produite : ", e)
+#                 return None, None
+
+#             try:
+#                 cur.execute(
+#                     "INSERT INTO ArretTrajet "
+#                     "VALUES (%s, %s, %s, TRUE)",
+#                     (trajet_id, num_arret_voyage, voyage)
+#                 )
+#                 cur.execute(
+#                     "INSERT INTO ArretTrajet "
+#                     "VALUES (%s, %s, %s, TRUE)",
+#                     (trajet_id, num_arrive, voyage)
+#                 )
+#             except psycopg2.Error as e:
+#                 print("\nERREUR : Une erreur s'est produite : ", e)
+#                 return None, None
+
+#         # Insertion d'un nouveau billet dans la base
+#         try:
+#             billet_id = time_now
+#             cur.execute(
+#                 "INSERT INTO Billet (id_billet, assurance, prix, voyageur_nom, voyageur_prenom, voyageur_adresse) "
+#                 "VALUES (%s, %s, %s, %s, %s, %s)",
+#                 (billet_id, occasionnel, prix, voyageur_nom, voyageur_prenom, voyageur_adresse)
+#             )
+#         except psycopg2.Error as e:
+#             print("\nERREUR : Une erreur s'est produite : ", e)
+#             return None, None
+
+#         # Insertion d'un nouveau CompositionBillet dans la base
+#         try:
+#             cur.execute(
+#                 "INSERT INTO CompositionBillet (billet, trajet) "
+#                 "VALUES (%s, %s)",
+#                 (billet_id, trajet_id)
+#             )
+#         except psycopg2.Error as e:
+#             print("\nERREUR : Une erreur s'est produite : ", e)
+#             return None, None
+
+#         conn.commit()
+
+#         return prix, billet_id
+
+#     except psycopg2.Error as e:
+#         print("\nERREUR : Une erreur s'est produite : ", e)
+#         return None, None
 
 
 
@@ -743,9 +916,7 @@ def argent_gagne():
 # Affiche la somme des prix des billets par voyageur (SELECT SUM) #A changer
 def argent_par_voyageur():
     print("Somme des prix des billets par voyageur :")
-    sql = """SELECT voyageur->>'nom' AS voyageur_nom,voyageur->>'prenom' AS voyageur_prenom,
-    voyageur->>'adresse' AS voyageur_adresse,SUM(prix) AS somme_prix
-    FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"""
+    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -764,10 +935,7 @@ def nb_voyages_par_jour():
 # Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE) #A changer
 def voyageur_bronze():
     print("Voyageurs ayant le statut bronze :")
-    sql = """SELECT DISTINCT voyageur->>'nom' AS voyageur_nom,
-    voyageur->>'prenom' AS voyageur_prenom,
-    voyageur->>'adresse' AS voyageur_adresse FROM Billet
-    WHERE voyageur->>'statut' = 'bronze';"""
+    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -819,19 +987,8 @@ if check_bdd():
                     #creer_compte_voyageur()
                     #input()
                 if choice == 1: #A changer
-                    print("Achat d'un billet")
-                    voyageur_nom = input("Entrez votre nom : ")
-                    voyageur_prenom = input("Entrez votre prénom : ")
-                    voyageur_adresse = input("Entrez votre adresse : ")
-                    voyage = int(input("Entrez le numéro du voyage : "))
-                    num_arret_voyage = int(input("Entrez le numéro de l'arrêt : "))
-                    num_arrive = int(input("Entrez le numéro de l'arrêt d'arrivée : "))
-                    date_ = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
-                    prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_arret_voyage, num_arrive, date_)
-                    if prix and billet_id:
-                        print("Billet acheté avec succès ! (création du trajet associé)")
-                        print("Prix de votre billet:", prix)
-                        print("Numéro (id) du billet:", billet_id)
+                    print()
+                    achat_billet()
                     input()
                 if choice == 2:
                     print()
@@ -862,7 +1019,7 @@ if check_bdd():
                 print("\n2 : ajouter un train")
                 print("\n3 : supprimer un train")
                 print("\n4 : modifier le type d'un train")
-                print("\n5 : statistiques sur la société")
+                print("\n5 : statistiques sur la société") #A changer
                 print("\n6 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:

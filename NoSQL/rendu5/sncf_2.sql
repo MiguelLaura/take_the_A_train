@@ -46,10 +46,13 @@ CREATE TABLE Gare (
     adresse JSON NOT NULL,
     -- adresse VARCHAR(80) NOT NULL,
     -- pays VARCHAR(20) NOT NULL,
+    hotel JSON,
+    taxi JSON,
+    transport_public JSON,
     PRIMARY KEY (nom, ville)
 );
 
-CREATE TABLE Hotel (
+/*CREATE TABLE Hotel (
     nom VARCHAR(20),
     adresse VARCHAR(80),
     PRIMARY KEY (nom, adresse)
@@ -88,7 +91,7 @@ CREATE TABLE DisposeTransportPublic (
     num_transport_public INT REFERENCES TransportPublic(num),
     PRIMARY KEY (nom_gare, ville_gare, num_transport_public),
     FOREIGN KEY (nom_gare, ville_gare) REFERENCES Gare(nom, ville)
-);
+);*/
 
 CREATE TABLE TypeTrain (
     nom VARCHAR(20) PRIMARY KEY,
@@ -220,7 +223,7 @@ CREATE TABLE CompositionBillet (
 
 -- VIEW
 
-CREATE VIEW v_DisposeHotel AS
+/*CREATE VIEW v_DisposeHotel AS
 SELECT h.nom, h.adresse
 FROM DisposeHotel d
 RIGHT OUTER JOIN Hotel h ON h.nom = d.nom_hotel AND h.adresse = d.adresse_hotel
@@ -245,7 +248,7 @@ RIGHT OUTER JOIN TransportPublic t ON t.num = d.num_transport_public
 WHERE d.num_transport_public IS NULL;
 -- Permet de vérifier
 --      Projection(DisposeTransportPublic, num_transport_public) = Projection(TransportPublic, num)
--- en donnant la liste des transports publics ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)
+-- en donnant la liste des transports publics ne respectant pas la contrainte (si la base de données est remplies correctement, la vue n'affiche rien)*/
 
 CREATE VIEW v_ArretLigne AS
 SELECT COUNT(a.ligne), l.num

@@ -12,28 +12,20 @@ NUM_TO_FRENCH = {
             6 : "dimanche"
         }
 
-'''database = input("A quelle base de données voulez-vous vous connecter ? ")
+database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
-password = input("Entrez votre mot de passe : ")'''
+password = input("Entrez votre mot de passe : ")
 
-# Connect to the PostgreSQL database server
-conn = psycopg2.connect(
-    host="localhost",
-    port =1114,
-    database="postgres",
-    user="postgres",
-    password="hu1999414"
-)
 
-'''
+
 # Connect to the PostgreSQL database server
 conn = psycopg2.connect(
     host=host,
     database=database,
     user=user,
     password=password
-)'''
+)
 
 
 cur = conn.cursor()

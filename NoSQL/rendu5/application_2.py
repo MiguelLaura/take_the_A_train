@@ -160,7 +160,7 @@ def check_bdd():
 
 
 # Créer un voyageur
-def creer_compte_voyageur():
+def creer_compte_voyageur(): #A changer (à supprimer)
     print("----- Création d'un compte voyageur -----")
     nom = input("Nom : ")
     prenom = input("Prénom : ")
@@ -211,7 +211,7 @@ def creer_compte_voyageur():
         print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
 
-# Création d'un billet
+# Création d'un billet #A changer
 def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_arret_voyage, num_arrive, date_):
     try:
         # vérification existence voyageur
@@ -740,7 +740,7 @@ def argent_gagne():
     row = cur.fetchall()
     print("Argent gagné par la société : %s" % row[0])
 
-# Affiche la somme des prix des billets par voyageur (SELECT SUM)
+# Affiche la somme des prix des billets par voyageur (SELECT SUM) #A changer
 def argent_par_voyageur():
     print("Somme des prix des billets par voyageur :")
     sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
@@ -759,7 +759,7 @@ def nb_voyages_par_jour():
     for row in rows:
         print("\tJour : %s\tNombre de voyages : %i"%(row))
 
-# Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
+# Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE) #A changer
 def voyageur_bronze():
     print("Voyageurs ayant le statut bronze :")
     sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
@@ -797,8 +797,8 @@ if check_bdd():
         if choice == 1:
             while choice in range(1, 8):
                 print("\nChoix de l'action :")
-                print("\n1 : créer un compte voyageur")
-                print("\n2 : acheter un billet")
+                print("\n1 : créer un compte voyageur") #A changer, à supprimer
+                print("\n2 : acheter un billet") #A changer
                 print("\n3 : consulter la liste des voyages")
                 print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
@@ -813,7 +813,7 @@ if check_bdd():
                     print()
                     creer_compte_voyageur()
                     input()
-                if choice == 2:
+                if choice == 2: #A changer
                     print("Achat d'un billet")
                     voyageur_nom = input("Entrez votre nom : ")
                     voyageur_prenom = input("Entrez votre prénom : ")
@@ -857,7 +857,7 @@ if check_bdd():
                 print("\n2 : ajouter un train")
                 print("\n3 : supprimer un train")
                 print("\n4 : modifier le type d'un train")
-                print("\n5 : statistiques sur la société")
+                print("\n5 : statistiques sur la société") #A changer
                 print("\n6 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:

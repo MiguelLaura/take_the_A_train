@@ -385,7 +385,11 @@ INSERT INTO Gare VALUES ('Gare ferroviaire', 'Compiegne',
         "rue": "avenue des papillons",
         "cp": "60200",
         "pays": "France"
-    }'
+    }',
+    '[{"nom":"B&B",adresse:"10 avenue Marcellin Berthelot"},
+    {"nom":"Ritz", adresse:"15 place Vendôme"}]',
+    '[{"num":1096,tel:"0654782945"}]',
+    NULL
 );
 
 INSERT INTO Gare VALUES ('Gare du Nord', 'Paris',
@@ -393,14 +397,22 @@ INSERT INTO Gare VALUES ('Gare du Nord', 'Paris',
         "numero": 18,
         "rue": "rue de Dunkerque",
         "pays": "France"
-    }'
+    }',
+    '[{"nom":"Novotel",adresse:"10 avenue Saint-Marcellin"},
+    {"nom":"Ritz", adresse:"15 place Vendôme"}]',
+    '[{"num":666,tel:"0654781234"}]',
+    '[{"num":92}]'
 );
 
 INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris',
     '{
         "rue": "place Louis-Armand",
         "pays": "France"
-    }'
+    }',
+    NULL,
+    '[{"num":666,tel:"0654781234"}]',
+    '[{"num":92}
+    {"num":5}]'
 );
 
 INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
@@ -408,21 +420,31 @@ INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
         "numero": 17,
         "rue": "boulevard de Vaugirard",
         "pays": "France"
-    }'
+    }',
+    '[{"nom":"Marriott",adresse:"70 avenue des Champs-Elysees"}]',
+    '[{"num":2003, "tel":"0751762378"}]',
+    '[{"num":17}]'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil',
     '{
         "rue": "rue Despinas",
         "pays": "France"
-    }'
+    }',
+    '[{"nom":"Novotel",adresse:"10 avenue Saint-Marcellin"},
+    {"nom":"Marriott",adresse:"70 avenue des Champs-Elysees"}]',
+    NULL,
+    '[{"num":5}]'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence',
     '{
         "rue": "rue de la Paix",
         "pays": "France"
-    }'
+    }',
+    NULL,
+    NULL,
+    NULL
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Amiens',
@@ -430,7 +452,10 @@ INSERT INTO Gare VALUES ('Gare ferroviaire', 'Amiens',
         "numero": 47,
         "rue": "place Alphonse Fiquet,",
         "pays": "France"
-    }'
+    }',
+    NULL,
+    NULL,
+    NULL
 );
 
 INSERT INTO Gare VALUES ('Gare Bruxelles-Midi', 'Bruxelles',
@@ -438,10 +463,13 @@ INSERT INTO Gare VALUES ('Gare Bruxelles-Midi', 'Bruxelles',
         "numero": "47B",
         "rue": "avenue Fonsny",
         "pays": "Belgique"
-    }'
+    }',
+    NULL,
+    NULL,
+    NULL
 );
 
-INSERT INTO Hotel VALUES ('B&B', '10 avenue Marcellin Berthelot');
+/*INSERT INTO Hotel VALUES ('B&B', '10 avenue Marcellin Berthelot');
 INSERT INTO Hotel VALUES ('Marriott', '70 avenue des Champs-Elysees');
 INSERT INTO Hotel VALUES ('Ritz', '15 place Vendôme');
 
@@ -461,7 +489,7 @@ INSERT INTO DisposeTaxi VALUES ('Gare ferroviaire', 'Compiegne', '2003');
 
 INSERT INTO TransportPublic VALUES (23);
 
-INSERT INTO DisposeTransportPublic VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence', 23);
+INSERT INTO DisposeTransportPublic VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence', 23);*/
 
 INSERT INTO TypeTrain VALUES ('TER', 204, 170, FALSE);
 INSERT INTO TypeTrain VALUES ('TGV', 500, 190, TRUE);

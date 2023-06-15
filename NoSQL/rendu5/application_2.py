@@ -35,26 +35,26 @@ def check_bdd():
 
     # VIEWS vérifier les contraintes sur les projections
 
-    sql = "SELECT * FROM v_DisposeHotel;" #A changer
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("Erreur sur les données dans la base : l'hotel '%s' à l'adresse '%s' n'est relié à aucune gare." % row)
-        status = False
-
-    sql = "SELECT * FROM v_DisposeTaxi;" #A changer
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("Erreur sur les données dans la base : le taxi '%d' n'est relié à aucune gare." % row)
-        status = False
-
-    sql = "SELECT * FROM v_DisposeTransportPublic;" #A changer
-    cur.execute(sql)
-    rows = cur.fetchall()
-    for row in rows:
-        print("Erreur sur les données dans la base : le transport public '%d' n'est relié à aucune gare." % row)
-        status = False
+    # sql = "SELECT * FROM v_DisposeHotel;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     for row in rows:
+#         print("Erreur sur les données dans la base : l'hotel '%s' à l'adresse '%s' n'est relié à aucune gare." % row)
+#         status = False
+# 
+#     sql = "SELECT * FROM v_DisposeTaxi;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     for row in rows:
+#         print("Erreur sur les données dans la base : le taxi '%d' n'est relié à aucune gare." % row)
+#         status = False
+# 
+#     sql = "SELECT * FROM v_DisposeTransportPublic;"
+#     cur.execute(sql)
+#     rows = cur.fetchall()
+#     for row in rows:
+#         print("Erreur sur les données dans la base : le transport public '%d' n'est relié à aucune gare." % row)
+#         status = False
 
     sql = "SELECT * FROM v_ArretLigne;"
     cur.execute(sql)
@@ -160,55 +160,55 @@ def check_bdd():
 
 
 # Créer un voyageur
-def creer_compte_voyageur(): #A changer (à supprimer)
-    print("----- Création d'un compte voyageur -----")
-    nom = input("Nom : ")
-    prenom = input("Prénom : ")
-    adresse = input("Adresse : ")
-    telephone = input("Téléphone : ")
-    paiement = input("Méthode de paiement (carte/cheque/monnaie) : ")
-    occasionnel = input("Voyageur occasionnel ? oui/non (entrez autre chose que oui) : ")
-    carte = None
-    statut = None
-    if occasionnel.lower() != "oui":
-        carte = input("Numéro de carte : ")
-        statut = input("Statut (bronze/silver/gold/platine) : ")
-        try:
-            carte = int(carte)
-        except ValueError:
-            print("\nERREUR : Veuillez entrer un entier pour le numéro de carte.")
-            return
-        if statut.lower() not in ["bronze", "silver", "gold", "platine"]:
-            print("\nERREUR : Veuillez entrer 'bronze', 'silver', 'gold', ou 'platine' comme statut.")
-            return
-    # Conversion
-    occasionnel = True if occasionnel.lower() == "oui" else False
-    # Verification Donnees completes
-    if not nom or not prenom or not adresse or not telephone or not paiement:
-        print("\nERREUR : Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
-        return
-    if paiement.lower() not in ["carte", "cheque", "monnaie"]:
-        print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
-        return
-    # Verification si le voyageur existe deja dans la base de données
-    cur.execute(
-        "SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
-        (nom, prenom, adresse)
-    )
-    count = cur.fetchone()[0]
-    if count > 0:
-        print("\nERREUR : Le voyageur existe déjà dans la base de données.")
-        return
-    # Insertion du compte voyageur dans la base de données
-    try:
-        cur.execute(
-            "INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-            (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel)
-        )
-        conn.commit()
-        print("\nLe compte voyageur a été créé avec succès.")
-    except psycopg2.Error as e:
-        print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
+# def creer_compte_voyageur():
+#     print("----- Création d'un compte voyageur -----")
+#     nom = input("Nom : ")
+#     prenom = input("Prénom : ")
+#     adresse = input("Adresse : ")
+#     telephone = input("Téléphone : ")
+#     paiement = input("Méthode de paiement (carte/cheque/monnaie) : ")
+#     occasionnel = input("Voyageur occasionnel ? oui/non (entrez autre chose que oui) : ")
+#     carte = None
+#     statut = None
+#     if occasionnel.lower() != "oui":
+#         carte = input("Numéro de carte : ")
+#         statut = input("Statut (bronze/silver/gold/platine) : ")
+#         try:
+#             carte = int(carte)
+#         except ValueError:
+#             print("\nERREUR : Veuillez entrer un entier pour le numéro de carte.")
+#             return
+#         if statut.lower() not in ["bronze", "silver", "gold", "platine"]:
+#             print("\nERREUR : Veuillez entrer 'bronze', 'silver', 'gold', ou 'platine' comme statut.")
+#             return
+#     # Conversion
+#     occasionnel = True if occasionnel.lower() == "oui" else False
+#     # Verification Donnees completes
+#     if not nom or not prenom or not adresse or not telephone or not paiement:
+#         print("\nERREUR : Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
+#         return
+#     if paiement.lower() not in ["carte", "cheque", "monnaie"]:
+#         print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
+#         return
+#     # Verification si le voyageur existe deja dans la base de données
+#     cur.execute(
+#         "SELECT COUNT(*) FROM Voyageur WHERE nom = %s AND prenom = %s AND adresse = %s",
+#         (nom, prenom, adresse)
+#     )
+#     count = cur.fetchone()[0]
+#     if count > 0:
+#         print("\nERREUR : Le voyageur existe déjà dans la base de données.")
+#         return
+#     # Insertion du compte voyageur dans la base de données
+#     try:
+#         cur.execute(
+#             "INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+#             (nom, prenom, adresse, telephone, paiement, carte, statut, occasionnel)
+#         )
+#         conn.commit()
+#         print("\nLe compte voyageur a été créé avec succès.")
+#     except psycopg2.Error as e:
+#         print("\nERREUR : Une erreur s'est produite lors de la création du compte voyageur :", e)
 
 
 # Création d'un billet #A changer
@@ -795,25 +795,25 @@ if check_bdd():
         except ValueError:
             choice = 0
         if choice == 1:
-            while choice in range(1, 8):
+            while choice in range(1, 7):
                 print("\nChoix de l'action :")
-                print("\n1 : créer un compte voyageur") #A changer, à supprimer
-                print("\n2 : acheter un billet") #A changer
-                print("\n3 : consulter la liste des voyages")
-                print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
-                print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
-                print("\n6 : annuler un billet")
-                print("\n7 : revenir en arrière dans le menu")
+                #print("\n1 : créer un compte voyageur")
+                print("\n1 : acheter un billet") #A changer
+                print("\n2 : consulter la liste des voyages")
+                print("\n3 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
+                print("\n4 : chercher un voyage aller simple en fonction de la date/gare donnée")
+                print("\n5 : annuler un billet")
+                print("\n6 : revenir en arrière dans le menu")
                 print("\nAutre numéro : sortie\n")
                 try:
                     choice = int(input("Votre choix : "))
                 except ValueError:
                     choice = 0
-                if choice == 1:
-                    print()
-                    creer_compte_voyageur()
-                    input()
-                if choice == 2: #A changer
+                #if choice == 1:
+                    #print()
+                    #creer_compte_voyageur()
+                    #input()
+                if choice == 1: #A changer
                     print("Achat d'un billet")
                     voyageur_nom = input("Entrez votre nom : ")
                     voyageur_prenom = input("Entrez votre prénom : ")
@@ -828,25 +828,25 @@ if check_bdd():
                         print("Prix de votre billet:", prix)
                         print("Numéro (id) du billet:", billet_id)
                     input()
-                if choice == 3:
+                if choice == 2:
                     print()
                     consulter_voyages_proposes()
                     input()
-                if choice == 4:
+                if choice == 3:
                     print()
                     ville_depart = input("Entrez la gare de ville de départ : ")
                     ville_arrivee = input("Entrez la gare de ville d'arrivée : ")
                     consulter_horaire_train(ville_depart, ville_arrivee)
                     input()
-                if choice == 5:
+                if choice == 4:
                     print()
                     consulter_voyage_aller_simple_date_gare()
                     input()
-                if choice == 6:
+                if choice == 5:
                     print()
                     annuler_billet()
                     input()
-                if choice == 7:
+                if choice == 6:
                     print()
                     choice = 1
                     break

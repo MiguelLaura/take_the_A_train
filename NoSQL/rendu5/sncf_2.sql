@@ -617,7 +617,7 @@ WHERE statut = 'bronze';*/
 
 SELECT voyageur->>'nom' AS voyageur_nom,
 voyageur->>'prenom' AS voyageur_prenom,
-voyageur->>'adresse' AS voyageur_adresse,
+voyageur->>'adresse' AS voyageur_adresse
 FROM Billet
 WHERE voyageur->>'statut' = 'bronze';
 

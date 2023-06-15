@@ -914,9 +914,21 @@ def argent_gagne():
     print("Argent gagné par la société : %s" % row[0])
 
 # Affiche la somme des prix des billets par voyageur (SELECT SUM) #A changer
+#def argent_par_voyageur():
+#    print("Somme des prix des billets par voyageur :")
+#    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
+#    cur.execute(sql)
+#    rows = cur.fetchall()
+#    for row in rows:
+#        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
+
 def argent_par_voyageur():
     print("Somme des prix des billets par voyageur :")
-    sql = "SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix FROM Billet GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"
+    sql = """SELECT voyageur->>'nom' AS voyageur_nom,
+    voyageur->>'prenom' AS voyageur_prenom,
+    voyageur->>'adresse' AS voyageur_adresse,
+    SUM(prix) AS somme_prix FROM Billet
+    GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;"""
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
@@ -933,9 +945,20 @@ def nb_voyages_par_jour():
         print("\tJour : %s\tNombre de voyages : %i"%(row))
 
 # Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE) #A changer
+#def voyageur_bronze():
+#    print("Voyageurs ayant le statut bronze :")
+#    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
+#    cur.execute(sql)
+#    rows = cur.fetchall()
+#    for row in rows:
+#        print("\tNom : %s\tPrénom : %s\tAdresse : %s"%(row))
+
 def voyageur_bronze():
     print("Voyageurs ayant le statut bronze :")
-    sql = "SELECT nom, prenom, adresse FROM Voyageur WHERE statut = 'bronze';"
+    sql = """SELECT DISTINCT voyageur->>'nom' AS voyageur_nom,
+    voyageur->>'prenom' AS voyageur_prenom,
+    voyageur->>'adresse' AS voyageur_adresse
+    FROM Billet WHERE voyageur->>'statut' = 'bronze';"""
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:

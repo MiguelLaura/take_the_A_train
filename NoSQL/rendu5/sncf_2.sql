@@ -386,9 +386,21 @@ INSERT INTO Gare VALUES ('Gare ferroviaire', 'Compiegne',
         "cp": "60200",
         "pays": "France"
     }',
-    '[{"nom":"B&B",adresse:"10 avenue Marcellin Berthelot"},
-    {"nom":"Ritz", adresse:"15 place Vendôme"}]',
-    '[{"num":1096,tel:"0654782945"}]',
+    '[
+        {
+            "nom":"B&B",
+            "adresse":"10 avenue Marcellin Berthelot"
+            },
+        {
+        "nom":"Ritz", "adresse":"15 place Vendôme"
+        }
+    ]',
+    '[
+        {
+            "num":1096,
+            "tel":"0654782945"
+        }
+    ]',
     NULL
 );
 
@@ -398,10 +410,27 @@ INSERT INTO Gare VALUES ('Gare du Nord', 'Paris',
         "rue": "rue de Dunkerque",
         "pays": "France"
     }',
-    '[{"nom":"Novotel",adresse:"10 avenue Saint-Marcellin"},
-    {"nom":"Ritz", adresse:"15 place Vendôme"}]',
-    '[{"num":666,tel:"0654781234"}]',
-    '[{"num":92}]'
+    '[
+        {
+            "nom":"Novotel",
+            "adresse":"10 avenue Saint-Marcellin"
+        },
+        {
+            "nom":"Ritz",
+            "adresse":"15 place Vendôme"
+        }
+    ]',
+    '[
+        {
+            "num":666,
+            "tel":"0654781234"
+        }
+    ]',
+    '[
+        {
+            "num":92
+        }
+    ]'
 );
 
 INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris',
@@ -410,9 +439,20 @@ INSERT INTO Gare VALUES ('Gare de Lyon', 'Paris',
         "pays": "France"
     }',
     NULL,
-    '[{"num":666,tel:"0654781234"}]',
-    '[{"num":92}
-    {"num":5}]'
+    '[
+        {
+            "num":666,
+            "tel":"0654781234"
+        }
+    ]',
+    '[
+        {
+            "num":92
+        },
+        {
+            "num":5
+        }
+    ]'
 );
 
 INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
@@ -421,9 +461,23 @@ INSERT INTO Gare VALUES ('Gare Montparnasse', 'Paris',
         "rue": "boulevard de Vaugirard",
         "pays": "France"
     }',
-    '[{"nom":"Marriott",adresse:"70 avenue des Champs-Elysees"}]',
-    '[{"num":2003, "tel":"0751762378"}]',
-    '[{"num":17}]'
+    '[
+        {
+            "nom":"Marriott",
+            "adresse":"70 avenue des Champs-Elysees"
+        }
+    ]',
+    '[
+        {
+            "num":2003,
+            "tel":"0751762378"
+        }
+        ]',
+    '[
+        {
+            "num":17
+        }
+    ]'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil',
@@ -431,10 +485,22 @@ INSERT INTO Gare VALUES ('Gare ferroviaire', 'Creil',
         "rue": "rue Despinas",
         "pays": "France"
     }',
-    '[{"nom":"Novotel",adresse:"10 avenue Saint-Marcellin"},
-    {"nom":"Marriott",adresse:"70 avenue des Champs-Elysees"}]',
+    '[
+        {
+            "nom":"Novotel",
+            "adresse":"10 avenue Saint-Marcellin"
+        },
+        {
+            "nom":"Marriott",
+            "adresse":"70 avenue des Champs-Elysees"
+        }
+    ]',
     NULL,
-    '[{"num":5}]'
+    '[
+        {
+            "num":5
+        }
+    ]'
 );
 
 INSERT INTO Gare VALUES ('Gare ferroviaire', 'Pont-Sainte-Maxence',

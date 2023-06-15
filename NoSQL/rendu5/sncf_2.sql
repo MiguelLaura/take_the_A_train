@@ -183,7 +183,7 @@ CREATE TABLE ArretTrajet (
     FOREIGN KEY (num_arret_voyage, voyage) REFERENCES ArretVoyage(num_arret, voyage)
 );
 
-CREATE TABLE Voyageur (
+/*CREATE TABLE Voyageur (
     nom VARCHAR(20),
     prenom VARCHAR(20),
     adresse VARCHAR(80),
@@ -195,16 +195,17 @@ CREATE TABLE Voyageur (
     PRIMARY KEY (nom, prenom, adresse),
     CHECK ((paiement = 'carte' OR paiement = 'cheque' OR paiement = 'monnaie') AND (statut = 'bronze' OR statut = 'silver' OR statut = 'gold' OR statut = 'platine')),
     CHECK ((occasionnel = FALSE AND carte IS NOT NULL AND statut IS NOT NULL) OR (occasionnel = true AND carte IS NULL AND statut IS NULL))
-);
+);*/
 
 CREATE TABLE Billet (
     id_billet INT PRIMARY KEY,
     assurance BOOLEAN NOT NULL,
     prix FLOAT NOT NULL,
-    voyageur_nom VARCHAR(20) NOT NULL,
-    voyageur_prenom VARCHAR(20) NOT NULL,
-    voyageur_adresse VARCHAR(80) NOT NULL,
-    FOREIGN KEY (voyageur_nom, voyageur_prenom, voyageur_adresse) REFERENCES Voyageur(nom, prenom, adresse)
+    --voyageur_nom VARCHAR(20) NOT NULL,
+    --voyageur_prenom VARCHAR(20) NOT NULL,
+    --voyageur_adresse VARCHAR(80) NOT NULL,
+    --FOREIGN KEY (voyageur_nom, voyageur_prenom, voyageur_adresse) REFERENCES Voyageur(nom, prenom, adresse)
+    voyageur JSON NOT NULL
 );
 
 CREATE TABLE CompositionBillet (
@@ -523,11 +524,35 @@ INSERT INTO ArretTrajet VALUES (2, 4, 234, FALSE);
 INSERT INTO ArretTrajet VALUES (3, 1, 27, TRUE);
 INSERT INTO ArretTrajet VALUES (3, 2, 27, FALSE);
 
-INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, occasionnel) VALUES ('Beauchamp', 'Elisabeth', '45 rue de la République', '0765438729', 'carte', TRUE);
-INSERT INTO Voyageur VALUES ('Smith', 'Henry', '288 avanue du Général de Gaulle', '0614263798', 'monnaie', 563, 'bronze', FALSE);
+--INSERT INTO Voyageur (nom, prenom, adresse, telephone, paiement, occasionnel) VALUES ('Beauchamp', 'Elisabeth', '45 rue de la République', '0765438729', 'carte', TRUE);
+--INSERT INTO Voyageur VALUES ('Smith', 'Henry', '288 avanue du Général de Gaulle', '0614263798', 'monnaie', 563, 'bronze', FALSE);
 
-INSERT INTO Billet VALUES (1, FALSE, 34.70, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
-INSERT INTO Billet VALUES (2, TRUE, 9.45, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
+--INSERT INTO Billet VALUES (1, FALSE, 34.70, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
+--INSERT INTO Billet VALUES (2, TRUE, 9.45, 'Smith', 'Henry', '288 avanue du Général de Gaulle');
+
+INSERT INTO Billet VALUES (1, FALSE, 34.70,
+    '{
+        "nom" : "Smith",
+        "prenom" : "Henry",
+        "adresse" : {"num" : 288, "rue" : "avenue du Général de Gaulle"},
+        "telephone" : "0614263798",
+        "paiement" : "monnaie",
+        "carte" : 563,
+        "statut" : "bronze",
+    }'
+);
+
+INSERT INTO Billet VALUES (2, TRUE, 9.45,
+    '{
+        "nom" : "Smith",
+        "prenom" : "Henry",
+        "adresse" : {"num" : 288, "rue" : "avenue du Général de Gaulle"},
+        "telephone" : "0614263798",
+        "paiement" : "monnaie",
+        "carte" : 563,
+        "statut" : "bronze",
+    }'
+);
 
 INSERT INTO CompositionBillet VALUES (1, 1);
 INSERT INTO CompositionBillet VALUES (1, 2);
@@ -554,7 +579,14 @@ SELECT SUM(prix) AS somme_prix
 FROM Billet;
 
 --Affiche la somme des prix des billets par voyageur (SELECT SUM)
-SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
+/*SELECT voyageur_nom, voyageur_prenom, voyageur_adresse, SUM(prix) AS somme_prix
+FROM Billet
+GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;*/
+
+SELECT voyageur->>'nom' AS voyageur_nom,
+voyageur->>'prenom' AS voyageur_prenom,
+voyageur->>'adresse' AS voyageur_adresse,
+SUM(prix) AS somme_prix
 FROM Billet
 GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
 
@@ -579,9 +611,15 @@ WHERE c.id_calendrier = v.calendrier GROUP BY j.jour_semaine;
 -- GROUP BY jour_semaine;
 
 --Affiche le nom/prenom/adresse des/du voyageur.s ayant le statut bronze (SELECT WHERE)
-SELECT nom, prenom, adresse
+/*SELECT nom, prenom, adresse
 FROM Voyageur
-WHERE statut = 'bronze';
+WHERE statut = 'bronze';*/
+
+SELECT voyageur->>'nom' AS voyageur_nom,
+voyageur->>'prenom' AS voyageur_prenom,
+voyageur->>'adresse' AS voyageur_adresse,
+FROM Billet
+WHERE voyageur->>'statut' = 'bronze';
 
 -- Récupère le taux de remplissage des trains (en %)
 SELECT id_voyage, date_, CAST((nb_billets * 100.0) / nb_places AS numeric(3,2)) AS taux_remplissage

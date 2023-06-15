@@ -857,7 +857,7 @@ if check_bdd():
                 print("\n2 : ajouter un train")
                 print("\n3 : supprimer un train")
                 print("\n4 : modifier le type d'un train")
-                print("\n5 : statistiques sur la société") #A changer
+                print("\n5 : statistiques sur la société")
                 print("\n6 : revenir en arrière")
                 print("\nAutre numéro : sortie")
                 try:

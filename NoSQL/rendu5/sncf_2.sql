@@ -538,7 +538,7 @@ INSERT INTO Billet VALUES (1, FALSE, 34.70,
         "telephone" : "0614263798",
         "paiement" : "monnaie",
         "carte" : 563,
-        "statut" : "bronze",
+        "statut" : "bronze"
     }'
 );
 
@@ -550,7 +550,7 @@ INSERT INTO Billet VALUES (2, TRUE, 9.45,
         "telephone" : "0614263798",
         "paiement" : "monnaie",
         "carte" : 563,
-        "statut" : "bronze",
+        "statut" : "bronze"
     }'
 );
 

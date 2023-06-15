@@ -35,21 +35,21 @@ def check_bdd():
 
     # VIEWS vérifier les contraintes sur les projections
 
-    sql = "SELECT * FROM v_DisposeHotel;"
+    sql = "SELECT * FROM v_DisposeHotel;" #A changer
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
         print("Erreur sur les données dans la base : l'hotel '%s' à l'adresse '%s' n'est relié à aucune gare." % row)
         status = False
 
-    sql = "SELECT * FROM v_DisposeTaxi;"
+    sql = "SELECT * FROM v_DisposeTaxi;" #A changer
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
         print("Erreur sur les données dans la base : le taxi '%d' n'est relié à aucune gare." % row)
         status = False
 
-    sql = "SELECT * FROM v_DisposeTransportPublic;"
+    sql = "SELECT * FROM v_DisposeTransportPublic;" #A changer
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:

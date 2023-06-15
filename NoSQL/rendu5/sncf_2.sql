@@ -615,7 +615,7 @@ WHERE c.id_calendrier = v.calendrier GROUP BY j.jour_semaine;
 FROM Voyageur
 WHERE statut = 'bronze';*/
 
-SELECT voyageur->>'nom' AS voyageur_nom,
+SELECT DISTINCT voyageur->>'nom' AS voyageur_nom,
 voyageur->>'prenom' AS voyageur_prenom,
 voyageur->>'adresse' AS voyageur_adresse
 FROM Billet

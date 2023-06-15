@@ -2,38 +2,19 @@ import psycopg2
 from datetime import date
 import time
 
-NUM_TO_FRENCH = {
-            0 : "lundi",
-            1 : "mardi",
-            2 : "mercredi",
-            3 : "jeudi",
-            4 : "vendredi",
-            5 : "samedi",
-            6 : "dimanche"
-        }
 
-'''database = input("A quelle base de données voulez-vous vous connecter ? ")
+database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
-password = input("Entrez votre mot de passe : ")'''
+password = input("Entrez votre mot de passe : ")
 
-# Connect to the PostgreSQL database server
-conn = psycopg2.connect(
-    host="localhost",
-    port =1114,
-    database="postgres",
-    user="postgres",
-    password="hu1999414"
-)
-
-'''
 # Connect to the PostgreSQL database server
 conn = psycopg2.connect(
     host=host,
     database=database,
     user=user,
     password=password
-)'''
+)
 
 
 cur = conn.cursor()
@@ -123,14 +104,12 @@ def check_bdd():
     #===========================================================================================================
     # CHECK
 
-    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, jours FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE);"
-    # sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE);"
+    sql = "SELECT id_trajet, trajet_date, id_calendrier, date_debut, date_fin, lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche FROM v_CheckDate WHERE (trajet_date >= date_debut AND trajet_date <= date_fin AND ajout <> FALSE);"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
         day = row[1].weekday()
-        if NUM_TO_FRENCH[day] not in row[5]:
-        # if not row[day + 5]:
+        if not row[day + 5]:
             print("Erreur sur les données dans la base : la date (%s) du trajet '%d' est en contradiction avec le calendrier '%d' (date sur un jour de la semaine non possible)." % (row[1], row[0], row[2]))
             status = False
 
@@ -272,26 +251,17 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
             return None, None
 
         cur.execute(
-            """SELECT c.date_debut, c.date_fin, c.jour, cc.date_exception, cc.ajout_exception
+            """SELECT c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
             FROM Voyage v
             JOIN Calendrier c ON v.calendrier = c.id_calendrier
             LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
             WHERE v.id_voyage = '%s'"""
             % (voyage)
         )
-        # cur.execute(
-        #     """SELECT c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
-        #     FROM Voyage v
-        #     JOIN Calendrier c ON v.calendrier = c.id_calendrier
-        #     LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
-        #     WHERE v.id_voyage = '%s'"""
-        #     % (voyage)
-        # )
         results = cur.fetchall()
         if results:
             for row in results:
-                if not (date_ >= row[0] and date_ <= row[1] and (NUM_TO_FRENCH[date_.weekday()] not in row[2]) and row[3] != date_) and not (row[3] == date_ and row[4] == True):
-                # if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 2] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
+                if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 5] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
                     print("\nERREUR : aucun voyage pour cette date.")
                     return None, None
 
@@ -418,7 +388,7 @@ def consulter_voyage_aller_simple_date_gare():
     ville_arrivee = input("Entrer la ville d'arrivee : ").title()
     # SQL pour rechercher trajet en fonction des données entrees par le user
     cur.execute(
-        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v1.num_arret_voyage AS arret_voyage_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, v2.num_arret_voyage AS arret_voyage_arrivee, c.date_debut, c.date_fin, c.jour, c.dimanche, cc.date_exception, cc.ajout_exception
+        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v1.num_arret_voyage AS arret_voyage_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, v2.num_arret_voyage AS arret_voyage_arrivee, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
         FROM v_VilleVoyage v1
         JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
         JOIN Voyage v ON v1.voyage = v.id_voyage
@@ -427,22 +397,11 @@ def consulter_voyage_aller_simple_date_gare():
         WHERE v1.num_arret_voyage < v2.num_arret_voyage AND v1.ville_gare = '%s' AND v2.ville_gare = '%s'"""
         % (ville_depart, ville_arrivee)
     )
-    # cur.execute(
-    #     """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v1.num_arret_voyage AS arret_voyage_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, v2.num_arret_voyage AS arret_voyage_arrivee, c.date_debut, c.date_fin, c.lundi, c.mardi, c.mercredi, c.jeudi, c.vendredi, c.samedi, c.dimanche, cc.date_exception, cc.ajout_exception
-    #     FROM v_VilleVoyage v1
-    #     JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
-    #     JOIN Voyage v ON v1.voyage = v.id_voyage
-    #     JOIN Calendrier c ON v.calendrier = c.id_calendrier
-    #     LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
-    #     WHERE v1.num_arret_voyage < v2.num_arret_voyage AND v1.ville_gare = '%s' AND v2.ville_gare = '%s'"""
-    #     % (ville_depart, ville_arrivee)
-    # )
     results = cur.fetchall()
     if results:
         to_print = True
         for row in results:
-            if (date_trajet >= row[10] and date_trajet <= row[11] and (NUM_TO_FRENCH[date_.weekday()] not in row[12]) and row[13] != date_trajet) or (row[13] == date_trajet and row[14] == True):
-            # if (date_trajet >= row[10] and date_trajet <= row[11] and row[date_trajet.weekday() + 12] and row[19] != date_trajet) or (row[19] == date_trajet and row[20] == True):
+            if (date_trajet >= row[10] and date_trajet <= row[11] and row[date_trajet.weekday() + 5] and row[19] != date_trajet) or (row[19] == date_trajet and row[20] == True):
                 if to_print:
                     print(f"Voyages le {date_trajet} de {ville_depart} à {ville_arrivee}:")
                     to_print = False
@@ -502,9 +461,10 @@ def ajouter_gare():
             print("\nVeuillez en saisir une autre.")
 
     adresse = input("Adresse : ")
+    pays = input("Pays : ")
 
     try:
-        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse)
+        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse,pays)
         cur.execute(sql)
         conn.commit()
         print("Gare ajoutée.")
@@ -760,8 +720,7 @@ def argent_par_voyageur():
 # Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
 def nb_voyages_par_jour():
     print("Nombre de voyages par jour de la semaine :")
-    sql = "SELECT j.jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier c, json_array_elements_text(c.jours) j(jour_semaine), Voyage v WHERE c.id_calendrier = v.calendrier GROUP BY j.jour_semaine;"
-    # sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
+    sql = "SELECT CASE WHEN lundi THEN 'Lundi' WHEN mardi THEN 'Mardi' WHEN mercredi THEN 'Mercredi' WHEN jeudi THEN 'Jeudi' WHEN vendredi THEN 'Vendredi' WHEN samedi THEN 'Samedi' WHEN dimanche THEN 'Dimanche' END AS jour_semaine, COUNT(*) AS nombre_voyages FROM Calendrier JOIN Voyage ON Calendrier.id_calendrier = Voyage.calendrier GROUP BY jour_semaine;"
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:

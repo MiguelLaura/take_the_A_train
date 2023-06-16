@@ -276,7 +276,7 @@ def achat_billet():
         num_arrive = int(input("Entrez le numéro de l'arrêt d'arrivée : "))
         date_ = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
         assurance = input("Voulez-vous souscrire à l'assurance (1 pour oui/0 pour non) :")
-        while assurance not in [0, 1]:
+        while assurance not in ["0", "1"]:
             assurance = input("Voulez-vous souscrire à l'assurance (1 pour oui/0 pour non) :")
 
         voyageur = creer_compte_voyageur()

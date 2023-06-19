@@ -2,6 +2,8 @@ import psycopg2
 from datetime import date
 import time
 import json
+from datetime import datetime
+
 
 NUM_TO_FRENCH = {
             0 : "lundi",
@@ -13,7 +15,7 @@ NUM_TO_FRENCH = {
             6 : "dimanche"
         }
 
-database = input("A quelle base de données voulez-vous vous connecter ? ")
+'''database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
 password = input("Entrez votre mot de passe : ")
@@ -27,7 +29,16 @@ conn = psycopg2.connect(
     user=user,
     password=password
 )
+'''
 
+
+conn = psycopg2.connect(
+    host="localhost",
+    port =1114,
+    database="postgres",
+    user="postgres",
+    password="hu1999414"
+)
 
 cur = conn.cursor()
 
@@ -161,6 +172,12 @@ def check_bdd():
 
 # Créer un voyageur
 def creer_compte_voyageur():
+    nom = ""
+    prenom = ""
+    adresse = ""
+    telephone = ""
+    paiement = ""
+
     nom = input("Nom : ")
     prenom = input("Prénom : ")
     adresse_pays = input("Adresse (pays) : ")
@@ -186,6 +203,9 @@ def creer_compte_voyageur():
     # Conversion
     occasionnel = True if occasionnel.lower() == "oui" else False
     # Verification Donnees completes
+    adresse = json.dumps({"pays": adresse_pays, "ville": adresse_ville, "rue": adresse_rue, "num": adresse_num})
+
+
     if not nom or not prenom or not adresse or not telephone or not paiement:
         print("\nERREUR : Veuillez fournir toutes les informations nécessaires pour créer le compte voyageur.")
         return
@@ -194,7 +214,6 @@ def creer_compte_voyageur():
         return 
     
     # transformation JSON
-    adresse = json.dump({"pays": adresse_pays, "ville": adresse_ville, "rue": adresse_rue, "num": adresse_num})
     if occasionnel:
         voyageur = {
             "nom" : nom,
@@ -284,7 +303,7 @@ def achat_billet():
             voyageur = creer_compte_voyageur()
 
         #Vérification si ligne existe
-        cur.execute("SELECT COUNT(*) FROM Voyage WHERE id_voyage = %s", voyage)
+        cur.execute("SELECT COUNT(*) FROM Voyage WHERE id_voyage = %s", (voyage,))
         line_exists = cur.fetchone()[0]
 
         if not line_exists:
@@ -314,7 +333,7 @@ def achat_billet():
             print("ERREUR : num_arrive n'existe pas.")
 
         cur.execute(
-            """SELECT c.date_debut, c.date_fin, c.jour, cc.date_exception, cc.ajout_exception
+            """SELECT c.date_debut, c.date_fin, c.jours, cc.date_exception, cc.ajout_exception
             FROM Voyage v
             JOIN Calendrier c ON v.calendrier = c.id_calendrier
             LEFT OUTER JOIN ConcerneCalendrier cc ON c.id_calendrier = cc.calendrier
@@ -324,7 +343,14 @@ def achat_billet():
         results = cur.fetchall()
         if results:
             for row in results:
-                if not (date_ >= row[0] and date_ <= row[1] and (NUM_TO_FRENCH[date_.weekday()] not in row[2]) and row[3] != date_) and not (row[3] == date_ and row[4] == True):
+                # date_ = datetime.strptime(date_, "%Y-%m-%d").date()
+                 if not (row[0] <= date_ <= row[1] and NUM_TO_FRENCH[date_.weekday()] in row[2] and row[3] != date_) and not (row[3] == date_ and row[4] == True):
+                    '''print("date_ ", date_)
+                    print("row: ", row)
+                    print("L'intervalle de dates：", row[0] <= date_ <= row[1])
+                    print("Semaine：", NUM_TO_FRENCH[date_.weekday()] not in row[2])
+                    print("date except：", row[3] != date_)
+                    print("autre：", row[3] == date_ and row[4] == True)'''
                     print("\nERREUR : aucun voyage pour cette date.")
 
         # Récupère le prix du billet
@@ -373,7 +399,7 @@ def achat_billet():
             billet_id = time_now
             cur.execute(
                 "INSERT INTO Billet (id_billet, assurance, prix, voyageur) "
-                "VALUES (%s, %s, %s, %s, %s, %s)",
+                "VALUES (%s, %s, %s, %s)",
                 (billet_id, assurance, prix, voyageur)
             )
         except psycopg2.Error as e:

@@ -261,7 +261,14 @@ def achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_ar
         results = cur.fetchall()
         if results:
             for row in results:
-                if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 5] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
+                # ----------Fix bug in rendu 4:----------
+                # if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 5] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
+                if not (date_ >= row[0] and date_ <= row[1] and row[date_.weekday() + 4] and row[9] != date_) and not (row[9] == date_ and row[10] == True):
+                    '''print("\ndate", date_)
+                    print("L'intervalle de dates：", row[0] <= date_ <= row[1])
+                    print("Semaine：", row[date_.weekday() + 4], date_.weekday() + 5)
+                    print("date except：", row[9] != date_)
+                    print("autre：", not (row[9] == date_ and row[10] == True))'''
                     print("\nERREUR : aucun voyage pour cette date.")
                     return None, None
 

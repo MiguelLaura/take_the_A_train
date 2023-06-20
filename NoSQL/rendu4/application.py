@@ -3,7 +3,7 @@ from datetime import date
 import time
 
 
-database = input("A quelle base de données voulez-vous vous connecter ? ")
+'''database = input("A quelle base de données voulez-vous vous connecter ? ")
 host = input("Quel est l'host ? ")
 user = input("Entrez votre nom d'utilisateur : ")
 password = input("Entrez votre mot de passe : ")
@@ -14,6 +14,15 @@ conn = psycopg2.connect(
     database=database,
     user=user,
     password=password
+)
+'''
+
+conn = psycopg2.connect(
+    host="localhost",
+    port =1114,
+    database="postgres",
+    user="postgres",
+    password="hu1999414"
 )
 
 
@@ -848,11 +857,13 @@ if check_bdd():
                     input()
                 if choice == 3:
                     print()
-                    modifier_train()
+                    # Debug: 3-supprimer et 4-modifier
+                    supprimer_train()
                     input()
                 if choice == 4:
                     print()
-                    supprimer_train()
+                     # Debug: 3-supprimer et 4-modifier
+                    modifier_train()
                     input()
                 if choice == 5:
                     print()

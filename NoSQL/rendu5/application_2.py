@@ -30,6 +30,7 @@ conn = psycopg2.connect(
     password=password
 )
 
+
 cur = conn.cursor()
 
 def check_bdd():
@@ -712,7 +713,7 @@ def ajouter_gare():
     adresse = json.dumps({"num": adresse_num, "rue": adresse_rue})
 
     try:
-        sql = "INSERT INTO Gare VALUES ('%s','%s','%s','%s');" % (nom,ville,adresse)
+        sql = "INSERT INTO Gare VALUES ('%s','%s','%s');" % (nom,ville,adresse)
         cur.execute(sql)
         conn.commit()
         print("Gare ajoutée.")
@@ -965,6 +966,7 @@ def argent_gagne():
 #    for row in rows:
 #        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
 
+# transformation JSON
 def argent_par_voyageur():
     print("Somme des prix des billets par voyageur :")
     sql = """SELECT voyageur->>'nom' AS voyageur_nom,
@@ -996,6 +998,7 @@ def nb_voyages_par_jour():
 #    for row in rows:
 #        print("\tNom : %s\tPrénom : %s\tAdresse : %s"%(row))
 
+# transformation JSON
 def voyageur_bronze():
     print("Voyageurs ayant le statut bronze :")
     sql = """SELECT DISTINCT voyageur->>'nom' AS voyageur_nom,

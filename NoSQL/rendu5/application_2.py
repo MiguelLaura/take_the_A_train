@@ -44,14 +44,14 @@ def check_bdd():
 #     for row in rows:
 #         print("Erreur sur les données dans la base : l'hotel '%s' à l'adresse '%s' n'est relié à aucune gare." % row)
 #         status = False
-# 
+#
 #     sql = "SELECT * FROM v_DisposeTaxi;"
 #     cur.execute(sql)
 #     rows = cur.fetchall()
 #     for row in rows:
 #         print("Erreur sur les données dans la base : le taxi '%d' n'est relié à aucune gare." % row)
 #         status = False
-# 
+#
 #     sql = "SELECT * FROM v_DisposeTransportPublic;"
 #     cur.execute(sql)
 #     rows = cur.fetchall()
@@ -202,8 +202,8 @@ def creer_compte_voyageur():
         return
     if paiement.lower() not in ["carte", "cheque", "monnaie"]:
         print("\nERREUR : Veuillez entrer 'carte', 'cheque', ou 'monnaie' comme moyen de paiement.")
-        return 
-    
+        return
+
     # transformation JSON
     if occasionnel:
         voyageur = {
@@ -409,6 +409,7 @@ def achat_billet():
         conn.commit()
 
         if prix and billet_id:
+            print()
             print("Billet acheté avec succès ! (création du trajet associé)")
             print("Prix de votre billet:", prix)
             print("Numéro (id) du billet:", billet_id)
@@ -614,7 +615,7 @@ def consulter_voyage_aller_simple_date_gare():
     ville_arrivee = input("Entrer la ville d'arrivee : ").title()
     # SQL pour rechercher trajet en fonction des données entrees par le user
     cur.execute(
-        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v1.num_arret_voyage AS arret_voyage_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, v2.num_arret_voyage AS arret_voyage_arrivee, c.date_debut, c.date_fin, c.jour, c.dimanche, cc.date_exception, cc.ajout_exception
+        """SELECT v1.voyage, v1.ligne, v1.heure_depart, v1.nom_gare AS gare_depart, v1.ville_gare AS ville_depart, v1.num_arret_voyage AS arret_voyage_depart, v2.heure_arrivee, v2.nom_gare AS gare_arrivee, v2.ville_gare AS ville_arrivee, v2.num_arret_voyage AS arret_voyage_arrivee, c.date_debut, c.date_fin, c.jours, cc.date_exception, cc.ajout_exception
         FROM v_VilleVoyage v1
         JOIN v_VilleVoyage v2 ON v1.voyage = v2.voyage
         JOIN Voyage v ON v1.voyage = v.id_voyage
@@ -637,7 +638,7 @@ def consulter_voyage_aller_simple_date_gare():
     if results:
         to_print = True
         for row in results:
-            if (date_trajet >= row[10] and date_trajet <= row[11] and (NUM_TO_FRENCH[date_trajet.weekday()] not in row[12]) and row[13] != date_trajet) or (row[13] == date_trajet and row[14] == True):
+            if (date_trajet >= row[10] and date_trajet <= row[11] and (NUM_TO_FRENCH[date_trajet.weekday()] in row[12]) and row[13] != date_trajet) or (row[13] == date_trajet and row[14] == True):
             # if (date_trajet >= row[10] and date_trajet <= row[11] and row[date_trajet.weekday() + 12] and row[19] != date_trajet) or (row[19] == date_trajet and row[20] == True):
                 if to_print:
                     print(f"Voyages le {date_trajet} de {ville_depart} à {ville_arrivee}:")
@@ -1042,7 +1043,7 @@ if check_bdd():
                 #print("\n1 : créer un compte voyageur")
                 print("\n1 : acheter un billet")
                 print("\n2 : consulter la liste des voyages")
-                print("\n3 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
+                print("\n3 : consulter les horaires de trains en fonction de la ville de départ et d'arrivée")
                 print("\n4 : chercher un voyage aller simple en fonction de la date/gare donnée")
                 print("\n5 : annuler un billet")
                 print("\n6 : revenir en arrière dans le menu")

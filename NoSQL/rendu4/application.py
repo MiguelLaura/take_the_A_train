@@ -773,7 +773,7 @@ if check_bdd():
                 print("\n1 : créer un compte voyageur")
                 print("\n2 : acheter un billet")
                 print("\n3 : consulter la liste des voyages")
-                print("\n4 : consulter les horaires de trains en fonction de la gare de départ et d'arrivée")
+                print("\n4 : consulter les horaires de trains en fonction de la ville de départ et d'arrivée")
                 print("\n5 : chercher un voyage aller simple en fonction de la date/gare donnée")
                 print("\n6 : annuler un billet")
                 print("\n7 : revenir en arrière dans le menu")
@@ -797,6 +797,7 @@ if check_bdd():
                     date_ = date.fromisoformat(input("Entrer la date (YYYY-MM-DD) : "))
                     prix, billet_id = achat_billet(voyageur_nom, voyageur_prenom, voyageur_adresse, voyage, num_arret_voyage, num_arrive, date_)
                     if prix and billet_id:
+                        print()
                         print("Billet acheté avec succès ! (création du trajet associé)")
                         print("Prix de votre billet:", prix)
                         print("Numéro (id) du billet:", billet_id)

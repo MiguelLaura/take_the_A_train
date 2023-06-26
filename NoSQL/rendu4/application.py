@@ -16,6 +16,7 @@ conn = psycopg2.connect(
     password=password
 )
 
+
 cur = conn.cursor()
 
 def check_bdd():
@@ -431,13 +432,13 @@ def annuler_billet():
             "WHERE billet = '%s';"%
             (id_billet)
         )
-        print("Le billet a été annulé avec succès.")
+        print("Le billet a été annulé dans CompositionBillet avec succès.")
         cur.execute(
             "DELETE FROM Billet "
             "WHERE id_billet = '%s';"%
             (id_billet)
         )
-        print("Le billet a été annulé avec succès.")
+        print("Le billet a été annulé dans Billet avec succès.")
         conn.commit()
     except e:
         print("Error: L'annulation du billet a échoué.", e)
@@ -712,7 +713,7 @@ def argent_gagne():
     sql = "SELECT SUM(prix) AS somme_prix FROM Billet;"
     cur.execute(sql)
     row = cur.fetchall()
-    print("Argent gagné par la société : %s" % row[0])
+    print("Argent gagné par la société : %.2f" % row[0])
 
 # Affiche la somme des prix des billets par voyageur (SELECT SUM)
 def argent_par_voyageur():
@@ -721,7 +722,7 @@ def argent_par_voyageur():
     cur.execute(sql)
     rows = cur.fetchall()
     for row in rows:
-        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé : %s"% row)
+        print("\tNom : %s\tPrénom : %s\tAdresse : %s\tArgent dépensé :  %.2f"% row)
 
 # Afficher le nombre de voyages par jour de la semaine (SELECT CASE)
 def nb_voyages_par_jour():

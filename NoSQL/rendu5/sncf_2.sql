@@ -683,7 +683,7 @@ GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;*/
 SELECT voyageur->>'nom' AS voyageur_nom,
 voyageur->>'prenom' AS voyageur_prenom,
 voyageur->>'adresse' AS voyageur_adresse,
-SUM(prix) AS somme_prix
+ROUND(SUM(prix)::numeric, 2) AS somme_prix
 FROM Billet
 GROUP BY voyageur_nom, voyageur_prenom, voyageur_adresse;
 
